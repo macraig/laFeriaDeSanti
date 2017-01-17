@@ -1,16 +1,15 @@
 fileFormatVersion: 2
-guid: 77dd62912983f1c4b8476d98c5052166
-timeCreated: 1483366918
+guid: 52242c50ca81d3b41a54c8bf0c938d84
+timeCreated: 1484656403
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: DMC-elementos-11_0
-    21300002: DMC-elementos-11_1
-    21300004: DMC-elementos-11_2
-    21300006: DMC-elementos-11_3
-    21300008: DMC-elementos-11_4
-    21300010: DMC-elementos-11_5
-    21300012: DMC-elementos-11_6
+    21300000: FDS-elementos-22_0
+    21300002: FDS-elementos-22_1
+    21300004: FDS-elementos-22_2
+    21300006: FDS-elementos-22_3
+    21300008: FDS-elementos-22_4
+    21300010: FDS-elementos-22_5
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -85,91 +84,78 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: DMC-elementos-11_0
+      name: FDS-elementos-22_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 411
-        height: 257
+        width: 490
+        height: 317
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: DMC-elementos-11_1
+      name: FDS-elementos-22_1
       rect:
         serializedVersion: 2
-        x: 411
+        x: 490
         y: 0
-        width: 411
-        height: 257
+        width: 490
+        height: 317
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: DMC-elementos-11_2
+      name: FDS-elementos-22_2
       rect:
         serializedVersion: 2
-        x: 822
+        x: 980
         y: 0
-        width: 411
-        height: 257
+        width: 490
+        height: 317
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: DMC-elementos-11_3
+      name: FDS-elementos-22_3
       rect:
         serializedVersion: 2
-        x: 1233
+        x: 1470
         y: 0
-        width: 411
-        height: 257
+        width: 490
+        height: 317
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: DMC-elementos-11_4
+      name: FDS-elementos-22_4
       rect:
         serializedVersion: 2
-        x: 1644
+        x: 1960
         y: 0
-        width: 411
-        height: 257
+        width: 490
+        height: 317
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: DMC-elementos-11_5
+      name: FDS-elementos-22_5
       rect:
         serializedVersion: 2
-        x: 2055
+        x: 2450
         y: 0
-        width: 411
-        height: 257
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: DMC-elementos-11_6
-      rect:
-        serializedVersion: 2
-        x: 2466
-        y: 0
-        width: 411
-        height: 257
+        width: 490
+        height: 317
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

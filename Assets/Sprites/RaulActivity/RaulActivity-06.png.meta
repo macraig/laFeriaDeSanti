@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: f10663bec7ee32f488ee24cf62e270e2
-timeCreated: 1483969987
+timeCreated: 1484662257
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -107,12 +107,12 @@ TextureImporter:
       name: RaulActivity-06_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 2
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -120,12 +120,12 @@ TextureImporter:
       name: RaulActivity-06_1
       rect:
         serializedVersion: 2
-        x: 229
+        x: 232
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -133,12 +133,12 @@ TextureImporter:
       name: RaulActivity-06_2
       rect:
         serializedVersion: 2
-        x: 458
+        x: 460
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -146,12 +146,12 @@ TextureImporter:
       name: RaulActivity-06_3
       rect:
         serializedVersion: 2
-        x: 687
+        x: 690
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -159,12 +159,12 @@ TextureImporter:
       name: RaulActivity-06_4
       rect:
         serializedVersion: 2
-        x: 916
+        x: 919
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -172,12 +172,12 @@ TextureImporter:
       name: RaulActivity-06_5
       rect:
         serializedVersion: 2
-        x: 1145
+        x: 1148
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -185,12 +185,12 @@ TextureImporter:
       name: RaulActivity-06_6
       rect:
         serializedVersion: 2
-        x: 1374
+        x: 1378
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -198,12 +198,12 @@ TextureImporter:
       name: RaulActivity-06_7
       rect:
         serializedVersion: 2
-        x: 1603
+        x: 1606
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -211,12 +211,12 @@ TextureImporter:
       name: RaulActivity-06_8
       rect:
         serializedVersion: 2
-        x: 1832
+        x: 1837
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -224,12 +224,12 @@ TextureImporter:
       name: RaulActivity-06_9
       rect:
         serializedVersion: 2
-        x: 2061
+        x: 2065
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -237,12 +237,12 @@ TextureImporter:
       name: RaulActivity-06_10
       rect:
         serializedVersion: 2
-        x: 2290
+        x: 2295
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -250,12 +250,12 @@ TextureImporter:
       name: RaulActivity-06_11
       rect:
         serializedVersion: 2
-        x: 2519
+        x: 2524
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -263,12 +263,12 @@ TextureImporter:
       name: RaulActivity-06_12
       rect:
         serializedVersion: 2
-        x: 2748
+        x: 2753
         y: 241
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -276,12 +276,12 @@ TextureImporter:
       name: RaulActivity-06_13
       rect:
         serializedVersion: 2
-        x: 0
+        x: 2
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -289,12 +289,12 @@ TextureImporter:
       name: RaulActivity-06_14
       rect:
         serializedVersion: 2
-        x: 229
+        x: 231
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -302,12 +302,12 @@ TextureImporter:
       name: RaulActivity-06_15
       rect:
         serializedVersion: 2
-        x: 458
+        x: 461
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -315,12 +315,12 @@ TextureImporter:
       name: RaulActivity-06_16
       rect:
         serializedVersion: 2
-        x: 687
+        x: 690
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -328,12 +328,12 @@ TextureImporter:
       name: RaulActivity-06_17
       rect:
         serializedVersion: 2
-        x: 916
+        x: 919
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -341,12 +341,12 @@ TextureImporter:
       name: RaulActivity-06_18
       rect:
         serializedVersion: 2
-        x: 1145
+        x: 1148
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -354,12 +354,12 @@ TextureImporter:
       name: RaulActivity-06_19
       rect:
         serializedVersion: 2
-        x: 1374
+        x: 1377
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -367,12 +367,12 @@ TextureImporter:
       name: RaulActivity-06_20
       rect:
         serializedVersion: 2
-        x: 1603
+        x: 1607
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -380,12 +380,12 @@ TextureImporter:
       name: RaulActivity-06_21
       rect:
         serializedVersion: 2
-        x: 1832
+        x: 1836
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -393,12 +393,12 @@ TextureImporter:
       name: RaulActivity-06_22
       rect:
         serializedVersion: 2
-        x: 2061
+        x: 2066
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -406,12 +406,12 @@ TextureImporter:
       name: RaulActivity-06_23
       rect:
         serializedVersion: 2
-        x: 2290
+        x: 2295
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -419,12 +419,12 @@ TextureImporter:
       name: RaulActivity-06_24
       rect:
         serializedVersion: 2
-        x: 2519
+        x: 2524
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -432,12 +432,12 @@ TextureImporter:
       name: RaulActivity-06_25
       rect:
         serializedVersion: 2
-        x: 2748
+        x: 2754
         y: 0
-        width: 229.61539
+        width: 230
         height: 241
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
