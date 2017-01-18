@@ -62,7 +62,7 @@ namespace Assets.Scripts.LevelCompleted
                 stars[i].gameObject.SetActive(i < gameMetrics.GetStars());
             }
             score.text = "" + gameMetrics.GetScore();
-            scorePercentage = (int)(((gameMetrics.GetScore() + 0f) / (MetricsController.GetController().GetMaxScore() + 0f)) * 100);
+//            scorePercentage = (int)(((gameMetrics.GetScore() + 0f) / (MetricsController.GetController().GetMaxScore() + 0f)) * 100);
             correct.text = "" + gameMetrics.GetRightAnswers();
             incorrect.text = "" + gameMetrics.GetWrongAnswers();
             Invoke("IncrementProgressBar", 0.1f);

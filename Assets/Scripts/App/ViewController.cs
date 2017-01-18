@@ -5,6 +5,7 @@ using Assets.Scripts.Settings;
 using Assets.Scripts.Sound;
 using Assets.Scripts.Games;
 using Assets.Scripts.Metrics;
+using Assets.Scripts.App;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.App
@@ -94,7 +95,9 @@ namespace Assets.Scripts.App
 
         internal void RestartCurrentGame()
         {
-            currentGameObject.GetComponent<LevelController>().RestartGame();
+			ChangeCurrentObject(LoadPrefab("Games/" + AppController.GetController().GetCurrentGame().GetPrefabName()));
+//            currentGameObject.GetComponent<LevelController>().RestartGame();
+
         }
 
         internal void LoadSettings()
@@ -107,34 +110,10 @@ namespace Assets.Scripts.App
 			ChangeCurrentObject(LoadPrefab("NameScreen"));
         }    
 
-        internal void StartGame(int level)
+		internal void StartGame(Game game)
         {
-			string game = "";
-			switch (level) {
-			case 1:
-				game = "BedroomActivity";
-				break;
-			case 2:
-				game = "HouseActivity";
-				break;
-			case 3:
-				game = "ClassroomActivity";
-				break;
-			case 4:
-				game = "SchoolActivity";
-				break;
-			case 5:
-				game = "TreasureActivity";
-				break;
-			case 6:
-				game = "NeighbourhoodActivity";
-				break;
-			case 7:
-				game = "PatternsActivity";
-				break;
-			}
 
-			ChangeCurrentObject(LoadPrefab("Games/" + game));
+			ChangeCurrentObject(LoadPrefab("Games/" + game.GetPrefabName()));
 //            SetCanvasScalerToCurrentGame();
         }
 
@@ -153,10 +132,10 @@ namespace Assets.Scripts.App
             Destroy(instructionsScreen);
         }
 
-        internal void LoadLevelCompleted()
-        {
-            ChangeCurrentObject(LoadPrefab("LevelCompleted"));
-        }
+//        internal void LoadLevelCompleted()
+//        {
+//            ChangeCurrentObject(LoadPrefab("LevelCompleted"));
+//        }
 
 
         public static ViewController GetController()

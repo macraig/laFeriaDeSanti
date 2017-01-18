@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Assets.Scripts.Sound;
-using Assets.Scripts.Metrics;
+using Assets.Scripts.Metrics.Model;
 using System;
 using I18N;
 

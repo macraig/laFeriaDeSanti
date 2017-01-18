@@ -1,72 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts.Metrics.Model;
+using SimpleJSON;
 using UnityEngine;
 
 namespace Assets.Scripts.App
 {
-    internal class AppModel
+    public class AppModel
     {
         private int currentArea;
-        private int currentGame;
+        private Game currentGame;
         private int currentLevel;
 
-        //  private List<List<List<string>>> gameNames;
-        //  private List<List<List<string>>> descriptions;
-        //   private List<List<int>> levelsByGame;
+		private List<Game> games; 
+		private Sprite[] icons;
 
         public AppModel()
         {
+			loadGames ();
 
         }
 
-        //public AppModel(List<int> gamesQuantity, List<List<List<List<string>>>> gamesInfo, List<List<int>> gamesLevels)
-        //{
-        //    InitDescriptions(gamesQuantity, gamesInfo, gamesLevels);
-        //    currentArea = -1;
-        //    currentGame = -1;
-        //    currentLevel = -1;
-        //}
+		void loadGames ()
+		{
 
-        //private void InitDescriptions(List<int> gamesQuantity, List<List<List<List<string>>>> gamesInfo, List<List<int>> gamesLevels)
-        //{
-        //    descriptions = new List<List<List<string>>>(gamesInfo.Count);
-        //    gameNames = new List<List<List<string>>>(gamesInfo.Count);
-        //    levelsByGame = new List<List<int>>(gamesInfo.Count);
-        //    for (int area = 0; area < gamesInfo.Count; area++)
-        //    {
-        //        descriptions.Add(new List<List<string>>(gamesInfo[area].Count));
-        //        gameNames.Add(new List<List<string>>(gamesInfo[area].Count));
-        //        levelsByGame.Add(new List<int>(gamesInfo[area].Count));
-        //        for (int game = 0; game < gamesInfo[area].Count; game++)
-        //        {
-        //            descriptions[area].Add(new List<string>(2));
-        //            descriptions[area][game].Add(gamesInfo[area][game][1][0]);
-        //            descriptions[area][game].Add(gamesInfo[area][game][1][1]);
+			JSONArray gamesObj = JSON.Parse(Resources.Load<TextAsset>("Jsons/games").text).AsObject["games"].AsArray;
+			icons = Resources.LoadAll<Sprite>("Sprites/icons");
 
-        //            gameNames[area].Add(new List<string>(2));
-        //            gameNames[area][game].Add(gamesInfo[area][game][0][0]);
-        //            gameNames[area][game].Add(gamesInfo[area][game][0][1]);
+			games = new List<Game>();
+			foreach(JSONClass game in gamesObj) {
+				Game newGame = new Game ();
+				newGame.SetId (int.Parse(game["id"].Value));
+				newGame.SetName (game ["name"].Value);
+				newGame.SetPrefabName (game ["prefabName"].Value);
+				newGame.SetDescription( game ["description"].Value);
+				newGame.SetIcon (icons[int.Parse(game ["icon"].Value)]);
+				games.Add (newGame);
+			}
 
-        //            levelsByGame[area].Add(gamesLevels[area][game]);
-        //        }
-        //    }
-        //}
+			AppController.GetController ().GetMetricsController ().SetMetricsModel (new MetricsModel(games));
+		}
 
-        //internal List<List<int>> GetLevelsOfGames()
-        //{
-        //    return levelsByGame;
-        //}
+		public Game GetGameById (int id)
+		{
+			for (int i = 0; i < games.Count; i++) {
+				if (games [i].GetId () == id)
+					return games [i];
+			
+			}
+			Debug.Log ("NO GAME FOUND in AppModel.GetGameById");
+			return null;
 
-        internal int GetCurrentGame(){
+
+		}			 
+
+        public Game GetCurrentGame(){
             return currentGame;
         }
 
-        //internal int GetLevelsOfCurrentGame()
-        //{
-        //    return levelsByGame[currentArea][currentGame];
-        //}
+		public List<Game> GetGames(){
+			return games;
+		}
 
-        internal void SetCurrentGame(int currentGame){
+        internal void SetCurrentGame(Game currentGame){
             this.currentGame = currentGame;
         }
 
@@ -90,9 +86,6 @@ namespace Assets.Scripts.App
             this.currentArea = area;
         }
 
-        //internal List<List<List<string>>> GetGameNames()
-        //{
-        //    return gameNames;
-        //}
+       
     }
 }

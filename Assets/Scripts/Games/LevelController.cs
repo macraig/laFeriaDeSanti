@@ -28,7 +28,7 @@ namespace Assets.Scripts.Games
         // This method have to restart the game. This includes model, view and metrics.
         // You must call MetricsController.GetController().GameStart(); in this method.
         public abstract void RestartGame();
-        public abstract void ResolveExercise();
+      
         
         /*
             You must call this method when the user realized an answer
@@ -48,16 +48,12 @@ namespace Assets.Scripts.Games
    You must call this method at the end of the game
    params minSeconds, pointsPerSecond and pointsPerError are defined in LevelModel
     */
-        public void EndGame(int minSeconds, int pointsPerSecond, int pointsPerError){
-            MetricsController.GetController().GameFinished(minSeconds, pointsPerSecond, pointsPerError);
-            ViewController.GetController().LoadLevelCompleted();
-        }
+//        public void EndGame(int minSeconds, int pointsPerSecond, int pointsPerError){
+//            MetricsController.GetController().GameFinished(minSeconds, pointsPerSecond, pointsPerError);
+//            ViewController.GetController().LoadLevelCompleted();
+//        }
 
-        public void EndGame(MetricsTable metricsTable)
-        {
-            MetricsController.GetController().GameFinished(metricsTable);
-            ViewController.GetController().LoadLevelCompleted();
-        }
+       
 
        
         /*

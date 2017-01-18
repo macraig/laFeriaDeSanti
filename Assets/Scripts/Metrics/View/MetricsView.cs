@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Assets.Scripts.Settings;
 using Assets.Scripts.App;
+using Assets.Scripts.Metrics.Model;
 
 namespace Assets.Scripts.Metrics.View
 {
@@ -14,7 +15,7 @@ namespace Assets.Scripts.Metrics.View
         private static MetricsView metricsView;
 
         public DetailsView details;
-        public ResultsView results;
+//        public ResultsView results;
         [SerializeField]
         private List<Sprite> areaIcons;
 
@@ -26,36 +27,37 @@ namespace Assets.Scripts.Metrics.View
 
         void Start()
         {
-            ShowResults();
+			//UNCOMMENT
+//            ShowResults();
             HideDetails();
         }
-
-        void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                if (details.isActiveAndEnabled) details.OnClickCrossBtn();            
-                else results.OnClickCrossBtn();                          
-            }
-        }
+		//UNCOMMENT
+//        void Update()
+//        {
+//            if (Input.GetKeyDown(KeyCode.Escape))
+//            {
+//                if (details.isActiveAndEnabled) details.OnClickCrossBtn();            
+//                else results.OnClickCrossBtn();                          
+//            }
+//        }
 
         private void HideDetails()
         {
             details.gameObject.SetActive(false);
         }               
 
-        internal void ShowDetailsOf(int area, int idGame, int level)
+		internal void ShowDetailsOf(int idGame)
         {
             details.gameObject.SetActive(true);
-            //details.ShowDetailsOf(AppController.GetController().GetActivityName(area, idGame),SettingsController.GetController().GetUsername(), MetricsController.GetController().GetMetricsByLevel(area, idGame, level));
             Debug.Log("id: " + idGame);
-            details.ShowDetailsOf(AppController.GetController().GetGameName(idGame),SettingsController.GetController().GetUsername(), MetricsController.GetController().GetMetricsByLevel(idGame, level));
+			details.ShowDetailsOf(AppController.GetController().GetGameName(idGame),SettingsController.GetController().GetUsername(), MetricsController.GetController().GetGameMetrics(idGame));
         }
 
-        internal void ShowResults()
-        {
-            results.gameObject.SetActive(true);
-        }
+		//UNCOMMENT
+//        internal void ShowResults()
+//        {
+//            results.gameObject.SetActive(true);
+//        }
 
         public static MetricsView GetMetricsView()
         {

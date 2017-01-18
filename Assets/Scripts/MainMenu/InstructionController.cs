@@ -110,30 +110,30 @@ namespace Assets.Scripts.MainMenu
 
         public void Play(Game game)
         {
-            string[] textStrings = SettingsController.GetController().GetLanguage() == 0
-                    ? game.SpanishInstructionStrings
-                    : game.EnglishInstructionStrings;
-            List<Text> texts = new List<Text>();
-            for (int i = 0; i < Animators.Count; i++)
-            {
-                Instruction instruction = Animators[i].gameObject.GetComponent<Instruction>();
-                texts.AddRange(instruction.Texts);
-                instruction.gameObject.SetActive(instruction.VisibleAtStart);
-                Animators[i].SetBool("play", false);
-            }
-
-            if(texts.Count != textStrings.Length) throw new Exception("Diferente cantidad");
-             
-            for (int i = textStrings.Length - 1; i >= 0; i--)
-            {
-                texts[i].text = textStrings[i];
-            }
-
-
-
-
-            _currentAnimation = -1;
-            NextAnimation();
+//            string[] textStrings = SettingsController.GetController().GetLanguage() == 0
+//                    ? game.SpanishInstructionStrings
+//                    : game.EnglishInstructionStrings;
+//            List<Text> texts = new List<Text>();
+//            for (int i = 0; i < Animators.Count; i++)
+//            {
+//                Instruction instruction = Animators[i].gameObject.GetComponent<Instruction>();
+//                texts.AddRange(instruction.Texts);
+//                instruction.gameObject.SetActive(instruction.VisibleAtStart);
+//                Animators[i].SetBool("play", false);
+//            }
+//
+//            if(texts.Count != textStrings.Length) throw new Exception("Diferente cantidad");
+//             
+//            for (int i = textStrings.Length - 1; i >= 0; i--)
+//            {
+//                texts[i].text = textStrings[i];
+//            }
+//
+//
+//
+//
+//            _currentAnimation = -1;
+//            NextAnimation();
         }
     }
 }

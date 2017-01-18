@@ -26,8 +26,8 @@ namespace Assets.Scripts.Metrics.View
         [SerializeField]
         private Button viewDetailsButton;
         private int area;
-        private int idGame;
-        private int level;
+        private int gameId;
+        private int index;
 
 
         void Start()
@@ -76,7 +76,7 @@ namespace Assets.Scripts.Metrics.View
         public void OnClickViewDetails()
         {
             SoundController.GetController().PlayClickSound();
-            MetricsView.GetMetricsView().ShowDetailsOf(area, idGame, level);
+            MetricsView.GetMetricsView().ShowDetailsOf(gameId);
         }
 
         internal void SetArea(int area)
@@ -86,22 +86,13 @@ namespace Assets.Scripts.Metrics.View
 
         internal void SetIndex(int index)
         {
-            this.idGame = index;
+			this.index = index;
         }
 
-        internal void SetLevel(int level)
-        {
-            this.level = level;
-            for (int i = 0; i < levels.Count; i++)
-            {
-                levels[i].gameObject.SetActive(i <= level);
-            }
-        }
-
-        internal int GetArea()
-        {
-            return area;
-        }
+		internal void SetGameId(int gameId)
+		{
+			this.gameId = gameId;
+		}
 
         internal void SetIcon(Sprite sprite)
         {

@@ -14,6 +14,7 @@ namespace Assets.Scripts.MainMenu
 //        public Text gameName;
         private Game data;
 
+		/*IMORTANT: id MUST MATCH GAME ID IN games JSON*/
 		public void OnClickGame(int id)
         {
             ClickSound();

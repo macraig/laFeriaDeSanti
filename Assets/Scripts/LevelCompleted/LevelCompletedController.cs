@@ -17,7 +17,7 @@ namespace Assets.Scripts.LevelCompleted
 
         internal void RetryLvl()
         {
-            AppController.GetController().PlayCurrentGame(AppController.GetController().GetCurrentLevel());
+            AppController.GetController().PlayCurrentGame();
         }
 
         internal void MainMenu()

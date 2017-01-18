@@ -6,62 +6,16 @@ using System.Collections.Generic;
 
 namespace Assets.Scripts.App
 {
-    public class Game : MonoBehaviour
+	[System.Serializable]
+    public class Game 
     {
-        [SerializeField]
-        private int id;
-        [SerializeField]
-        private Sprite icon;
-        [SerializeField]
-        private string[] name;
-        [SerializeField]
-        private string[] titles;
-        [SerializeField]
-        private string[] description;
-        public string[] SpanishInstructionStrings;
-        public string[] EnglishInstructionStrings;
-        [SerializeField]
-        private int levels;
-        [SerializeField]
-        private int area;
-        [SerializeField] private string prefabName;
-        [SerializeField] private List<int> _exercisesBySubLevel;
+       
+		public int id;
+		public Sprite icon;    
+		public string name;
+		public string description; 
+		public string prefabName;
 
-        public GameObject[] InstructionsSequence;
-
-
-        private Game instance;
-
-
-        public Sprite GetIcon()
-        {
-            return icon;
-        }
-
-        public string[] GetNames()
-        {
-            return name;
-        }
-
-        public string[] GetTitles()
-        {
-            return titles;
-        }
-
-        public string[] GetDescriptions()
-        {
-            return description;
-        }
-
-        public int GetLevels()
-        {
-            return levels;
-        }
-
-        public int GetArea()
-        {
-            return area;
-        }    
 
         public int GetId()
         {
@@ -73,9 +27,46 @@ namespace Assets.Scripts.App
             return prefabName;
         }
 
-        public List<int> GetExercisesBySubLevel()
-        {
-            return _exercisesBySubLevel;
-        }
+		public void SetIcon(Sprite icon)
+		{
+			this.icon = icon;
+		}
+
+		public Sprite GetIcon()
+		{
+			return icon;
+		}
+
+		public string GetName()
+		{
+			return name;
+		}
+
+		public void SetName(string name)
+		{
+			 this.name=name;
+		}
+
+		public string GetDescription()
+		{
+			return description;
+		}
+
+		public void SetDescription(string description)
+		{
+			this.description = description;
+		}
+
+		public void SetId(int id)
+		{
+			this.id = id;
+		}
+
+		public void SetPrefabName(String prefabName)
+		{
+			this.prefabName = prefabName;
+		}
+
+   
     }
 }

@@ -7,14 +7,14 @@ using Assets.Scripts.App;
 using Assets.Scripts.Metrics.Model;
 using Assets.Scripts.Games;
 
-namespace Assets.Scripts.Metrics
+namespace Assets.Scripts.Metrics.Model
 {
     public class MetricsController : MonoBehaviour
     {
         private static MetricsController metricsController;
         public MetricsModel metricsModel;
         // this list is to register the answers of the currentSublevel. It's is restarted
-        // when a sublevel change 
+        // when a sublevel changes 
         private List<List<bool>> actualBuffer;
 
         void Awake()
@@ -26,18 +26,33 @@ namespace Assets.Scripts.Metrics
 
         void Start()
         {
-            metricsModel = new MetricsModel(AppController.GetController().GetGames());
+			
             // list to first exercise is added
             actualBuffer = new List<List<bool>> {new List<bool>()};
         }
 
-        internal GameMetrics GetLastMetricOf(int game, int level)
+		public void SetMetricsModel(MetricsModel metricsModel){
+			this.metricsModel = metricsModel;
+		}
+
+		internal GameMetrics GetLastMetricOf(Game game)
         {
-            List<List<GameMetrics>> metrics = metricsModel.SearchMetricsByGame(game);
-            return metrics[level][metrics[level].Count - 1];
+			List<GameMetrics> currentMetrics = metricsModel.SearchMetricsByGame(game.GetId());
+			return currentMetrics[currentMetrics.Count-1];
         }
 
-        internal List<MetricsGroup> GetMetrics()
+		public List<GameMetrics> GetGameMetrics (int idGame)
+		{
+			return metricsModel.SearchMetricsByGame (idGame);
+		}
+
+		internal GameMetrics GetMetricByIndex(int gameId, int metricIndex)
+		{
+			List<GameMetrics> currentMetrics = metricsModel.SearchMetricsByGame(gameId);
+			return currentMetrics[metricIndex];
+		}
+
+		internal List<List<GameMetrics>> GetMetrics()
         {
             return metricsModel.GetMetrics();
         }
@@ -47,11 +62,8 @@ namespace Assets.Scripts.Metrics
             return metricsModel.GetCurrentMetrics();
         }
 
-        internal List<GameMetrics> GetMetricsByLevel(int game, int level)
-        {
-            return metricsModel.SearchMetricsByGame(game)[level];
-        }
-        
+
+
         public void GameStart()
         {
             metricsModel.GameStarted();
@@ -72,23 +84,13 @@ namespace Assets.Scripts.Metrics
             saveToDisk();
         }
 
-        public void GameFinished(MetricsTable metricsTable)
+        
+
+        internal GameMetrics GetBestMetric(int game)
         {
-            Timer.GetTimer().FinishTimer();
-            //metricsModel.GameFinished(Timer.GetTimer().GetLapsedSeconds(), minSeconds, pointsPerSecond, pointsPerError);
-            metricsModel.GameFinished(Timer.GetTimer().GetLapsedSeconds(), metricsTable);
-            saveToDisk();
+            return metricsModel.GetBestMetric(game);
         }
 
-        internal GameMetrics GetBestMetric(int area, int game, int level)
-        {
-            return metricsModel.GetBestMetric(game, level);
-        }
-
-        internal float GetMaxScore()
-        {
-            return metricsModel.GetMaxScore();
-        }
 
         private void saveToDisk()
         {
@@ -107,10 +109,12 @@ namespace Assets.Scripts.Metrics
                 metricsModel = (MetricsModel)bf.Deserialize(file);
                 file.Close();
 
-                metricsModel.UpdateGames(AppController.GetController().GetGames());
-            } else
-            {
-                metricsModel = new MetricsModel(AppController.GetController().GetGames());
+				/*Could be implemented to wipe data from deprecated games*/
+//                metricsModel.UpdateGames(AppController.GetController().GetGames());
+//            } else
+//            {
+//                metricsModel = new MetricsModel(AppController.GetController().GetGames());
+//				AppController.GetController ().GetMetricsController ().SetMetricsModel (metricsModel);
             }
         }
 
@@ -123,12 +127,7 @@ namespace Assets.Scripts.Metrics
         {
             GetCurrentMetrics().AddRightAnswer();
             actualBuffer[actualBuffer.Count - 1].Add(true);
-
-            // the first answer is the most important
-            if (actualBuffer[actualBuffer.Count - 1].Count == 1)
-            {
-                GetCurrentMetrics().CheckIfPassedToNextSubLevel(actualBuffer);
-            }           
+			           
             // always the next list is initialized
             actualBuffer.Add(new List<bool>());
         }
@@ -138,14 +137,8 @@ namespace Assets.Scripts.Metrics
             GetCurrentMetrics().AddWrongAnswer();
             actualBuffer[actualBuffer.Count - 1].Add(false);
 
-            // the first answer is the most important
-            if (actualBuffer[actualBuffer.Count - 1].Count == 1)
-            {
-                GetCurrentMetrics().CheckIfDownSubLevel(actualBuffer);
-            }
-
-  
-
+         
+        
         }
 
 //        private bool CheckSurrenderPossibility()
@@ -154,10 +147,7 @@ namespace Assets.Scripts.Metrics
 //
 //        }
 
-        public int GetCurrentSubLevel()
-        {
-            return GetCurrentMetrics().GetCurrentSubLevel();
-        }
+       
 
         public void OnSurrender()
         {

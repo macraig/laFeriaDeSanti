@@ -39,10 +39,7 @@ namespace Assets.Scripts.MainMenu
             menuView.gameObject.SetActive(true);
         }
 
-        internal void PlayCurrentGame(int level)
-        {
-            AppController.GetController().PlayCurrentGame(level);
-        }
+        
       
 		internal void GoBack() {
 			ViewController.GetController().LoadLogin();
@@ -50,14 +47,14 @@ namespace Assets.Scripts.MainMenu
 
         internal void ShowPreviewGame(int id)
         {
-            //AppController.GetController().SetCurrentGame(0); // todo
-            // AppController.GetController().SetCurrentArea(game.GetArea());
+            
             ViewController.GetController().SetCanvasScaler(1f);
-            AppController.GetController().SetCurrentGame(id);
-//            gamePreview.SetGameDescription(game.GetDescriptions()[SettingsController.GetController().GetLanguage()]);
-//            gamePreview.SetPossibleLevels(game.GetLevels());
-           // gamePreview.SetImages(game.GetIcon(), areaColors[game.GetArea()]);
-
+			Game game = AppController.GetController ().GetAppModel ().GetGameById (id);
+			AppController.GetController().SetCurrentGame(game);
+			gamePreview.SetGameDescription(game.GetDescription());
+            gamePreview.SetIcon(game.GetIcon());
+			gamePreview.SetTitle(game.GetName());
+			gamePreview.SetGameNumber(game.GetId().ToString());
             gamePreview.gameObject.SetActive(true);
 //            menuView.gameObject.SetActive(false);
 
@@ -76,32 +73,7 @@ namespace Assets.Scripts.MainMenu
             ViewController.GetController().LoadSettings();
         }
 
-        internal void ShowMetrics()
-        {
-            ViewController.GetController().LoadMetrics();
-        }
 
-      
-
-        internal List<Game> Search(List<int> areas, string text)
-        {
-
-            List<Game> gamesToShow = new List<Game>();
-            string searchText = text.ToLower();
-            foreach (Game game in AppController.GetController().GetGames())
-            {
-                string gameName = game.GetNames()[SettingsController.GetController().GetLanguage()].ToLower();
-                string gameNameSimplified = gameName.Replace('á', 'a').Replace('é', 'e').Replace('í', 'i').Replace('ó', 'o').Replace('ú', 'u').ToLower();
-                if (areas.Contains(game.GetArea()) && (gameName.Contains(searchText) || gameNameSimplified.Contains(searchText)))
-                {
-                    gamesToShow.Add(game);
-                }
-            }
-           
-
-            return gamesToShow;
-            
-        }
 
        
     }

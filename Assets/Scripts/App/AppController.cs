@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Assets.Scripts.Sound;
+using Assets.Scripts.Metrics.Model;
 using Assets.Scripts.Metrics;
 using Assets.Scripts.Settings;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace Assets.Scripts.App
     {
         private static AppController appController;
         private AppModel appModel;
+		[SerializeField]
+		private MetricsController metricsController;
         [SerializeField]
         private List<Game> games;
 
@@ -19,13 +22,22 @@ namespace Assets.Scripts.App
             else if (appController != this) Destroy(gameObject);     
             DontDestroyOnLoad(gameObject);
             appModel = new AppModel();
-            //InitModelFromJsonInfo();
+            
         }
 
-        internal GameMetrics GetCurrentMetrics()
+		public GameMetrics GetCurrentMetrics()
         {
-            return MetricsController.GetController().GetLastMetricOf(appModel.GetCurrentGame(), appModel.GetCurrentLevel());
+            return MetricsController.GetController().GetLastMetricOf(appModel.GetCurrentGame());
         }
+
+		public Game GetGameById (int idGame)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public MetricsController GetMetricsController(){
+			return metricsController;
+		}
 
         //private void InitModelFromJsonInfo()
         //{
@@ -69,7 +81,7 @@ namespace Assets.Scripts.App
         {
             for (int i = 0; i < games.Count; i++)
             {
-                if (games[i].GetId() == idGame) return games[i].GetNames()[SettingsController.GetController().GetLanguage()];
+				if (games[i].GetId() == idGame) return games[i].GetName();
 
             }
             return "Error";
@@ -77,14 +89,14 @@ namespace Assets.Scripts.App
 
       
 
-        internal void PlayCurrentGame(int level)
+        internal void PlayCurrentGame()
         {
 //            SoundController.GetController().StopMusic();
-            appModel.SetCurrentLevel(level);
-			Debug.Log (level);
-			Debug.Log (GetCurrentLevel());
+//            appModel.SetCurrentLevel(level);
+//			Debug.Log (level);
+//			Debug.Log (GetCurrentLevel());
             // ViewController.GetController().StartGame(appModel.GetCurrentArea(), appModel.GetCurrentGame());
-			ViewController.GetController().StartGame(GetCurrentLevel());
+			ViewController.GetController().StartGame(GetCurrentGame());
       
         }
 
@@ -103,7 +115,7 @@ namespace Assets.Scripts.App
             appModel.SetCurrentArea(area);
         }
 
-        internal void SetCurrentGame(int currentGame){
+        internal void SetCurrentGame(Game currentGame){
             appModel.SetCurrentGame(currentGame);
         }
 
@@ -112,14 +124,9 @@ namespace Assets.Scripts.App
             return appModel.GetCurrentLevel();
         }
 
-//        internal int GetCurrentGame(){
-//            for (int i = 0; i < games.Count; i++)
-//            {
-//                if (games[i].GetId() == appModel.GetCurrentGame()) return games[i];
-//               
-//            }
-//            return null;
-//        }
+        internal Game GetCurrentGame(){
+			return appModel.GetCurrentGame ();
+        }
 
         internal void ShowInGameMenu(){
             Timer.GetTimer().Pause();
@@ -142,21 +149,10 @@ namespace Assets.Scripts.App
             return appModel.GetCurrentArea();
         }
 
-        //internal IEnumerable<GameData> GetGameDatasByArea(int area)
-        //{
+		public AppModel GetAppModel(){
+			return appModel;
+		}
 
-        //    List<List<string>> gameNames = appModel.GetGameNames()[area];
-
-        //    List<GameData> datas = new List<GameData>();
-        //    int language = SettingsController.GetController().GetLanguage();
-
-        //    for (int level = 0; level < gameNames.Count; level++)
-        //    {
-        //        datas.Add(new GameData(gameNames[level][language], area, level));
-        //    }
-
-        //    return datas;
-        //}
         public void SetCurrentLevel(int level)
         {
             appModel.SetCurrentLevel(level);

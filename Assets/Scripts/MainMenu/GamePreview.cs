@@ -12,15 +12,16 @@ namespace Assets.Scripts.MainMenu
     public class GamePreview : MonoBehaviour
     {
 
-        public Text levelLabel;
+        public Text gameTitle;
  	    public Text gameDescription;
         [SerializeField]
-        private Image levelImage;
+		private Image gameIcon;
         [SerializeField]
         private Button playButton;
+		[SerializeField]
+		private Text gameId;
    
 
-        private int leveLSelected;
 
         void Update()
         {
@@ -36,34 +37,38 @@ namespace Assets.Scripts.MainMenu
             this.gameDescription.text = description.Replace("/n", "\n");
         }
 
+		internal void SetGameNumber(string gameId)
+		{
+			this.gameId.text = gameId;
+		}
+
+		internal void SetTitle(string title)
+		{
+			this.gameTitle.text = title;
+		}
+
+
      
-        internal void SetImages(Sprite areaSprite)
+        internal void SetIcon(Sprite gameSprite)
         {
-            levelImage.sprite = areaSprite;      
+			gameIcon.sprite = gameSprite;      
         }
 
         public void OnClickPlayBtn()
         {
             ClickSound();
-           /* int levelSelected = 0;
-            for (; levelSelected < levelToggles.Count && levelToggles[levelSelected].isOn; levelSelected++)*/
-			Debug.Log("level selected"+leveLSelected);
-			MainMenuController.GetController().PlayCurrentGame(AppController.GetController().GetCurrentLevel());
+          
+			AppController.GetController().PlayCurrentGame();
         }
 
         public void OnClickBackBtn()
         {
             ViewController.GetController().SetCanvasScaler(0.5f);
             ClickSound();
-            MainMenuController.GetController().ShowMenu();
             gameObject.SetActive(false);
         }
 
-        public void OnClickLvlBtn(int level)
-        {
-            leveLSelected = level;     
-            ClickSound();
-        }
+        
 
         internal void ClickSound()
         {

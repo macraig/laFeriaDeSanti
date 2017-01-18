@@ -33,13 +33,16 @@ namespace Assets.Scripts.Common.Dragger {
 				transform.position = Input.mousePosition;
 		}
 
-		public void OnEndDrag(PointerEventData eventData) {
+		public void OnEndDrag(PointerEventData eventData = null) {
 			if (active) {
 				//SoundController.GetController().PlayClickSound ();
 				itemBeingDragged = null;
 				GetComponent<CanvasGroup> ().blocksRaycasts = true;
 
-				transform.position = startPosition;
+				if(!dropped)
+					transform.position = startPosition;
+				else
+					SetActive(false);
 
 				if (dropped && !activeOnDrop) {
 					dropped = false;

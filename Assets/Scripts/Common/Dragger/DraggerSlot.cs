@@ -11,6 +11,7 @@ namespace Assets.Scripts.Common.Dragger {
 			DraggerHandler target = DraggerHandler.itemBeingDragged;
 			if(view.CanDropInSlot(target, this)){
 				target.Dropped();
+				target.OnEndDrag();
 				view.Dropped(target, this);
 			}
 		}
