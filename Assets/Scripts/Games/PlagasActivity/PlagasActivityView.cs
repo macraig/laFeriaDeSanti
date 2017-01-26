@@ -8,6 +8,7 @@ using System.Security.Policy;
 using Assets.Scripts.Common;
 using UnityEngine.EventSystems;
 using System.Threading;
+using System;
 
 public class PlagasActivityView : LevelView {
 	public Button okBtn;
@@ -18,6 +19,8 @@ public class PlagasActivityView : LevelView {
 	private Randomizer veggieRandomizer = Randomizer.New(3, 1), moleRandomizer = Randomizer.New(6, 4);
 	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7;
 	private PlagasActivityModel model;
+
+	Timer timer = null;
 
 	override public void Next(bool first = false){
 		if (!first) PlaySoundClick();
@@ -32,19 +35,13 @@ public class PlagasActivityView : LevelView {
 
 	public void OkClick() {
 		okBtn.enabled = false;
-		if (IsCorrect()){
+		if (model.IsCorrect(letter.text, number.text)){
 			model.Correct();
 			ShowRightAnswerAnimation();
 		} else {
 			ShowWrongAnswerAnimation();
 			model.Wrong();
 		}
-	}
-
-	bool IsCorrect() {
-		
-
-		return true;
 	}
 
 	public void Start(){
@@ -63,20 +60,64 @@ public class PlagasActivityView : LevelView {
 		if(model.HasTime()){
 			TimeLevel(model.CurrentLvl());
 		} else {
-			TimeLevel(model.CurrentLvl());
+			NormalLevel(model.CurrentLvl());
 		}
 	}
 
-	int a = 0;
-
 	void TimeLevel(PlagasLevel lvl) {
-		Timer timer = null; 
-		timer = new System.Threading.Timer((obj) =>
-			{
-				Debug.Log("Paso un sec");
-				a++;
-				if(a == 5) timer.Dispose();
-			}, null, 1000, System.Threading.Timeout.Infinite);
+		int randomSpawn = lvl.RandomSpawnTime();
+		int moleQuantity = lvl.MolesInSpawn(randomSpawn);
+
+		for(int i = 0; i < moleQuantity; i++) {
+			int freeSlot = model.GetFreeSlot();
+
+			model.SetTimerTile(freeSlot, randomSpawn);
+		}
+
+		StartTimer(() => TimerFunction(true));
+	}
+
+	void StartTimer(Action action) {
+		timer = new System.Threading.Timer((a) => action.Invoke(), null, 1000, System.Threading.Timeout.Infinite);
+	}
+
+	public void TimerFunction(bool first = false) {
+		Debug.Log("segundo");
+
+		UpdateView();
+
+		if(timer != null) StartTimer(() => TimerFunction());
+	}
+
+	void UpdateView() {
+		model.DecreaseTimer();
+		List<PlagaTile> t = model.GetTiles();
+
+		for(int i = 0; i < t.Count; i++) {
+			PlagaTile tile = t[i];
+			clocks[i].GetComponentInChildren<Text>(true).text = tile.GetTimer().ToString();
+
+			//si tiene que aparecer un vegetal.
+			if(tile.HasToAppear()){
+				tiles[i].sprite = tileSprites[veggieRandomizer.Next()];
+				t[i].AppearVeggie();
+			}
+			//si se termino el tiempo y no le pego.
+			if(tile.TimeDoneAndNotSmacked()){
+				tiles[i].sprite = tileSprites[GRASS_SPRITE];
+				clocks[i].gameObject.SetActive(false);
+				t[i].DissapearMole();
+			}
+			//si sale vegetal y aparece topo.
+			if(tile.MoleHasToAppear()){
+				tiles[i].sprite = GetMoleFromVeggie(tiles[i].sprite);
+				t[i].AppearMole();
+			}
+		}
+	}
+
+	Sprite GetMoleFromVeggie(Sprite sprite) {
+		return tileSprites[Array.IndexOf(tileSprites, sprite) + 3];
 	}
 
 	void NormalLevel(PlagasLevel lvl) {
@@ -84,19 +125,10 @@ public class PlagasActivityView : LevelView {
 	}
 
 	void PlaceMoles(int moleQuantity) {
-		Randomizer tileRandomizer = Randomizer.New(tiles.Count - 1);
-		int placedMoles = 0;
-
-		while(placedMoles != moleQuantity){
-			int nextSpot = tileRandomizer.Next();
-			if(IsSpotFree(nextSpot)){
-				tiles[nextSpot].sprite = tileSprites[moleRandomizer.Next()];
-			}
+		for(int i = 0; i < moleQuantity; i++) {
+			int nextSpot = model.GetFreeSlot();
+			tiles[nextSpot].sprite = tileSprites[moleRandomizer.Next()];
 		}
-	}
-
-	bool IsSpotFree(int spot) {
-		return tiles[spot].sprite != tileSprites[GRASS_SPRITE];
 	}
 
 	public void LetterClick(string l){

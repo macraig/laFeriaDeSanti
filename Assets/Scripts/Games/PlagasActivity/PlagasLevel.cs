@@ -1,6 +1,7 @@
 ﻿using System;
 using SimpleJSON;
 using System.Collections.Generic;
+using Assets.Scripts.Common;
 
 public class PlagasLevel {
 	bool withTime;
@@ -16,6 +17,14 @@ public class PlagasLevel {
 		} else {
 			moleQuantity = source["moleQuantity"].AsInt;
 		}
+	}
+
+	public int RandomSpawnTime(){
+		return spawnTimes[Randomizer.RandomInRange(spawnTimes.Count - 1)];
+	}
+
+	public int MolesInSpawn(int spawn){
+		return molesInSpawn[spawnTimes.IndexOf(spawn)];
 	}
 
 	public bool HasTime(){ return withTime; }
