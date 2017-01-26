@@ -20,14 +20,8 @@ namespace Assets.Scripts.Games
         protected MetricsTable MetricsTable;
 
    
-		// This method have to call to the model and the view to show the next challenge
-//		public abstract void NextChallenge();
-		// This method have to init the game. This includes model, view and metrics. 
-		// You must call MetricsController.GetController().GameStart(); in this method.
-//		public abstract void InitGame();
-		// This method have to restart the game. This includes model, view and metrics.
-		// You must call MetricsController.GetController().GameStart(); in this method.
-//		public abstract void RestartGame();
+	
+
 
 
 		/*

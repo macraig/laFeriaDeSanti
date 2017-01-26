@@ -20,11 +20,16 @@ namespace Assets.Scripts.Games
 		//Explanation Panel
 		public GameObject explanationPanel;
 		public AudioClip explanationSound;
+		//Right and wrong animations
+		public Image rightAnimation;
+		public Image wrongAnimation;
 
 		public GameObject starPanel;
 		private Sprite star;
 
 
+		// This method is used as the game's loop
+		abstract public void Next(bool first = false);
 
 
 		/*-----Functions for menuPanel panel-----*/
@@ -35,6 +40,7 @@ namespace Assets.Scripts.Games
 		}
 
 		public void ShowInGameMenu(){
+			menuPanel.transform.SetAsLastSibling ();
 			menuPanel.SetActive (true);
 		}
 
@@ -87,6 +93,7 @@ namespace Assets.Scripts.Games
 
 
 		public void ShowEndPanel(){
+			endGamePanel.transform.SetAsLastSibling ();
 			endGamePanel.SetActive (true);
 			SoundController.GetController ().PlayLevelCompleteSound ();
 			ShowStars ();
@@ -122,6 +129,7 @@ namespace Assets.Scripts.Games
 
 
 		internal void ShowExplanation(){
+			explanationPanel.transform.SetAsLastSibling ();
 			explanationPanel.SetActive(true);
 			SoundController.GetController ().PlayClip (explanationSound);
 		}
@@ -130,16 +138,14 @@ namespace Assets.Scripts.Games
 		public void HideExplanation(){
 			PlaySoundClick ();
 			explanationPanel.SetActive (false);
-
+			Next (true);
 		}
-
-
-
 
 
 		internal void ExitGame(){
 //			MetricsController.GetController().DiscardCurrentMetrics();
 			ViewController.GetController().LoadMainMenu();
+			SoundController.GetController ().PlayMusic ();
 		}
 
         // This method have to restart the view of the game to the initial state
@@ -171,13 +177,17 @@ namespace Assets.Scripts.Games
         {
             SoundController.GetController().PlayFailureSound();
         }
-			
 
-        public void OnClickNextButton()
-        {
-            PlaySoundClick();
-            LevelController.GetLevelController().NextChallenge();
-        }
+		internal void PlayDropSound()
+		{
+			SoundController.GetController().PlayDropSound();
+		}
+
+		internal void PlayDragSound()
+		{
+			SoundController.GetController().PlayDragSound();
+		}
+			
 
         void Update()
         {
@@ -190,5 +200,24 @@ namespace Assets.Scripts.Games
 			ShowEndPanel ();
 		}
 
+		internal void ShowRightAnswerAnimation(){
+			rightAnimation.transform.SetAsLastSibling ();
+			rightAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
+			SoundController.GetController ().PlayRightAnswerSound ();
+		}
+
+		internal void ShowWrongAnswerAnimation(){
+			wrongAnimation.transform.SetAsLastSibling ();
+			wrongAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
+			SoundController.GetController ().PlayFailureSound ();
+		}
+
+		virtual public void OnRightAnimationEnd(){
+			Next ();
+		}
+
+		virtual public void OnWrongAnimationEnd(){
+			
+		}
     }
 }
