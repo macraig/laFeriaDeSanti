@@ -5,30 +5,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Sound;
 using System.Security.Policy;
+using Assets.Scripts.Common;
+using UnityEngine.EventSystems;
+using System.Threading;
 
 public class PlagasActivityView : LevelView {
-	public List<Image> pattern;
-	public Button soundBtn, okBtn, NextButton;
-	public List<Button> droppers;
+	public Button okBtn;
 	public List<Image> tiles, clocks;
-	public Text time;
+	public Text letter, number;
 
 	private Sprite[] tileSprites;
+	private Randomizer veggieRandomizer = Randomizer.New(3, 1), moleRandomizer = Randomizer.New(6, 4);
+	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7;
 	private PlagasActivityModel model;
-	public AudioClip ingameExplanationSound;
 
 	override public void Next(bool first = false){
-
 		if (!first) PlaySoundClick();
-		okBtn.enabled = true;
-		NextButton.gameObject.SetActive(false);
-		okBtn.gameObject.SetActive(true);
+		ClocksActive(false);
 		okBtn.enabled = true;
 		SetCurrentLevel();
 	}
 
-	public void OkClick()
-	{
+	void ClocksActive(bool active) {
+		clocks.ForEach((c) => c.gameObject.SetActive(active));
+	}
+
+	public void OkClick() {
 		okBtn.enabled = false;
 		if (IsCorrect()){
 			model.Correct();
@@ -39,25 +41,10 @@ public class PlagasActivityView : LevelView {
 		}
 	}
 
-	public void OnSoundButtonClick(){
-		SoundController.GetController ().PlayClip (ingameExplanationSound);
-	}
-
 	bool IsCorrect() {
-		for(int i = 0; i < pattern.Count; i++) {
-			if(droppers[i].image.sprite != pattern[i].sprite) return false;
-			if(droppers[i + 4].image.sprite != pattern[i].sprite) return false;
-		}
+		
 
 		return true;
-	}
-
-	public void EraseDropper(Button dropper){
-		dropper.image.sprite = null;
-		dropper.image.color = new Color32(0,0,0,1);
-
-		okBtn.interactable = false;
-		SoundController.GetController().PlayClickSound();
 	}
 
 	public void Start(){
@@ -72,22 +59,61 @@ public class PlagasActivityView : LevelView {
 
 	private void SetCurrentLevel() {
 		CheckOk();
+		//deberia ser con herencia, pero odio c# :)
+		if(model.HasTime()){
+			TimeLevel(model.CurrentLvl());
+		} else {
+			TimeLevel(model.CurrentLvl());
+		}
 	}
 
-	void CleanDroppers() {
-		droppers.ForEach(EraseDropper);
+	int a = 0;
+
+	void TimeLevel(PlagasLevel lvl) {
+		Timer timer = null; 
+		timer = new System.Threading.Timer((obj) =>
+			{
+				Debug.Log("Paso un sec");
+				a++;
+				if(a == 5) timer.Dispose();
+			}, null, 1000, System.Threading.Timeout.Infinite);
 	}
 
-	public void Dropped() { CheckOk(); }
+	void NormalLevel(PlagasLevel lvl) {
+		PlaceMoles(lvl.MoleQuantity());
+	}
+
+	void PlaceMoles(int moleQuantity) {
+		Randomizer tileRandomizer = Randomizer.New(tiles.Count - 1);
+		int placedMoles = 0;
+
+		while(placedMoles != moleQuantity){
+			int nextSpot = tileRandomizer.Next();
+			if(IsSpotFree(nextSpot)){
+				tiles[nextSpot].sprite = tileSprites[moleRandomizer.Next()];
+			}
+		}
+	}
+
+	bool IsSpotFree(int spot) {
+		return tiles[spot].sprite != tileSprites[GRASS_SPRITE];
+	}
+
+	public void LetterClick(string l){
+		letter.text = l;
+		CheckOk();
+	}
+
+	public void NumberClick(string n){
+		number.text = n;
+		CheckOk();
+	}
 
 	void CheckOk() {
 		okBtn.interactable = CanSubmit();
 	}
 
 	bool CanSubmit() {
-		foreach(Button dropper in droppers) {
-			if(dropper.image.sprite == null) return false;
-		}
-		return true;
+		return letter.text.Length == 1 && number.text.Length == 1;
 	}
 }

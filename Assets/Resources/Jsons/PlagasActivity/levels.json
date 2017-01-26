@@ -1,0 +1,41 @@
+﻿{
+	"levels": [
+	{
+		"withTime": "false",
+		"moleQuantity": "1"
+	}, {
+		"withTime": "false",
+		"moleQuantity": "2"
+	}, {
+		"withTime": "false",
+		"moleQuantity": "3"
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["4","5","6","7","8"],
+		"molesInSpawn": ["1", "1", "1", "2", "2"]
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["3","4","5","6","7"],
+		"molesInSpawn": ["1", "1", "1", "2", "2"]
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["2","3","4","5","6"],
+		"molesInSpawn": ["1", "1", "1", "2", "2"]
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["1","2","3","4","5"],
+		"molesInSpawn": ["1", "1", "1", "2", "2"]
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["1","2","3","4"],
+		"molesInSpawn": ["1", "1", "2", "2"]
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["1","2","3"],
+		"molesInSpawn": ["1", "2", "2"]
+	}, {
+		"withTime": "true",
+		"spawnTimes": ["2"],
+		"molesInSpawn": ["2"]
+	}]
+}
