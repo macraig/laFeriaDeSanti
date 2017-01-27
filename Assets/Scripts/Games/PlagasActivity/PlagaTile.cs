@@ -24,7 +24,10 @@ public class PlagaTile {
 	}
 
 	public void AppearVeggie() {
-		if(state == PlagaState.TO_APPEAR_VEGGIE) state = PlagaState.VEGGIE;
+		if(state == PlagaState.TO_APPEAR_VEGGIE) {
+			state = PlagaState.VEGGIE;
+			timeToMole = PlagasActivityModel.VEGETABLE_TO_MOLE;
+		}
 	}
 
 	public bool IsCorrect() {
@@ -48,7 +51,10 @@ public class PlagaTile {
 	}
 
 	public void AppearMole() {
-		if(state == PlagaState.VEGGIE) state = PlagaState.MOLE;
+		if(state == PlagaState.VEGGIE) {
+			state = PlagaState.MOLE;
+			timer = PlagasActivityModel.MOLE_TIME;
+		}
 	}
 
 	public void SetTimeToAppear(int timeToAppear){

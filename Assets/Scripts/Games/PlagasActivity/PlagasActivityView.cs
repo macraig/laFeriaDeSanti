@@ -121,7 +121,8 @@ public class PlagasActivityView : LevelView {
 			int freeSlot = model.GetFreeSlot();
 
 			model.SetTimerTile(freeSlot, randomSpawn);
-			tiles[freeSlot].sprite = tileSprites[veggieRandomizer.Next()];
+
+			// TODO set two starting veggies.
 		}
 
 		StartTimer(true);
@@ -130,7 +131,6 @@ public class PlagasActivityView : LevelView {
 	void StartTimer(bool first = false) {
 		StartCoroutine(TimerFunction(first));
 		timerActive = true;
-		//timer = new System.Threading.Timer((a) => action.Invoke(), null, 1000, System.Threading.Timeout.Infinite);
 	}
 
 	public IEnumerator TimerFunction(bool first = false) {
