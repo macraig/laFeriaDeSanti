@@ -25,8 +25,11 @@ public class PlagasActivityView : LevelView {
 	override public void Next(bool first = false){
 		if (!first) PlaySoundClick();
 		ClocksActive(false);
-		okBtn.enabled = true;
+		ResetTiles();
+		letter.text = "";
+		number.text = "";
 		SetCurrentLevel();
+		CheckOk();
 	}
 
 	void ClocksActive(bool active) {
@@ -34,13 +37,62 @@ public class PlagasActivityView : LevelView {
 	}
 
 	public void OkClick() {
-		okBtn.enabled = false;
-		if (model.IsCorrect(letter.text, number.text)){
-			model.Correct();
-			ShowRightAnswerAnimation();
+		int row = model.GetRow(number.text);
+		int column = model.GetColumn(letter.text);
+
+		if(model.HasTime()){
+			TimeOkClick(row, column);
 		} else {
-			ShowWrongAnswerAnimation();
+			NoTimeOkClick(row, column);
+		}
+	}
+
+	void ResetTiles() {
+		foreach(var tile in tiles) {
+			tile.sprite = tileSprites[GRASS_SPRITE];
+		}
+	}
+
+	void NoTimeOkClick(int row, int column) {
+		int slot = model.GetSlot(row, column);
+		if(tiles[slot].sprite != tileSprites[GRASS_SPRITE] && tiles[slot].sprite != tileSprites[SMACKED_MOLE_SPRITE]){
+			//correct
+			model.Correct();
+			SmackMole(slot);
+
+			CheckEndLevel();
+		} else {
+			PlayWrongSound();
+		}
+	}
+
+	void TimeOkClick(int row, int column) {
+		if (model.IsCorrectTime(row, column)){
+			model.Correct();
+			PlayRightSound();
+			SmackMole(model.GetSlot(row, column));
+			//ShowRightAnswerAnimation();
+
+			CheckEndLevel();
+		} else {
+			//ShowWrongAnswerAnimation();
+			PlayWrongSound();
 			model.Wrong();
+		}
+	}
+
+	void SmackMole(int slot) {
+		tiles[slot].sprite = tileSprites[SMACKED_MOLE_SPRITE];
+	}
+
+	void CheckEndLevel() {
+		if(model.IsLevelEnded()){
+			if(timer != null){
+				timer.Dispose();
+				timer = null;
+			}
+			ShowRightAnswerAnimation();
+			model.NextLvl();
 		}
 	}
 

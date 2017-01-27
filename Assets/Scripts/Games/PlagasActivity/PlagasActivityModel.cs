@@ -37,6 +37,10 @@ public class PlagasActivityModel : LevelModel {
 		return nextSpot;
 	}
 
+	public bool IsLevelEnded() {
+		return lvls[currentLvl].HasTime() ? smackedMoles == MOLES_TO_NEXT_LEVEL : smackedMoles == lvls[currentLvl].MoleQuantity();
+	}
+
 	public bool IsSpotFree(int spot) {
 		return tiles[spot].GetState() == PlagaState.FREE;
 	}
@@ -84,6 +88,7 @@ public class PlagasActivityModel : LevelModel {
 
 	public void NextLvl(){
 		currentLvl++;
+		smackedMoles = 0;
 	}
 
 	public void Correct() {
@@ -100,7 +105,23 @@ public class PlagasActivityModel : LevelModel {
 		LogAnswer(false);
 	}
 
-	public bool IsCorrect(string letter, string number) {
-		return true;
+	public int GetRow(string number) {
+		List<string> numbers = new List<string>{ "6", "5", "4", "3", "2", "1" };
+		return numbers.IndexOf(number);
+	}
+
+	public int GetColumn(string letter) {
+		List<string> letters = new List<string>{ "A", "B", "C", "D", "E", "F" };
+		return letters.IndexOf(letter);
+	}
+
+	public int GetSlot(int row, int column) {
+		return row * 6 + column;
+	}
+
+	public bool IsCorrectTime(int row, int column) {
+		int result = GetSlot(row, column);
+
+		return tiles[result].IsCorrect();
 	}
 }

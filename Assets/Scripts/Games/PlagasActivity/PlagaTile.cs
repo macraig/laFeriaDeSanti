@@ -27,6 +27,14 @@ public class PlagaTile {
 		if(state == PlagaState.TO_APPEAR_VEGGIE) state = PlagaState.VEGGIE;
 	}
 
+	public bool IsCorrect() {
+		if(state == PlagaState.MOLE){
+			state = PlagaState.SMACKED_MOLE;
+			return true;
+		}
+		return false;
+	}
+
 	public bool TimeDoneAndNotSmacked() {
 		return state == PlagaState.MOLE && timer == 0;
 	}
