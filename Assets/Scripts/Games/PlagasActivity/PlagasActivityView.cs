@@ -20,7 +20,7 @@ public class PlagasActivityView : LevelView {
 	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7;
 	private PlagasActivityModel model;
 
-	Timer timer = null;
+	bool timerActive = false;
 
 	override public void Next(bool first = false){
 		if (!first) PlaySoundClick();
@@ -87,10 +87,7 @@ public class PlagasActivityView : LevelView {
 
 	void CheckEndLevel() {
 		if(model.IsLevelEnded()){
-			if(timer != null){
-				timer.Dispose();
-				timer = null;
-			}
+			if(timerActive) timerActive = false;
 			ShowRightAnswerAnimation();
 			model.NextLvl();
 		}
@@ -124,21 +121,25 @@ public class PlagasActivityView : LevelView {
 			int freeSlot = model.GetFreeSlot();
 
 			model.SetTimerTile(freeSlot, randomSpawn);
+			tiles[freeSlot].sprite = tileSprites[veggieRandomizer.Next()];
 		}
 
-		StartTimer(() => TimerFunction(true));
+		StartTimer(true);
 	}
 
-	void StartTimer(Action action) {
-		timer = new System.Threading.Timer((a) => action.Invoke(), null, 1000, System.Threading.Timeout.Infinite);
+	void StartTimer(bool first = false) {
+		StartCoroutine(TimerFunction(first));
+		timerActive = true;
+		//timer = new System.Threading.Timer((a) => action.Invoke(), null, 1000, System.Threading.Timeout.Infinite);
 	}
 
-	public void TimerFunction(bool first = false) {
+	public IEnumerator TimerFunction(bool first = false) {
+		yield return new WaitForSeconds(1);
 		Debug.Log("segundo");
 
 		UpdateView();
 
-		if(timer != null) StartTimer(() => TimerFunction());
+		if(timerActive) StartTimer();
 	}
 
 	void UpdateView() {
