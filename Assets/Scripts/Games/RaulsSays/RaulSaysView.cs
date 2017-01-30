@@ -48,12 +48,7 @@ namespace Assets.Scripts.Games
             words[1] = wordHolder.transform.GetChild(1).gameObject.GetComponent<Text>();
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
+        
 
         public void SetLevel1()
         {
@@ -242,6 +237,11 @@ namespace Assets.Scripts.Games
             {
                 resultToModify.transform.GetChild(i).gameObject.GetComponent<Button>().enabled = state;
             }
+        }
+
+        public override void Next(bool first = false)
+        {
+            throw new NotImplementedException();
         }
     }
 }
