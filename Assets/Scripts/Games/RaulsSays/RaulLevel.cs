@@ -1,7 +1,6 @@
-﻿using System.Collections;
+﻿using Assets.Scripts.Games;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.Scripts.Games;
 
 public abstract class RaulLevel  {
 
@@ -19,6 +18,8 @@ public abstract class RaulLevel  {
 
     public RaulLevel(Sprite[] animalSprite)
     {
+        
+
         randomListGenenrator = new List<int>();
         for(int i = 0; i < animalSprite.Length/2; i++)
         {

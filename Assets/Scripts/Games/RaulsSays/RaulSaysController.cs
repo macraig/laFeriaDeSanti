@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+//Picadura de la Cobra Gay
 namespace Assets.Scripts.Games
 {
     public class RaulSaysController : MonoBehaviour
@@ -65,8 +65,6 @@ namespace Assets.Scripts.Games
             stageDictionary.Add(Stages.Arrow, new RaulArrowStage(arrows));
             stageDictionary.Add(Stages.Sound, new RaulSoundStage(audios));
             stageDictionary.Add(Stages.Word, new RaulWordStage());
-
-
             currentLevelCounter = -1;
             ChangeToNextLevel();
         }
@@ -85,8 +83,16 @@ namespace Assets.Scripts.Games
 
             if(correctAnswers == 3 && currentLevelCounter != 2)
             {
-                ChangeToNextStage(2);
-            }else if(currentLevelCounter == 2)
+                RaulStage nextStage = GetNextStage();
+                if(nextStage == null)
+                {
+                    ChangeToNextLevel();
+                }else
+                {
+                    StartCoroutine(GetNextOption(nextStage, 2));
+                }
+            }
+            else if(currentLevelCounter == 2)
             {
                 if (correctAnswers < 10 && correctAnswers % 3 == 0)
                 {
@@ -102,7 +108,7 @@ namespace Assets.Scripts.Games
             }
             else
             {
-                Invoke("GetNextOption", 2.0f);
+                StartCoroutine(GetNextOption(null, 2));
             }
         }
 
@@ -116,7 +122,7 @@ namespace Assets.Scripts.Games
             if (currentLevelCounter != 2)
             {
                 correctAnswers = 0;
-                Invoke("GetNextOption", 2.0f);
+                StartCoroutine(GetNextOption(null, 2.0f));
             }else
             {
                 CancelInvoke("RunTime");
@@ -131,24 +137,24 @@ namespace Assets.Scripts.Games
             int randomStage = Random.Range(0, allStages.Count);
             RaulStage stageToPass;
             stageDictionary.TryGetValue(allStages[randomStage], out stageToPass);
-            currentLevel.SetNewStage(stageToPass);
-            Invoke("GetNextOption", time);
+            StartCoroutine(GetNextOption(stageToPass, time));
         }
 
-        private void ChangeToNextStage(float time)
+
+
+        private RaulStage GetNextStage()
         {
             currentStage++;
             if (currentStage % allStages.Count == 0 && currentStage!=0)
             {
-                ChangeToNextLevel();
+                return null;
             }
             else
             {
                 correctAnswers = 0;
                 RaulStage stageToPass;
                 stageDictionary.TryGetValue(allStages[currentStage], out stageToPass);
-                currentLevel.SetNewStage(stageToPass);
-                Invoke("GetNextOption", time);
+                return stageToPass;
             }
         }
 
@@ -165,28 +171,43 @@ namespace Assets.Scripts.Games
             if (currentLevelCounter == 0)
             {
                 currentLevel = new RaulLevel1(animalSprites);
-                ChangeToNextStage(0);
+                StartCoroutine(GetNextOption(GetNextStage(), 0));
             }
             else if(currentLevelCounter == 1)
             {
                 currentLevel = new RaulLevel2(animalSprites);
-                ChangeToNextStage(0);
+                StartCoroutine(GetNextOption(GetNextStage(), 2));
             }
             else if(currentLevelCounter == 2)
             {
-                correctAnswers = 0;
                 currentLevel = new RaulLevel3(animalSprites);
+                correctAnswers = 0;
+
                 currentTime = 26;
                 view.SetTime(currentTime);
-                RandomizeStage(0);
+                RandomizeStage(2);
+            }else
+            {
+                RestartGame();
+                //ACA TENES QUE POINER EL ENDGAME MARIAAAAAAAAAAAAAAAAAA 
+                
             }
             
         }
 
-        private void GetNextOption()
+        private IEnumerator GetNextOption(RaulStage newStage, float timeToWait)
         {
+            yield return new WaitForSeconds(timeToWait);
             view.ResetView();
+
+            if (newStage != null)
+            {
+                currentLevel.SetNewStage(newStage);
+            }
+
             currentLevel.GetNewOption();
+
+
 
             if (currentLevelCounter == 2)
             {
@@ -199,12 +220,18 @@ namespace Assets.Scripts.Games
             currentTime -= 1;
             if(currentTime < 0)
             {
-                StopCoroutine("RunTime");
+                CancelInvoke("RunTime");
                 ChangeToNextLevel();
             }else
             {
                 view.SetTime(currentTime);
             }
+        }
+
+        public void RestartGame()
+        {
+            currentLevelCounter = -1;
+            ChangeToNextLevel();
         }
 
 

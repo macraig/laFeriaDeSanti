@@ -42,7 +42,7 @@ public class RaulSoundStage : RaulStage
     public override void ShowNextEnunciado(int randomResult,  Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
     {
         PlaySound(randomResult);
-        RaulSaysController.instance.view.SetOptions(randomResult, restAnimalEnunciado, restAnimalResultado);
+        RaulSaysController.instance.view.ShowSoundOption(randomResult, restAnimalEnunciado, restAnimalResultado);
     }
 
     public override void SetView()

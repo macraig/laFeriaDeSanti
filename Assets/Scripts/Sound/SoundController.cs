@@ -150,8 +150,12 @@ namespace Assets.Scripts.Sound{
 				else if (currentAudioIndex == playingAudios.Count - 1) {
 					currentAudio = null;
 					concatenatingAudios = false;
-					//action.Invoke ();
-					return;
+                    if (action != null)
+                    {
+                        action.Invoke();
+
+                    }
+                    return;
 				} else {
 					currentAudioIndex++;
 					currentAudio = playingAudios [currentAudioIndex];

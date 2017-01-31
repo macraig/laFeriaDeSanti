@@ -21,6 +21,11 @@ namespace Assets.Scripts.Games
         Image firstArrowIndicator;
         [SerializeField]
         Image secondArrowIndicator;
+        [SerializeField]
+        GameObject leftArmGroup;
+        [SerializeField]
+        GameObject rightArmGroup;
+
 
         [SerializeField]
         GameObject wordHolder;
@@ -48,7 +53,7 @@ namespace Assets.Scripts.Games
             words[1] = wordHolder.transform.GetChild(1).gameObject.GetComponent<Text>();
         }
 
-        
+     
 
         public void SetLevel1()
         {
@@ -123,6 +128,21 @@ namespace Assets.Scripts.Games
 
         public void ShowWordOption(int answer, string[] wordToShow, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
         {
+            firstArrowIndicator.color = Color.clear;
+            secondArrowIndicator.color = Color.clear;
+
+
+            if (!wordHolder.activeSelf)
+            {
+                wordHolder.SetActive(true);
+
+            }
+
+
+            leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 60);
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f, 0));
+
+
             words[0].text = wordToShow[0];
             words[1].text = "";
             if (wordToShow.Length > 1)
@@ -133,15 +153,32 @@ namespace Assets.Scripts.Games
 
         }
 
+        public void ShowSoundOption(int randomResult, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
+        {
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.3f, 0));
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f, 0.3f));
+
+            StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, -60), 0.3f, 0));
+            StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, 60), 0.3f, 0.3f));
+
+            RaulSaysController.instance.view.SetOptions(randomResult, restAnimalEnunciado, restAnimalResultado);
+
+        }
+
         public void ShowArrowOption(int answer, Sprite[] spriteToShow, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
         {
             firstArrowIndicator.color = Color.white;
             firstArrowIndicator.sprite = spriteToShow[0];
 
+            leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 60);
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f,0));
+
             if (spriteToShow.Length > 1)
             {
                 secondArrowIndicator.color = Color.white;
                 secondArrowIndicator.sprite = spriteToShow[1];
+                rightArmGroup.transform.eulerAngles = new Vector3(0, 0, -60);
+                StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, 60), 0.3f, 0));
             }
 
 
@@ -151,7 +188,6 @@ namespace Assets.Scripts.Games
 
         public void SetWordStage()
         {
-            wordHolder.SetActive(true);
             if (words == null)
             {
                 words = new Text[2];
@@ -208,6 +244,8 @@ namespace Assets.Scripts.Games
 
         public void SetAudioStage()
         {
+
+
             firstArrowIndicator.gameObject.SetActive(false);
             secondArrowIndicator.gameObject.SetActive(false);
             wordHolder.SetActive(false);
@@ -216,18 +254,33 @@ namespace Assets.Scripts.Games
         public void ShowCorrectAnimation()
         {
             ChangeButtonState(false);
+            
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.2f, 0));
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.2f, 0.2f));
+
+            StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, 60), 0.2f, 0));
+            StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, -60), 0.2f, 0.2f));
+
             raulImage.sprite = raulStates[1];
         }
 
         public void ShowIncorrectAnimation()
         {
             ChangeButtonState(false);
+
+            StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.2f, 0));
+            StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, -60), 0.2f, 0));
+
+
             raulImage.sprite = raulStates[2];
         }
 
         public void ResetView()
         {
             ChangeButtonState(true);
+
+            leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
+            rightArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
             raulImage.sprite = raulStates[0];
         }
 
@@ -242,6 +295,19 @@ namespace Assets.Scripts.Games
         public override void Next(bool first = false)
         {
             throw new NotImplementedException();
+        }
+
+        IEnumerator Rotate(GameObject objectToRotate, Vector3 byAngles, float inTime, float waitTime)
+        {
+            yield return new WaitForSeconds(waitTime);
+            var fromAngle = objectToRotate.transform.rotation;
+            var toAngle = Quaternion.Euler(objectToRotate.transform.eulerAngles + byAngles);
+            for (var t = 0f; t < 1; t += Time.deltaTime / inTime)
+            {
+                objectToRotate.transform.rotation = Quaternion.Lerp(fromAngle, toAngle, t);
+                yield return null;
+            }
+            objectToRotate.transform.rotation = toAngle;
         }
     }
 }

@@ -6,17 +6,22 @@ using Assets.Scripts.Games;
 public class RaulLevel2 : RaulLevel
 {
 
-
+    private bool viewSetted;
 
     public RaulLevel2(Sprite[] animalSprite) : base(animalSprite)
     {
-        
-        RaulSaysController.instance.view.SetLevel2();
+        viewSetted = false;
 
     }
 
     public override void GetNewOption()
     {
+
+        if (!viewSetted)
+        {
+            RaulSaysController.instance.view.SetLevel2();
+
+        }
 
         ShuffleList();
 
