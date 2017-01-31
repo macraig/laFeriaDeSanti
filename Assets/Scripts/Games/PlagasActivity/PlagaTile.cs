@@ -30,6 +30,11 @@ public class PlagaTile {
 		}
 	}
 
+	public void AppearInitVeggie() {
+		state = PlagaState.VEGGIE;
+		timeToMole = PlagasActivityModel.VEGETABLE_TO_MOLE;
+	}
+
 	public bool IsCorrect() {
 		if(state == PlagaState.MOLE){
 			state = PlagaState.SMACKED_MOLE;

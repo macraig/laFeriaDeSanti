@@ -12,10 +12,11 @@ using System;
 
 public class PlagasActivityView : LevelView {
 	public Button okBtn;
-	public List<Image> tiles, clocks;
+	public List<Image> tiles, clocks, lives;
 	public Text letter, number;
 
 	private Sprite[] tileSprites;
+	private bool keyboardActive;
 	private Randomizer veggieRandomizer = Randomizer.New(3, 1), moleRandomizer = Randomizer.New(6, 4);
 	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7;
 	private PlagasActivityModel model;
@@ -23,13 +24,22 @@ public class PlagasActivityView : LevelView {
 	bool timerActive = false;
 
 	override public void Next(bool first = false){
-		if (!first) PlaySoundClick();
-		ClocksActive(false);
-		ResetTiles();
+		if(model.GameEnded()) {
+			EndGame(60, 0, 1250);
+		} else {
+			ClocksActive(false);
+			ResetTiles();
+			ResetLetterNumber();
+			SetCurrentLevel();
+			keyboardActive = true;
+
+			CheckOk();
+		}
+	}
+
+	void ResetLetterNumber() {
 		letter.text = "";
 		number.text = "";
-		SetCurrentLevel();
-		CheckOk();
 	}
 
 	void ClocksActive(bool active) {
@@ -42,8 +52,16 @@ public class PlagasActivityView : LevelView {
 
 		if(model.HasTime()){
 			TimeOkClick(row, column);
+			SetLives(model.GetLives());
 		} else {
 			NoTimeOkClick(row, column);
+			SetLives(0);
+		}
+	}
+
+	void SetLives(int livesModel) {
+		for(int i = 0; i < lives.Count; i++) {
+			lives[i].gameObject.SetActive(livesModel > i);
 		}
 	}
 
@@ -78,16 +96,27 @@ public class PlagasActivityView : LevelView {
 			//ShowWrongAnswerAnimation();
 			PlayWrongSound();
 			model.Wrong();
+			model.OneLessLife();
+
+			if(model.NoMoreLives()){
+				timerActive = false;
+				EndGame(60, 0, 1250);
+			}
 		}
 	}
 
 	void SmackMole(int slot) {
 		tiles[slot].sprite = tileSprites[SMACKED_MOLE_SPRITE];
+		clocks[slot].gameObject.SetActive(false);
+
+		ResetLetterNumber();
+		CheckOk();
 	}
 
 	void CheckEndLevel() {
 		if(model.IsLevelEnded()){
 			if(timerActive) timerActive = false;
+			keyboardActive = false;
 			ShowRightAnswerAnimation();
 			model.NextLvl();
 		}
@@ -96,6 +125,7 @@ public class PlagasActivityView : LevelView {
 	public void Start(){
 		model = new PlagasActivityModel();
 		tileSprites = Resources.LoadAll<Sprite>("Sprites/PlagasActivity/tiles");
+		timerActive = false;
 		Begin();
 	}
 
@@ -104,28 +134,38 @@ public class PlagasActivityView : LevelView {
 	}
 
 	private void SetCurrentLevel() {
-		CheckOk();
 		//deberia ser con herencia, pero odio c# :)
 		if(model.HasTime()){
 			TimeLevel(model.CurrentLvl());
+			SetLives(model.GetLives());
 		} else {
 			NormalLevel(model.CurrentLvl());
 		}
 	}
 
 	void TimeLevel(PlagasLevel lvl) {
-		int randomSpawn = lvl.RandomSpawnTime();
-		int moleQuantity = lvl.MolesInSpawn(randomSpawn);
+		TimerTiles(lvl);
 
-		for(int i = 0; i < moleQuantity; i++) {
-			int freeSlot = model.GetFreeSlot();
+		List<PlagaTile> modelTiles = model.GetTiles();
 
-			model.SetTimerTile(freeSlot, randomSpawn);
+		//Set two starting veggies.
+		for(int i = 0; i < PlagasActivityModel.VEGETABLES_IN_START; i++) {
+			int slot = model.GetFreeSlot();
 
-			// TODO set two starting veggies.
+			tiles[slot].sprite = tileSprites[veggieRandomizer.Next()];
+			modelTiles[slot].AppearInitVeggie();
 		}
 
 		StartTimer(true);
+	}
+
+	void TimerTiles(PlagasLevel lvl) {
+		int randomSpawn = lvl.RandomSpawnTime();
+		int moleQuantity = lvl.MolesInSpawn(randomSpawn);
+		for(int i = 0; i < moleQuantity; i++) {
+			int freeSlot = model.GetFreeSlot();
+			model.SetTimerTile(freeSlot, randomSpawn);
+		}
 	}
 
 	void StartTimer(bool first = false) {
@@ -144,27 +184,38 @@ public class PlagasActivityView : LevelView {
 
 	void UpdateView() {
 		model.DecreaseTimer();
-		List<PlagaTile> t = model.GetTiles();
+		List<PlagaTile> modelTiles = model.GetTiles();
+		bool newTimerSet = false;
 
-		for(int i = 0; i < t.Count; i++) {
-			PlagaTile tile = t[i];
+		for(int i = 0; i < modelTiles.Count; i++) {
+			PlagaTile tile = modelTiles[i];
 			clocks[i].GetComponentInChildren<Text>(true).text = tile.GetTimer().ToString();
 
 			//si tiene que aparecer un vegetal.
 			if(tile.HasToAppear()){
 				tiles[i].sprite = tileSprites[veggieRandomizer.Next()];
-				t[i].AppearVeggie();
+				modelTiles[i].AppearVeggie();
+
+				if(!newTimerSet){
+					newTimerSet = true;
+
+					TimerTiles(model.CurrentLvl());
+				}
 			}
+
+			//si sale vegetal y aparece topo.
+			if(tile.MoleHasToAppear()){
+				tiles[i].sprite = GetMoleFromVeggie(tiles[i].sprite);
+				modelTiles[i].AppearMole();
+				clocks[i].gameObject.SetActive(true);
+				clocks[i].GetComponentInChildren<Text>(true).text = tile.GetTimer().ToString();
+			}
+
 			//si se termino el tiempo y no le pego.
 			if(tile.TimeDoneAndNotSmacked()){
 				tiles[i].sprite = tileSprites[GRASS_SPRITE];
 				clocks[i].gameObject.SetActive(false);
-				t[i].DissapearMole();
-			}
-			//si sale vegetal y aparece topo.
-			if(tile.MoleHasToAppear()){
-				tiles[i].sprite = GetMoleFromVeggie(tiles[i].sprite);
-				t[i].AppearMole();
+				modelTiles[i].DissapearMole();
 			}
 		}
 	}
@@ -200,5 +251,24 @@ public class PlagasActivityView : LevelView {
 
 	bool CanSubmit() {
 		return letter.text.Length == 1 && number.text.Length == 1;
+	}
+
+	public void RestartGame(){
+		Start();
+	}
+
+	void OnGUI() {
+		Event e = Event.current;
+		if (e.isKey && e.type == EventType.KeyUp && keyboardActive) {
+			if (e.keyCode >= KeyCode.A && e.keyCode <= KeyCode.F) {
+				Debug.Log ("Detected key code: " + e.keyCode);
+				LetterClick(e.keyCode.ToString());
+			} else if (e.keyCode == KeyCode.Return) {
+				Debug.Log ("Detected key code: Enter");
+				if(okBtn.interactable) OkClick();
+			} else if((e.keyCode >= KeyCode.Alpha1 && e.keyCode <= KeyCode.Alpha6) || (e.keyCode >= KeyCode.Keypad1 && e.keyCode <= KeyCode.Keypad6)) {
+				NumberClick(e.keyCode.ToString()[e.keyCode.ToString().Length - 1].ToString());
+			}
+		}
 	}
 }

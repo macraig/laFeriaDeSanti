@@ -6,8 +6,16 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.Games
 {
-    public class RaulSaysView : LevelView
+	public class RaulSaysView : LevelView
     {
+		#region implemented abstract members of LevelView
+
+		public override void Next(bool first = false) {
+			throw new NotImplementedException();
+		}
+
+		#endregion
+
         [SerializeField]
         GameObject image8Task;
 

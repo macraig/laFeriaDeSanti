@@ -11,18 +11,26 @@ public class PlagasActivityModel : LevelModel {
 	//time is in seconds
 	public const int MOLE_TIME = 9, VEGETABLE_TO_MOLE = 2, VEGETABLES_IN_START = 2, MOLES_TO_NEXT_LEVEL = 5;
 	private List<PlagaTile> tiles;
-	private int smackedMoles;
+	private int smackedMoles, lives;
 
-	private int currentLvl, exercisesDone;
+	private int currentLvl;
 	List<PlagasLevel> lvls;
 
 	public PlagasActivityModel() {
-		exercisesDone = 0;
 		currentLvl = 0;
 		smackedMoles = 0;
+		lives = 3;
 		StartLevels();
 		ResetTiles();
 		MetricsController.GetController().GameStart();
+	}
+
+	public bool GameEnded(){
+		return currentLvl == lvls.Count;
+	}
+
+	public bool NoMoreLives() {
+		return lives == 0;
 	}
 
 	public int GetFreeSlot() {
@@ -35,6 +43,10 @@ public class PlagasActivityModel : LevelModel {
 			if(IsSpotFree(nextSpot)) valid = true;
 		}
 		return nextSpot;
+	}
+
+	public int GetLives() {
+		return lives;
 	}
 
 	public bool IsLevelEnded() {
@@ -82,10 +94,6 @@ public class PlagasActivityModel : LevelModel {
 		return CurrentLvl().HasTime();
 	}
 
-	public bool GameEnded(){
-		return exercisesDone == 6;
-	}
-
 	public void NextLvl(){
 		currentLvl++;
 		smackedMoles = 0;
@@ -97,8 +105,8 @@ public class PlagasActivityModel : LevelModel {
 		smackedMoles++;
 	}
 
-	void AddExerciseDone() {
-		exercisesDone++;
+	public void OneLessLife(){
+		lives--;
 	}
 
 	public void Wrong(){
