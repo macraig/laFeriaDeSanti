@@ -300,10 +300,7 @@ namespace Assets.Scripts.Games
             }
         }
 
-        public override void Next(bool first = false)
-        {
-            throw new NotImplementedException();
-        }
+      
 
         IEnumerator Rotate(GameObject objectToRotate, Vector3 byAngles, float inTime, float waitTime)
         {
