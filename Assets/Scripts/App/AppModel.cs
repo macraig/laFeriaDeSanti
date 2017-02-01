@@ -11,6 +11,7 @@ namespace Assets.Scripts.App
         private int currentArea;
         private Game currentGame;
         private int currentLevel;
+		private List<int> gameOrder = new List<int>(){1,2,3,4,6,5,7};
 
 		private List<Game> games; 
 		private Sprite[] icons;
@@ -41,6 +42,8 @@ namespace Assets.Scripts.App
 			AppController.GetController ().GetMetricsController ().SetMetricsModel (new MetricsModel(games));
 		}
 
+
+
 		public Game GetGameById (int id)
 		{
 			for (int i = 0; i < games.Count; i++) {
@@ -51,8 +54,18 @@ namespace Assets.Scripts.App
 			Debug.Log ("NO GAME FOUND in AppModel.GetGameById");
 			return null;
 
+		}	
 
-		}			 
+		public Game GetNextGame(){
+			int gameIndex = gameOrder.IndexOf (currentGame.GetId());
+			if (gameIndex < gameOrder.Count - 1) 
+				currentGame = GetGameById(gameOrder[gameIndex + 1]);
+			else 
+				currentGame = GetGameById(gameOrder[0]);
+			return currentGame;
+			
+
+		}
 
         public Game GetCurrentGame(){
             return currentGame;

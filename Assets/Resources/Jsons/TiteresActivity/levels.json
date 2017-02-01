@@ -1,0 +1,26 @@
+﻿{
+	"levels": [
+	{
+		"withTime": "false",
+		"personQuantity": ["2", "2"],
+		"personDifficulty": [["1"], ["2"]]
+	}, {
+		"withTime": "false",
+		"personQuantity": ["2", "2"],
+		"personDifficulty": [["1", "2", "3"], ["3"]]
+	}, {
+		"withTime": "false",
+		"personQuantity": ["2", "1", "1"],
+		"personDifficulty": [["1", "2", "3"], ["4"], ["5"]]
+	}, {
+		"withTime": "false",
+		"personQuantity": ["2", "1", "1"],
+		"personDifficulty": [["2", "3"], ["4", "5"], ["6"]]
+	}, {
+		"withTime": "false",
+		"personQuantity": ["1", "3"],
+		"personDifficulty": [["2", "3"], ["4", "5", "6"]]
+	}, {
+		"withTime": "true"
+	}]
+}
