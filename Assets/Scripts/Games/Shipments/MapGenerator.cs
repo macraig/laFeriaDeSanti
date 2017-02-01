@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.Common;
+using Assets.Scripts.Games.Shipments;
 using UnityEngine;
 using Vectrosity;
 using Random = UnityEngine.Random;
@@ -15,10 +16,15 @@ public class MapGenerator : MonoBehaviour {
     public Texture dottedLineMaterial;
     public Material DottedLineMateriallMaterial;
 
+    public Sprite[] CrosSprites;
+    public Sprite[] PlacesSprites;
+
+    private List<VectorLine> lines;
+
     // Use this for initialization
     void Start()
     {
-        LocatePlaces();
+        lines = new List<VectorLine>();
 
 /*
         LocatePlaces();
@@ -45,38 +51,43 @@ public class MapGenerator : MonoBehaviour {
         }*/
     }
 
-    public void LocatePlaces()
+    public void LocatePlaces(List<ShipmentNode> nodes)
     {
+        foreach (MapPlace mapPlace in Places.GetRange(1, Places.Count - 1))
+        {
+            mapPlace.Id = -1;
+        }
+
+
         float scaleFactor = FindObjectOfType<Canvas>().scaleFactor;
         float edge = Places[0].GetComponent<RectTransform>().sizeDelta.x;
-        float distanceMin = Mathf.Sqrt(2) * edge;
+        float distanceMin = Mathf.Sqrt(2)*edge*2;
         Vector2 mapSize = Map.GetComponent<RectTransform>().sizeDelta;
         float xMax = mapSize.x * scaleFactor - edge;
         float yMax = mapSize.y * scaleFactor - edge;
 
         List<MapPlace> locatedPlaces = new List<MapPlace>(Places.Count);
-        SetFirstPlace(xMax, yMax);
+        SetFirstPlace(nodes[0], xMax, yMax);
         locatedPlaces.Add(Places[0]);
-
-        foreach (MapPlace mapPlace in Places.GetRange(1, Places.Count - 1))
+        int i = 1;
+        for (; i < nodes.Count; i++)
         {
+            Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0]);
             do
             {
-                LocatePlace(mapPlace, xMax, yMax);
-            } while (!CheckMinDistances(mapPlace, locatedPlaces, distanceMin));
-
-            locatedPlaces.Add(mapPlace);
-
+                LocatePlace(Places[i], xMax, yMax);
+            } while (!CheckMinDistances(Places[i], locatedPlaces, distanceMin));
+            Places[i].gameObject.SetActive(true);
         }
-
-        /*foreach (MapPlace mapPlace in Places)
+        for (int j = Places.Count - 1; j >= i; j--)
         {
-            mapPlace.transform.localPosition = new Vector2(xMax - edge, yMax - edge);
-        }*/
+            Places[j].gameObject.SetActive(false);
+        }
     }
 
-    private void SetFirstPlace(float xMax, float yMax)
+    private void SetFirstPlace(ShipmentNode node, float xMax, float yMax)
     {
+        Places[0].SetData(node.Id, PlacesSprites[node.Id], CrosSprites[node.Type == ShipmentNodeType.Other ? 1 : 0]);
         Places[0].transform.localPosition = new Vector2(-xMax, yMax);
     }
 
@@ -85,11 +96,13 @@ public class MapGenerator : MonoBehaviour {
         foreach (MapPlace locatedPlace in locatedPlaces)
         {
             float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
-            //float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.localPosition, mapPlace.CrossReference.transform.localPosition);
-            if (distance < distanceMin || Math.Abs((distance / Ruler.GetUnityDistances()) % 1) > 0.1)
-                return false;
+            float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
+            float f = referenceDistance / Ruler.GetUnityDistances();
+            Debug.Log(f);
+            if (distance < distanceMin || Math.Abs(f % 1) > 0.1 || Mathf.RoundToInt(f) > 10)
+                return false;          
         }
-
+        
         return true;
     }
 
@@ -99,4 +112,34 @@ public class MapGenerator : MonoBehaviour {
     }
 
 
+    public void TraceEdges(List<ShipmentEdge> edges)
+    {
+        foreach (VectorLine line in lines)
+        {
+            line.rectTransform.gameObject.SetActive(false);
+            /*
+            VectorLine aLine = line;
+            VectorLine.Destroy(ref aLine);*/
+        }
+
+        foreach (ShipmentEdge shipmentEdge in edges)
+        {
+            MapPlace mapPlace = Places.Find(e => e.Id == shipmentEdge.IdNodeA);
+            MapPlace place = Places.Find(e => e.Id == shipmentEdge.IdNodeB);
+            Vector3 position = mapPlace.CrossReference.gameObject.transform.position;
+            Vector3 vector3 = place.CrossReference.gameObject.transform.position;
+            VectorLine line = new VectorLine("Curve", new List<Vector2> { position, vector3 }, null, 8.0f, LineType.Continuous);
+
+            line.SetCanvas(FindObjectOfType<Canvas>());
+
+            line.material = DottedLineMateriallMaterial;
+            line.textureScale = 1f;
+
+            line.Draw();
+            lines.Add(line);
+            line.rectTransform.transform.SetParent(Ruler.transform.parent);
+
+        }
+        Ruler.transform.SetAsLastSibling();
+    }
 }
