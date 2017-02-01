@@ -66,6 +66,7 @@ namespace Assets.Scripts.Games
             stageDictionary.Add(Stages.Sound, new RaulSoundStage(audios));
             stageDictionary.Add(Stages.Word, new RaulWordStage());
             currentLevelCounter = -1;
+            currentLevel = new RaulLevel(animalSprites);
             ChangeToNextLevel();
         }
 
@@ -168,21 +169,20 @@ namespace Assets.Scripts.Games
                 entry.Value.UpdateLevelValues(currentLevelCounter);
             }
 
+
+            currentLevel.SetNewLevelValue(currentLevelCounter);
+
             if (currentLevelCounter == 0)
             {
-                currentLevel = new RaulLevel1(animalSprites);
                 StartCoroutine(GetNextOption(GetNextStage(), 0));
             }
             else if(currentLevelCounter == 1)
             {
-                currentLevel = new RaulLevel2(animalSprites);
                 StartCoroutine(GetNextOption(GetNextStage(), 2));
             }
             else if(currentLevelCounter == 2)
             {
-                currentLevel = new RaulLevel3(animalSprites);
                 correctAnswers = 0;
-
                 currentTime = 26;
                 view.SetTime(currentTime);
                 RandomizeStage(2);
@@ -198,7 +198,6 @@ namespace Assets.Scripts.Games
         private IEnumerator GetNextOption(RaulStage newStage, float timeToWait)
         {
             yield return new WaitForSeconds(timeToWait);
-            view.ResetView();
 
             if (newStage != null)
             {
@@ -206,6 +205,7 @@ namespace Assets.Scripts.Games
             }
 
             currentLevel.GetNewOption();
+            view.ResetView();
 
 
 
@@ -213,6 +213,11 @@ namespace Assets.Scripts.Games
             {
                 InvokeRepeating("RunTime", 0, 1f);
             }
+        }
+
+        public void RepeatLastSound()
+        {
+            ((RaulSoundStage)currentLevel.CurrentStage).RepeatLastSound();
         }
 
         public void RunTime()

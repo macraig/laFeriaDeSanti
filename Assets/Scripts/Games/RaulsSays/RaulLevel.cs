@@ -2,19 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class RaulLevel  {
+public class RaulLevel  {
 
 
-    protected RaulStage currentStage;
+    private RaulStage currentStage;
 
 
-    protected Sprite[] animalSpriteEnunciados;
+    private Sprite[] animalSpriteEnunciados;
 
-    protected Sprite[] animalSpriteResultados;
+    private Sprite[] animalSpriteResultados;
 
-    protected List<int> randomListGenenrator;
+    private List<int> randomListGenenrator;
 
+    private bool viewSetted;
+    private int optionLength;
+    private int randomLength;
 
+    public RaulStage CurrentStage
+    {
+        get
+        {
+            return currentStage;
+        }
+
+        
+    }
 
     public RaulLevel(Sprite[] animalSprite)
     {
@@ -35,7 +47,42 @@ public abstract class RaulLevel  {
             animalSpriteResultados[i] = animalSprite[(animalSprite.Length / 2) + i];
         }
 
+        viewSetted = false;
 
+    }
+
+    public void GetNewOption()
+    {
+
+        if (!viewSetted)
+        {
+            if (optionLength == 4)
+            {
+                RaulSaysController.instance.view.SetLevel1();
+            }else if(optionLength == 8 && randomLength==4)
+            {
+                RaulSaysController.instance.view.SetLevel2();
+            }else
+            {
+                RaulSaysController.instance.view.SetLevel3();
+            }
+            viewSetted = true;
+        }
+
+        ShuffleList();
+
+        Sprite[] restAnimalEnunciado = new Sprite[optionLength];
+        Sprite[] restAnimalResultado = new Sprite[optionLength];
+
+        for (int i = 0; i < restAnimalEnunciado.Length; i++)
+        {
+            restAnimalEnunciado[i] = animalSpriteEnunciados[randomListGenenrator[i]];
+            restAnimalResultado[i] = animalSpriteResultados[randomListGenenrator[i]];
+        }
+
+        int randomResult = Random.Range(0, randomLength);
+
+        currentStage.ShowNextEnunciado(randomResult, restAnimalEnunciado, restAnimalResultado);
     }
 
     public void ShuffleList()
@@ -59,12 +106,31 @@ public abstract class RaulLevel  {
         
     }
 
-    public abstract void GetNewOption();
 
     public void SetNewStage(RaulStage newStage)
     {
         currentStage = newStage;
         currentStage.SetView();
+    }
+
+    public void SetNewLevelValue(int levelValue)
+    {
+        viewSetted = false;
+
+        if (levelValue == 0)
+        {
+            optionLength = 4;
+            randomLength = 4;
+        }else if(levelValue == 1)
+        {
+            optionLength = 8;
+            randomLength = 4;
+        }
+        else if(levelValue == 2)
+        {
+            optionLength = 8;
+            randomLength = 8;
+        }
     }
 
 }

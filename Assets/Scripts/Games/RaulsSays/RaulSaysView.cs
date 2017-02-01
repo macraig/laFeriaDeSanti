@@ -52,6 +52,9 @@ namespace Assets.Scripts.Games
 
         public Text time;
         public GameObject timeLogo;
+
+        public GameObject clock;
+        public GameObject repeatSoundButton;
         // Use this for initialization
         void Start()
         {
@@ -65,6 +68,7 @@ namespace Assets.Scripts.Games
 
         public void SetLevel1()
         {
+            clock.SetActive(false);
             image8Result.SetActive(false);
             image4Result.SetActive(true);
             resultToModify = image4Result;
@@ -86,7 +90,7 @@ namespace Assets.Scripts.Games
 
         public void SetLevel2()
         {
-
+            
             taskImages = new List<GameObject>();
             image8Result.SetActive(true);
             image4Result.SetActive(false);
@@ -106,7 +110,7 @@ namespace Assets.Scripts.Games
 
         public void SetLevel3()
         {
-
+            clock.SetActive(true);
             taskImages = new List<GameObject>();
             image8Result.SetActive(true);
             image4Result.SetActive(false);
@@ -126,6 +130,7 @@ namespace Assets.Scripts.Games
 
         public void SetArrowStage()
         {
+            repeatSoundButton.SetActive(false);
             wordHolder.SetActive(false);
             firstArrowIndicator.gameObject.SetActive(true);
             secondArrowIndicator.gameObject.SetActive(true);
@@ -145,7 +150,7 @@ namespace Assets.Scripts.Games
                 wordHolder.SetActive(true);
 
             }
-
+            SetNeutralArms();
 
             leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 60);
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f, 0));
@@ -163,6 +168,8 @@ namespace Assets.Scripts.Games
 
         public void ShowSoundOption(int randomResult, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
         {
+
+            SetNeutralArms();
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.3f, 0));
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f, 0.3f));
 
@@ -178,6 +185,7 @@ namespace Assets.Scripts.Games
             firstArrowIndicator.color = Color.white;
             firstArrowIndicator.sprite = spriteToShow[0];
 
+            SetNeutralArms();
             leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 60);
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f,0));
 
@@ -196,6 +204,7 @@ namespace Assets.Scripts.Games
 
         public void SetWordStage()
         {
+            repeatSoundButton.SetActive(false);
             if (words == null)
             {
                 words = new Text[2];
@@ -253,7 +262,7 @@ namespace Assets.Scripts.Games
         public void SetAudioStage()
         {
 
-
+            repeatSoundButton.SetActive(true);
             firstArrowIndicator.gameObject.SetActive(false);
             secondArrowIndicator.gameObject.SetActive(false);
             wordHolder.SetActive(false);
@@ -262,7 +271,11 @@ namespace Assets.Scripts.Games
         public void ShowCorrectAnimation()
         {
             ChangeButtonState(false);
-            
+
+
+            SetNeutralArms();
+
+
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.2f, 0));
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.2f, 0.2f));
 
@@ -276,6 +289,7 @@ namespace Assets.Scripts.Games
         {
             ChangeButtonState(false);
 
+            SetNeutralArms();
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.2f, 0));
             StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, -60), 0.2f, 0));
 
@@ -283,12 +297,18 @@ namespace Assets.Scripts.Games
             raulImage.sprite = raulStates[2];
         }
 
+        private void SetNeutralArms()
+        {
+            leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
+            rightArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+
         public void ResetView()
         {
             ChangeButtonState(true);
 
-            leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
-            rightArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
+            //leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
+            //rightArmGroup.transform.eulerAngles = new Vector3(0, 0, 0);
             raulImage.sprite = raulStates[0];
         }
 

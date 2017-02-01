@@ -11,6 +11,7 @@ public class RaulSoundStage : RaulStage
     private AudioClip[][] soundsToPlay;
     private AudioClip[] sounds;
 
+    private int lastValueSelected;
     public RaulSoundStage(AudioClip[] sounds)
     {
 
@@ -25,6 +26,7 @@ public class RaulSoundStage : RaulStage
 
     public void PlaySound(int random)
     {
+        lastValueSelected = random;
         if(soundsToPlay[random].Length == 1)
         {
             SoundController.GetController().PlayClip(soundsToPlay[random][0]);
@@ -48,6 +50,11 @@ public class RaulSoundStage : RaulStage
     public override void SetView()
     {
         RaulSaysController.instance.view.SetAudioStage();
+    }
+
+    public void RepeatLastSound()
+    {
+        PlaySound(lastValueSelected);
     }
 
     public override void UpdateLevelValues(int currentLevel)
