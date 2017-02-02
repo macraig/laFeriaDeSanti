@@ -9,12 +9,14 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		public Text clock, rules;
 		public Button next, previous, okBtn, soundBtn;
 
-		public Image obj;
+		public Image obj, landscape;
 		public List<Image> draggers;
 
-		public Sprite[] objects, landscapes;
 		public Randomizer objectLandscapeRandomizer;
 
+		private Sprite[] objects, landscapes;
+		private int currentRule;
+		bool timerActive;
 		private TiteresActivityModel model;
 
 		public void Start(){
@@ -40,46 +42,200 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		void SetCurrentLevel() {
+			currentRule = 0;
+			//TODO randomize landscape and object.
 			if(model.HasTime()){
 				TimeLevel(model.CurrentLvl());
+				model.WithTime();
 			} else {
 				NormalLevel(model.CurrentLvl());
 			}
 		}
 
 		void NormalLevel(TiteresLevel lvl) {
-			
+			clock.gameObject.SetActive(false);
+
+			SetRule();
 		}
 
 		void TimeLevel(TiteresLevel lvl) {
-			
+			clock.gameObject.SetActive(true);
+			SetClock();
+			StartTimer(true);
+		}
+
+		void StartTimer(bool first = false) {
+			StartCoroutine(TimerFunction(first));
+			timerActive = true;
+		}
+
+		public IEnumerator TimerFunction(bool first = false) {
+			yield return new WaitForSeconds(1);
+			Debug.Log("segundo");
+
+			UpdateView();
+
+			if(timerActive) StartTimer();
+		}
+
+		void SetClock() {
+			clock.text = model.GetTimer().ToString();
+		}
+
+		void UpdateView() {
+			model.DecreaseTimer();
+
+			SetClock();
+
+			if(model.IsTimerDone()){
+				timerActive = false;
+				EndGame(60, 0, 1250);
+			}
 		}
 
 		void ResetPuppets() {
-			
+			draggers.ForEach((d) => d.GetComponent<TiteresDragger>().SetToInitialPosition());
 		}
 
 		public void NextClick(){
-			
+			currentRule++;
+			SetRule();
 		}
 
 		public void PreviousClick(){
+			currentRule--;
+			SetRule();
+		}
 
+		void SetRule() {
+			List<TiteresDirection> actions = model.CurrentLvl().ActionsToShow();
+			rules.text = actions[currentRule].GetText(actions);
+			CheckButtons();
+		}
+
+		void CheckButtons() {
+			next.interactable = currentRule != (draggers.Count - 1);
+			previous.interactable = currentRule != 0;
 		}
 
 		public void SoundClick(){
 			
 		}
 
-		public void OkClick(){
+		public void OkClick() {
+			if(model.HasTime()){
+				TimeOkClick();
+			} else {
+				NoTimeOkClick();
+			}
+		}
 
+		void TimeOkClick() {
+			timerActive = false;
+			if(IsCorrect()){
+				//correct
+				ShowRightAnswerAnimation();
+				model.Correct();
+				model.CorrectTimer();
+				SetClock();
+				model.NextLvl();
+			} else {
+				PlayWrongSound();
+				model.Wrong();
+				EndGame(60, 0, 1250);
+			}
+		}
+
+		void NoTimeOkClick() {
+			if(IsCorrect()){
+				//correct
+				ShowRightAnswerAnimation();
+				model.Correct();
+				model.NextLvl();
+			} else {
+				PlayWrongSound();
+				model.Wrong();
+			}
+		}
+
+		bool IsCorrect() {
+			List<TiteresDirection> actions = model.CurrentLvl().Actions();
+
+			for(int i = 0; i < actions.Count; i++) {
+				TiteresDirection action = actions[i];
+				Image dragger = draggers[i];
+
+				if(!IsDirectionCorrect(action, dragger)) return false;
+			}
+			return true;
+		}
+
+		bool IsDirectionCorrect(TiteresDirection action, Image dragger) {
+			List<Sprite> puppets = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/TiteresActivity/puppets"));
+			int index = puppets.IndexOf(dragger.sprite) % 4;
+
+			//Check for action.
+			if(action.action == TiteresAction.STANDING && index != 0) {
+				Debug.Log("not standing");
+				return false;
+			}
+			if(action.action == TiteresAction.RIGHT_ARM && index != 2) {
+				Debug.Log("not right arm");
+				return false;
+			}
+			if(action.action == TiteresAction.LEFT_ARM && index != 1) {
+				Debug.Log("not left arm");
+				return false;
+			}
+			if(action.action == TiteresAction.SIT && index != 3) {
+				Debug.Log("not sitting");
+				return false;
+			}
+
+			//Check for direction
+
+			Vector2 draggerPosition = dragger.transform.position;
+
+			Debug.Log("dragger x: " + draggerPosition.x);
+			Debug.Log("dragger y: " + draggerPosition.y);
+
+			Vector2 objPosition = action.relativeToPuppetNumber == -1 ? obj.transform.position : draggers[action.relativeToPuppetNumber].transform.position;
+
+			Debug.Log("obj x: " + objPosition.x);
+			Debug.Log("obj y: " + objPosition.y);
+
+			if(action.direction == Direction.RIGHT && draggerPosition.x < objPosition.x) {
+				Debug.Log("not right");
+				return false;
+			}
+			if(action.direction == Direction.LEFT && draggerPosition.x > objPosition.x) {
+				Debug.Log("not left");
+				return false;
+			}
+			if(action.direction == Direction.UP && draggerPosition.y < objPosition.y) {
+				Debug.Log("not up");
+				return false;
+			}
+			if(action.direction == Direction.DOWN && draggerPosition.y > objPosition.y) {
+				Debug.Log("not down");
+				return false;
+			}
+
+			return true;
 		}
 
 		public void CheckOk(){
-			
+			foreach(Image d in draggers) {
+				if(!d.GetComponent<TiteresDragger>().IsDroppedInLandscape()){
+					okBtn.interactable = false;
+					return;
+				}
+			}
+			okBtn.interactable = true;
 		}
 
 		public void RestartGame(){
+			ResetPuppets();
 			Start();
 		}
 	}
