@@ -35,21 +35,6 @@ namespace Assets.Scripts.Games.Shipments
             //Next(true);
         }
 
-        private void AddCellLiseners()
-        {
-            List<ShipmentsAnswerCell> cells = GetAnswerCells();
-            for (int i = 0; i < cells.Count; i++)
-            {
-                var i1 = i;
-                cells[i].GetComponent<Button>().onClick.AddListener(
-                    () =>
-                    {
-                        OnClickAnswerCell(i1);
-                    }
-                    
-                    );
-            }
-        }
 
         void Update()
         {
@@ -138,7 +123,7 @@ namespace Assets.Scripts.Games.Shipments
         public override void Next(bool first = false)
         {
             _shipmentsModel.NextExercise();
-            MapGenerator.LocatePlaces(_shipmentsModel.Nodes);
+            MapGenerator.LocatePlaces(_shipmentsModel.Nodes, _shipmentsModel.Edges);
             MapGenerator.TraceEdges(_shipmentsModel.Edges);
         }
 
@@ -202,5 +187,22 @@ namespace Assets.Scripts.Games.Shipments
         {
             TryButton.interactable = AnsweStateIsValid();
         }
+
+        private void AddCellLiseners()
+        {
+            List<ShipmentsAnswerCell> cells = GetAnswerCells();
+            for (int i = 0; i < cells.Count; i++)
+            {
+                var i1 = i;
+                cells[i].GetComponent<Button>().onClick.AddListener(
+                    () =>
+                    {
+                        OnClickAnswerCell(i1);
+                    }
+
+                    );
+            }
+        }
+
     }
 }

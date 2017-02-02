@@ -51,7 +51,7 @@ public class MapGenerator : MonoBehaviour {
         }*/
     }
 
-    public void LocatePlaces(List<ShipmentNode> nodes)
+    public void LocatePlaces(List<ShipmentNode> nodes, List<ShipmentEdge> edges)
     {
         foreach (MapPlace mapPlace in Places.GetRange(1, Places.Count - 1))
         {
@@ -61,7 +61,7 @@ public class MapGenerator : MonoBehaviour {
 
         float scaleFactor = FindObjectOfType<Canvas>().scaleFactor;
         float edge = Places[0].GetComponent<RectTransform>().sizeDelta.x;
-        float distanceMin = Mathf.Sqrt(2)*edge*2;
+        float distanceMin = Mathf.Sqrt(2)*edge;
         Vector2 mapSize = Map.GetComponent<RectTransform>().sizeDelta;
         float xMax = mapSize.x * scaleFactor - edge;
         float yMax = mapSize.y * scaleFactor - edge;
@@ -76,7 +76,12 @@ public class MapGenerator : MonoBehaviour {
             do
             {
                 LocatePlace(Places[i], xMax, yMax);
-            } while (!CheckMinDistances(Places[i], locatedPlaces, distanceMin));
+            } while (!CheckMinDistances(Places[i], locatedPlaces.FindAll(
+                e =>
+                {
+                    ShipmentEdge shipmentEdge = edges.Find(f => (f.IdNodeA == Places[i].Id && f.IdNodeB == e.Id) || (f.IdNodeB == Places[i].Id && f.IdNodeA == e.Id));
+                    return shipmentEdge != null;
+                }), distanceMin));
             Places[i].gameObject.SetActive(true);
         }
         for (int j = Places.Count - 1; j >= i; j--)
@@ -117,9 +122,6 @@ public class MapGenerator : MonoBehaviour {
         foreach (VectorLine line in lines)
         {
             line.rectTransform.gameObject.SetActive(false);
-            /*
-            VectorLine aLine = line;
-            VectorLine.Destroy(ref aLine);*/
         }
 
         foreach (ShipmentEdge shipmentEdge in edges)
