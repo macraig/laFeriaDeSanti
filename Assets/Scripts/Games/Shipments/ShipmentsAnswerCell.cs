@@ -29,10 +29,6 @@ namespace Assets.Scripts.Games.Shipments
             }
         }
 
-        void Start()
-        {
-            _value = 1;
-        }
 
         public void Clear()
         {

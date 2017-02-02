@@ -69,19 +69,38 @@ public class MapGenerator : MonoBehaviour {
         List<MapPlace> locatedPlaces = new List<MapPlace>(Places.Count);
         SetFirstPlace(nodes[0], xMax, yMax);
         locatedPlaces.Add(Places[0]);
+/*
+        nodes.Sort((node, otherNode) => ShipmentsView.instance.Model.GetEdgesByIdNode(node.Id).Count - ShipmentsView.instance.Model.GetEdgesByIdNode(otherNode.Id).Count);
+*/
         int i = 1;
         for (; i < nodes.Count; i++)
         {
+            /*
+                        if(nodes[i].Id == 0) continue;
+            */
             Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0]);
-            do
-            {
-                LocatePlace(Places[i], xMax, yMax);
-            } while (!CheckMinDistances(Places[i], locatedPlaces.FindAll(
+            List<int> edgeDistances = new List<int>();
+         /*   List<MapPlace> listOfPlaces =
+                locatedPlaces.FindAll(
+                    e =>
+                    {
+                        ShipmentEdge shipmentEdge = ShipmentsView.instance.Model.GetEdgesByIdNode(Places[i].Id)
+                            .Find(f => f.IdNodeA == e.Id || f.IdNodeB == e.Id);
+                        if (shipmentEdge != null) edgeDistances.Add(shipmentEdge);
+                        return shipmentEdge != null;
+                    });*/
+            List<MapPlace> listOfPlaces = locatedPlaces.FindAll(
                 e =>
                 {
                     ShipmentEdge shipmentEdge = edges.Find(f => (f.IdNodeA == Places[i].Id && f.IdNodeB == e.Id) || (f.IdNodeB == Places[i].Id && f.IdNodeA == e.Id));
+                    if(shipmentEdge != null) edgeDistances.Add(shipmentEdge.Length);
                     return shipmentEdge != null;
-                }), distanceMin));
+                });
+            do
+            {
+                LocatePlace(Places[i], xMax, yMax);
+               
+            } while (!CheckEdgeDistances(Places[i], listOfPlaces, edgeDistances) || !CheckMinDistances(Places[i], locatedPlaces, distanceMin));
             Places[i].gameObject.SetActive(true);
         }
         for (int j = Places.Count - 1; j >= i; j--)
@@ -96,24 +115,51 @@ public class MapGenerator : MonoBehaviour {
         Places[0].transform.localPosition = new Vector2(-xMax, yMax);
     }
 
+    private bool CheckEdgeDistances(MapPlace mapPlace, List<MapPlace> locatedPlaces, List<int> edgeDistances)
+    {
+        for (var i = locatedPlaces.Count - 1; i >= 0; i--)
+        {
+            MapPlace locatedPlace = locatedPlaces[i];
+/*
+            float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
+*/
+            float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
+            float f = referenceDistance / Ruler.GetUnityDistances();
+            if (Math.Abs(f - edgeDistances[i]) > 0.1)
+            {
+                return false;
+            }
+
+        }
+    
+        return true;
+    }
+
+
     private bool CheckMinDistances(MapPlace mapPlace, List<MapPlace> locatedPlaces, float distanceMin)
     {
+   
         foreach (MapPlace locatedPlace in locatedPlaces)
         {
             float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
-            float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
-            float f = referenceDistance / Ruler.GetUnityDistances();
-            Debug.Log(f);
-            if (distance < distanceMin || Math.Abs(f % 1) > 0.1 || Mathf.RoundToInt(f) > 10)
+            /*
+                        float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
+
+                        float f = referenceDistance / Ruler.GetUnityDistances();
+            */
+            if (distance < distanceMin /*|| Math.Abs(f % 1) > 0.1 || Mathf.RoundToInt(f) > 10*/)
                 return false;          
         }
         
         return true;
     }
 
+
+
     private void LocatePlace(MapPlace mapPlace, float xMax, float yMax)
     {
-        mapPlace.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1  : -1) * Random.Range(0, xMax), (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, yMax));
+        mapPlace.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1 : -1)*Random.Range(0, xMax),
+            (Randomizer.RandomBoolean() ? 1 : -1)*Random.Range(0, yMax));
     }
 
 

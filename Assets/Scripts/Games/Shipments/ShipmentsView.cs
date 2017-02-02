@@ -12,12 +12,15 @@ namespace Assets.Scripts.Games.Shipments
         public static ShipmentsView instance; 
 
         public MapGenerator MapGenerator;
-        private ShipmentsModel _shipmentsModel;
         public GameObject[] AnswerRowGameObjects;
+        public Sprite[] AnswerCellSprites;
         public Button TryButton;
         public Color FocusedColor;
         public Color UnfocusedColor;
+        public Text ScaleText;
         private int _currentFocus;
+
+        public ShipmentsModel Model { get; set; }
 
         void Awake()
         {
@@ -29,10 +32,11 @@ namespace Assets.Scripts.Games.Shipments
         void Start ()
         {
             AddCellLiseners();
-            _shipmentsModel = new ShipmentsModel();
+            GetAnswerCells()[0].Value = 0;
+            Model = new ShipmentsModel();
             _currentFocus = 1;
             HighlightCurrentFocus();
-            //Next(true);
+            Next(true);
         }
 
 
@@ -122,9 +126,12 @@ namespace Assets.Scripts.Games.Shipments
 
         public override void Next(bool first = false)
         {
-            _shipmentsModel.NextExercise();
-            MapGenerator.LocatePlaces(_shipmentsModel.Nodes, _shipmentsModel.Edges);
-            MapGenerator.TraceEdges(_shipmentsModel.Edges);
+            Model.NextExercise();
+            MapGenerator.LocatePlaces(Model.Nodes, Model.Edges);
+            MapGenerator.TraceEdges(Model.Edges);
+            ScaleText.text = Model.Scale + " kg";
+
+
         }
 
 
@@ -179,7 +186,9 @@ namespace Assets.Scripts.Games.Shipments
             {
                 SoundController.GetController().PlayTypingSound();
                 cell.Value = id;
-                cell.GetComponent<Image>().sprite = MapGenerator.PlacesSprites[id];
+                cell.GetComponent<Image>().sprite = AnswerCellSprites[id];
+                OnClickAnswerCell(_currentFocus + 1);
+
             }
         }
 
@@ -191,18 +200,59 @@ namespace Assets.Scripts.Games.Shipments
         private void AddCellLiseners()
         {
             List<ShipmentsAnswerCell> cells = GetAnswerCells();
-            for (int i = 0; i < cells.Count; i++)
+            for (int i = 1; i < cells.Count; i++)
             {
                 var i1 = i;
+                cells[i].Value = -1;
                 cells[i].GetComponent<Button>().onClick.AddListener(
                     () =>
                     {
                         OnClickAnswerCell(i1);
+                        
                     }
 
                     );
             }
         }
 
+        public void OnClickOk()
+        {
+            PlaySoundClick();
+            List<ShipmentEdge> edgeAnswers = new List<ShipmentEdge>();
+
+            int i = 0;
+            for (; i < AnswerRowGameObjects.Length; i++)
+            {
+                GameObject answerRowGameObject = AnswerRowGameObjects[i];
+                List<ShipmentsAnswerCell> answerCells = answerRowGameObject.GetComponentsInChildren<ShipmentsAnswerCell>().ToList();
+                if (answerCells[0].Value == -1) break;
+                ShipmentEdge shipmentEdge = new ShipmentEdge
+                {
+                    IdNodeA = answerCells[0].Value,
+                    IdNodeB = answerCells[1].Value,
+                    Length = answerCells[2].Value
+                };
+                edgeAnswers.Add(shipmentEdge);
+            }
+
+            if (Model.IsCorrectAnswer(edgeAnswers))
+            {
+                ShowRightAnswerAnimation();
+            }
+            else
+            {
+                ShowWrongAnswerAnimation();
+            }
+        }
+
+        public override void OnRightAnimationEnd()
+        {
+            base.OnRightAnimationEnd();
+        }
+
+        public override void OnWrongAnimationEnd()
+        {
+            base.OnWrongAnimationEnd();
+        }
     }
 }
