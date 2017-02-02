@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Games.Shipments;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class MapPlace : MonoBehaviour
@@ -15,6 +16,7 @@ public class MapPlace : MonoBehaviour
     void Start()
     {
         Id = -1;
+        GetComponent<Button>().onClick.AddListener(OnClickMapPlace);
     }
 
     public void SetData(int id, Sprite placesSprite, Sprite crossSprite)
@@ -22,5 +24,10 @@ public class MapPlace : MonoBehaviour
         this.Id = id;
         CrossReference.sprite = crossSprite;
         GetComponent<Image>().sprite = placesSprite;
+    }
+
+    private void OnClickMapPlace()
+    {
+        ShipmentsView.instance.OnClickMapPlace(_id);
     }
 }

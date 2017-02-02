@@ -48,7 +48,6 @@ namespace Assets.Scripts.Games.Shipments
                     };
 
                     Edges.Add(edge1);
-                    _currentLevel++;
                     break;
                 case 1:
                     nodes = 3;

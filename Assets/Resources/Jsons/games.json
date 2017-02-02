@@ -33,9 +33,9 @@
 	}, {
 		"id": "6",
 		"icon": "5",
-		"name": "?",
+		"name": "Envíos",
 		"description": "¡Armamos el barrio de Santi!\n\nSEGUIMOS LAS INDICACIONES PARA UBICAR LOS EDIFICIOS.\n\nDesarrollar las nociones espaciales para ubicar elementos en relación a otros.",
-		"prefabName":"NeighbourhoodActivity"
+		"prefabName":"EnviosActivity"
 	}
 ]
 }
