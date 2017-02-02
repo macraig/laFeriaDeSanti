@@ -1,6 +1,7 @@
 ﻿using System;
 using Assets.Scripts.Common;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class TiteresDirection : IEquatable<TiteresDirection> {
 	public Direction direction;
@@ -39,7 +40,7 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 			result += "DE " + TiteresActivityModel.NAMES[relativeToPuppetNumber];
 		} else {
 			//TODO object?
-			result += "OBJECT ";
+			result += "DEL OBJETO ";
 		}
 
 		if(action == TiteresAction.LEFT_ARM){
