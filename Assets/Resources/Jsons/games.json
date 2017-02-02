@@ -4,37 +4,37 @@
 		"id": "1",
 		"icon": "0",
 		"name": "Raúl dice",
-		"description": "¡A ordenar el cuarto!\n\nSIGAMOS LAS INDICACIONES DE SANTI PARA ORDENAR EL CUARTO.\n\nDescribir el espacio que nos rodea utilizando vocabulario específico para identificar posiciones y elementos.",
+		"description": "Seguimos las indicaciones de Raúl para encontrar el animal que nos pide.\n\nUsamos las direcciones espaciales arriba, abajo, derecha e izquierda.",
 		"prefabName":"RaulActivity"
 	}, {
 		"id": "2",
 		"icon": "1",
 		"name": "Títeres",
-		"description": "¡Es hora de cazar fantasmas!\n\nIDENTIFIQUEMOS DÓNDE ESTÁ EL FANTASMA Y LUEGO DEMOS INDICACIONES PARA QUE SANTI LO ATRAPE.\n\nDesarrollar las nociones espaciales de arriba, abajo, izquierda y derecha.",
+		"description": "Seguimos las indicaciones para ubicar los títeres en el escenario.\n\nDesarrollar la direccionalidad y la lateralidad usando distintos puntos de referencia.",
 		"prefabName":"TiteresActivity"
 	}, {
 		"id": "3",
 		"icon": "2",
 		"name": "Rompecabezas",
-		"description": "¿Dónde están las cosas?\n\nIDENTIFIQUEMOS OBJETOS EN EL AULA A PARTIR DE LAS DESCRIPCIONES SOBRE SU UBICACIÓN.\n\nEntender el plano como la representación de un espacio visto desde arriba.", 
+		"description": "Acomodamos las piezas en la posición adecuada para completar el rompecabezas\n\nResolver problemas espaciales usando imágenes mentales y gráficas.", 
 		"prefabName":"RompecabezasActivity"
 	}, {
 		"id": "4",
 		"icon": "3",
 		"name": "Recorridos",
-		"description": "¡Recorremos la escuela!\n\nCONSTRUIMOS INDICACIONES PARA QUE SANTI LLEGUÉ A DESTINO.\n\nUtilizar el plano y la información que provee para realizar recorridos en el espacio.",
+		"description": "Indicamos un camino para que el muñeco llegue a destino.\n\nProgramar recorridos usando nociones espaciales.",
 		"prefabName":"RecorridosActivity"
 	}, {
 		"id": "5",
 		"icon": "4",
 		"name": "Plagas",
-		"description": "¡A descifrar el código!\n\nARRASTRAMOS LAS PIEZAS PARA COPIAR EL PATRÓN.\n\nUsar e interpretar referencias para ubicar elementos en un plano. ",
+		"description": "Escribimos las coordenadas para atrapar a los topos.\n\nUbicar objetos o describir su posición usando sistemas de coordenadas.",
 		"prefabName":"PlagasActivity"
 	}, {
 		"id": "6",
 		"icon": "5",
 		"name": "Envíos",
-		"description": "¡Armamos el barrio de Santi!\n\nSEGUIMOS LAS INDICACIONES PARA UBICAR LOS EDIFICIOS.\n\nDesarrollar las nociones espaciales para ubicar elementos en relación a otros.",
+		"description": "Medimos distancias y usamos la escala para enviar el barco a destino.\n\nMedir distancias usando puntos de referencia y escalas.",
 		"prefabName":"EnviosActivity"
 	}
 ]
