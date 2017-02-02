@@ -179,11 +179,11 @@ namespace Assets.Scripts.Games.TiteresActivity {
 				Debug.Log("not standing");
 				return false;
 			}
-			if(action.action == TiteresAction.RIGHT_ARM && index != 1) {
+			if(action.action == TiteresAction.RIGHT_ARM && index != 2) {
 				Debug.Log("not right arm");
 				return false;
 			}
-			if(action.action == TiteresAction.LEFT_ARM && index != 2) {
+			if(action.action == TiteresAction.LEFT_ARM && index != 1) {
 				Debug.Log("not left arm");
 				return false;
 			}
