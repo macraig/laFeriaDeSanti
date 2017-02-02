@@ -12,9 +12,10 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		public Image obj;
 		public List<Image> draggers;
 
-		public Sprite[] objects, landscapes;
 		public Randomizer objectLandscapeRandomizer;
 
+		private Sprite[] objects, landscapes;
+		private int currentRule;
 		private TiteresActivityModel model;
 
 		public void Start(){
@@ -40,6 +41,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		void SetCurrentLevel() {
+			currentRule = 0;
 			if(model.HasTime()){
 				TimeLevel(model.CurrentLvl());
 			} else {
@@ -48,23 +50,38 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		void NormalLevel(TiteresLevel lvl) {
-			
+			clock.gameObject.SetActive(false);
+
+			SetRule();
 		}
 
 		void TimeLevel(TiteresLevel lvl) {
-			
+			clock.gameObject.SetActive(true);
 		}
 
 		void ResetPuppets() {
-			
+			draggers.ForEach((d) => d.GetComponent<TiteresDragger>().SetToInitialPosition());
 		}
 
 		public void NextClick(){
-			
+			currentRule++;
+			SetRule();
 		}
 
 		public void PreviousClick(){
+			currentRule--;
+			SetRule();
+		}
 
+		void SetRule() {
+			List<TiteresDirection> actions = model.CurrentLvl().Actions();
+			rules.text = actions[currentRule].GetText(actions);
+			CheckButtons();
+		}
+
+		void CheckButtons() {
+			next.interactable = currentRule != (draggers.Count - 1);
+			previous.interactable = currentRule != 0;
 		}
 
 		public void SoundClick(){
@@ -76,10 +93,17 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		public void CheckOk(){
-			
+			foreach(Image d in draggers) {
+				if(!d.GetComponent<TiteresDragger>().IsDroppedInLandscape()){
+					okBtn.interactable = false;
+					return;
+				}
+			}
+			okBtn.interactable = true;
 		}
 
 		public void RestartGame(){
+			ResetPuppets();
 			Start();
 		}
 	}

@@ -5,35 +5,34 @@ using Assets.Scripts.Common;
 
 public class TiteresLevel {
 	bool withTime;
-	List<int> personQuantity, personDifficulty;
 	List<TiteresDirection> actions;
 
 	public TiteresLevel(JSONClass source) {
 		withTime = source["withTime"].AsBool;
 
-		if(withTime){
-			personQuantity = new List<JSONNode>(source["personQuantity"].Childs).ConvertAll((n) => n.AsInt);
+		if(!withTime){
+			List<int> personQuantity = new List<JSONNode>(source["personQuantity"].Childs).ConvertAll((n) => n.AsInt);
 			List<List<int>> diffs = new List<JSONNode>(source["personDifficulty"].Childs)
 				.ConvertAll((n) => new List<JSONNode>(n.AsArray.Childs).ConvertAll((inner) => inner.AsInt));
 
-			RandomizeDifficulties(diffs);
+			List<int> difficulties = RandomizeDifficulties(personQuantity, diffs);
 
-			SetActions();
+			SetActions(difficulties);
 		}
 	}
 
-	void SetActions() {
+	void SetActions(List<int> difficulties) {
 		actions = new List<TiteresDirection>();
 		Direction[] dirs = (Direction[]) Enum.GetValues(typeof(Direction));
 		Randomizer dirRandomizer = Randomizer.New(dirs.Length - 1);
 		TiteresDirection newDir = null;
 
-		while(actions.Count < personDifficulty.Count) {
+		while(actions.Count < difficulties.Count) {
 			int current = actions.Count;
 			Direction dir = dirs[dirRandomizer.Next()];
 			Tuple<Direction, int> relativeDir = null;
 
-			switch(personDifficulty[current]) {
+			switch(difficulties[current]) {
 			case 1:
 				newDir = new TiteresDirection(dir, TiteresAction.NONE, -1, 1);
 				break;
@@ -62,13 +61,19 @@ public class TiteresLevel {
 	}
 
 	Tuple<Direction, int> RandomRelativeDir() {
-		int relativeTo = -1;
 		Randomizer puppetRandomizer = Randomizer.New(actions.Count - 1);
-		while(relativeTo == -1) {
-			TiteresDirection puppet = actions[puppetRandomizer.Next()];
+		int puppetNumber = puppetRandomizer.Next();
+		TiteresDirection puppet = actions[puppetNumber];
 
-		}
-		return null;
+		Direction d = RandomDirection(puppet.direction == Direction.LEFT || puppet.direction == Direction.RIGHT);
+
+		return Tuple.Create(d, puppetNumber);
+	}
+
+	Direction RandomDirection(bool upDown) {
+		return (upDown ? new List<Direction>{ Direction.UP, Direction.DOWN } : 
+			new List<Direction> { Direction.LEFT, Direction.RIGHT })
+			[Randomizer.RandomInRange(1)];
 	}
 
 	TiteresAction RandomAction(bool sitStand) {
@@ -77,20 +82,20 @@ public class TiteresLevel {
 				[Randomizer.RandomInRange(1)];
 	}
 
-	void RandomizeDifficulties(List<List<int>> diffs) {
-		personDifficulty = diffs.ConvertAll((List<int> diff) => {
-			if(diff.Count == 1) return diff[0];
-			else return diff[Randomizer.RandomInRange(diff.Count - 1)];
-		});
+	List<int> RandomizeDifficulties(List<int> personQuantity, List<List<int>> diffs) {
+		List<int> result = new List<int>();
+		for(int i = 0; i < personQuantity.Count; i++) {
+			for (int j = 0; j < personQuantity[i]; j++) {
+				if(diffs[i].Count == 1) result.Add(diffs[i][0]);
+				else result.Add(diffs[i][Randomizer.RandomInRange(diffs[i].Count - 1)]);
+			}
+		}
+		return result;
 	}
 
 	public bool HasTime(){ return withTime; }
 
-	public List<int> PersonQuantity() {
-		return personQuantity;
-	}
-
-	public List<int> PersonDifficulty(){
-		return personDifficulty;
+	public List<TiteresDirection> Actions() {
+		return actions;
 	}
 }
