@@ -4,24 +4,19 @@ using System.Collections.Generic;
 using Assets.Scripts.Common;
 
 public class TiteresLevel {
-	bool withTime;
-	List<TiteresDirection> actions;
+	List<TiteresDirection> actions, actionsToShow;
 
-	public TiteresLevel(JSONClass source) {
-		withTime = source["withTime"].AsBool;
+	public TiteresLevel(JSONClass source, bool withTime) {
+		List<int> personQuantity = new List<JSONNode>(source["personQuantity"].Childs).ConvertAll((n) => n.AsInt);
+		List<List<int>> diffs = new List<JSONNode>(source["personDifficulty"].Childs)
+			.ConvertAll((n) => new List<JSONNode>(n.AsArray.Childs).ConvertAll((inner) => inner.AsInt));
 
-		if(!withTime){
-			List<int> personQuantity = new List<JSONNode>(source["personQuantity"].Childs).ConvertAll((n) => n.AsInt);
-			List<List<int>> diffs = new List<JSONNode>(source["personDifficulty"].Childs)
-				.ConvertAll((n) => new List<JSONNode>(n.AsArray.Childs).ConvertAll((inner) => inner.AsInt));
+		List<int> difficulties = RandomizeDifficulties(personQuantity, diffs);
 
-			List<int> difficulties = RandomizeDifficulties(personQuantity, diffs);
-
-			SetActions(difficulties);
-		}
+		SetActions(difficulties, withTime);
 	}
 
-	void SetActions(List<int> difficulties) {
+	void SetActions(List<int> difficulties, bool withTime) {
 		actions = new List<TiteresDirection>();
 		Direction[] dirs = (Direction[]) Enum.GetValues(typeof(Direction));
 		Randomizer dirRandomizer = Randomizer.New(dirs.Length - 1);
@@ -58,6 +53,8 @@ public class TiteresLevel {
 
 			if(!actions.Contains(newDir) && newDir != null) actions.Add(newDir);
 		}
+
+		actionsToShow = withTime ? Randomizer.RandomizeList(actions) : actions;
 	}
 
 	Tuple<Direction, int> RandomRelativeDir() {
@@ -93,9 +90,11 @@ public class TiteresLevel {
 		return result;
 	}
 
-	public bool HasTime(){ return withTime; }
-
 	public List<TiteresDirection> Actions() {
+		return actions;
+	}
+
+	public List<TiteresDirection> ActionsToShow() {
 		return actions;
 	}
 }

@@ -16,6 +16,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		private Sprite[] objects, landscapes;
 		private int currentRule;
+		bool timerActive;
 		private TiteresActivityModel model;
 
 		public void Start(){
@@ -45,6 +46,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 			//TODO randomize landscape and object.
 			if(model.HasTime()){
 				TimeLevel(model.CurrentLvl());
+				model.WithTime();
 			} else {
 				NormalLevel(model.CurrentLvl());
 			}
@@ -58,6 +60,37 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		void TimeLevel(TiteresLevel lvl) {
 			clock.gameObject.SetActive(true);
+			SetClock();
+			StartTimer(true);
+		}
+
+		void StartTimer(bool first = false) {
+			StartCoroutine(TimerFunction(first));
+			timerActive = true;
+		}
+
+		public IEnumerator TimerFunction(bool first = false) {
+			yield return new WaitForSeconds(1);
+			Debug.Log("segundo");
+
+			UpdateView();
+
+			if(timerActive) StartTimer();
+		}
+
+		void SetClock() {
+			clock.text = model.GetTimer().ToString();
+		}
+
+		void UpdateView() {
+			model.DecreaseTimer();
+
+			SetClock();
+
+			if(model.IsTimerDone()){
+				timerActive = false;
+				EndGame(60, 0, 1250);
+			}
 		}
 
 		void ResetPuppets() {
@@ -75,7 +108,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		void SetRule() {
-			List<TiteresDirection> actions = model.CurrentLvl().Actions();
+			List<TiteresDirection> actions = model.CurrentLvl().ActionsToShow();
 			rules.text = actions[currentRule].GetText(actions);
 			CheckButtons();
 		}
@@ -98,14 +131,27 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		void TimeOkClick() {
-			
+			timerActive = false;
+			if(IsCorrect()){
+				//correct
+				ShowRightAnswerAnimation();
+				model.Correct();
+				model.CorrectTimer();
+				SetClock();
+				model.NextLvl();
+			} else {
+				PlayWrongSound();
+				model.Wrong();
+				EndGame(60, 0, 1250);
+			}
 		}
 
 		void NoTimeOkClick() {
 			if(IsCorrect()){
 				//correct
-				PlayRightSound();
+				ShowRightAnswerAnimation();
 				model.Correct();
+				model.NextLvl();
 			} else {
 				PlayWrongSound();
 				model.Wrong();
@@ -148,58 +194,31 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 			//Check for direction
 
-			Vector2 draggerPosition = dragger.rectTransform.rect.center;
+			Vector2 draggerPosition = dragger.transform.position;
 
 			Debug.Log("dragger x: " + draggerPosition.x);
 			Debug.Log("dragger y: " + draggerPosition.y);
 
-			if(action.relativeToPuppetNumber == -1){
-				Vector2 landscapePosition = landscape.rectTransform.rect.position;
+			Vector2 objPosition = action.relativeToPuppetNumber == -1 ? obj.transform.position : draggers[action.relativeToPuppetNumber].transform.position;
 
-				Debug.Log("landscape x: " + landscapePosition.x);
-				Debug.Log("landscape y: " + landscapePosition.y);
+			Debug.Log("obj x: " + objPosition.x);
+			Debug.Log("obj y: " + objPosition.y);
 
-				if(action.direction == Direction.RIGHT && draggerPosition.x < landscapePosition.x) {
-					Debug.Log("not right");
-					return false;
-				}
-				if(action.direction == Direction.LEFT && draggerPosition.x > landscapePosition.x) {
-					Debug.Log("not left");
-					return false;
-				}
-				if(action.direction == Direction.UP && draggerPosition.y > landscapePosition.y) {
-					Debug.Log("not up");
-					return false;
-				}
-				if(action.direction == Direction.DOWN && draggerPosition.y < landscapePosition.y) {
-					Debug.Log("not down");
-					return false;
-				}
-
-			} else {
-				Vector2 relativePosition = draggers[action.relativeToPuppetNumber].rectTransform.rect.center;
-				//for extra precision in other moment.
-				//Vector2 size = draggers[action.relativeToPuppetNumber].rectTransform.rect.size;
-
-				Debug.Log("relative x: " + relativePosition.x);
-				Debug.Log("relative y: " + relativePosition.y);
-
-				if(action.direction == Direction.RIGHT && draggerPosition.x < relativePosition.x) {
-					Debug.Log("not right");
-					return false;
-				}
-				if(action.direction == Direction.LEFT && draggerPosition.x > relativePosition.x) {
-					Debug.Log("not left");
-					return false;
-				}
-				if(action.direction == Direction.UP && draggerPosition.y > relativePosition.y) {
-					Debug.Log("not up");
-					return false;
-				}
-				if(action.direction == Direction.DOWN && draggerPosition.y < relativePosition.y) {
-					Debug.Log("not down");
-					return false;
-				}
+			if(action.direction == Direction.RIGHT && draggerPosition.x < objPosition.x) {
+				Debug.Log("not right");
+				return false;
+			}
+			if(action.direction == Direction.LEFT && draggerPosition.x > objPosition.x) {
+				Debug.Log("not left");
+				return false;
+			}
+			if(action.direction == Direction.UP && draggerPosition.y < objPosition.y) {
+				Debug.Log("not up");
+				return false;
+			}
+			if(action.direction == Direction.DOWN && draggerPosition.y > objPosition.y) {
+				Debug.Log("not down");
+				return false;
 			}
 
 			return true;
