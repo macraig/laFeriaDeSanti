@@ -22,7 +22,7 @@ namespace Assets.Scripts.Games.Shipments
             _nodes = new List<ShipmentNode>();
             _edges = new List<ShipmentEdge>();
             _solutionPaths = new List<ShipmentsPath>();
-            _currentLevel = 0;
+            _currentLevel = 1;
         }
 
         public List<ShipmentNode> Nodes
@@ -61,11 +61,11 @@ namespace Assets.Scripts.Games.Shipments
                     _currentLevel++;
                     break;
                 case 1:
-                    nodes = 3;
+                    nodes = Random.Range(2, 5);
                     solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths) { 2 };
+                    edgesBySolutionPath = new List<int>(solutionPaths) { nodes - 1 };
                     extraEdgeProbability = 0;
-                    maxLongEdge = 4;
+                    maxLongEdge = 5;
 
                     break;
                 default:
@@ -115,16 +115,16 @@ namespace Assets.Scripts.Games.Shipments
             foreach (ShipmentsPath shipmentsPath in _solutionPaths)
             {
                 shipmentsPath.EdgesList = new List<ShipmentEdge>(shipmentsPath.NodesList.Count - 1);
-                for (var i = shipmentsPath.NodesList.Count - 1; i > 0; i--)
+                for (var i = 0; i < shipmentsPath.NodesList.Count - 1; i++)
                 {
 
-                    ShipmentEdge shipmentEdge = GetEdge(shipmentsPath.NodesList[i].Id, shipmentsPath.NodesList[i - 1].Id);
+                    ShipmentEdge shipmentEdge = GetEdge(shipmentsPath.NodesList[i].Id, shipmentsPath.NodesList[i + 1].Id);
                     if (shipmentEdge == null)
                     {
                         shipmentEdge = new ShipmentEdge
                         {
                             IdNodeA = shipmentsPath.NodesList[i].Id,
-                            IdNodeB = shipmentsPath.NodesList[i - 1].Id,
+                            IdNodeB = shipmentsPath.NodesList[i + 1].Id,
                             Length = Random.Range(2, maxLong + 1)
                         };
                         Edges.Add(shipmentEdge);
@@ -208,6 +208,7 @@ namespace Assets.Scripts.Games.Shipments
 
         public bool IsCorrectAnswer(List<ShipmentEdge> edgeAnswers)
         {
+            List<int> measuresList = ShipmentsView.instance.measuresList;
             foreach (ShipmentsPath shipmentsPath in _solutionPaths)
             {
                 if(shipmentsPath.EdgesList.Count != edgeAnswers.Count) continue;
@@ -216,18 +217,21 @@ namespace Assets.Scripts.Games.Shipments
                 {
                     if(shipmentsPath.EdgesList[i].IdNodeA != edgeAnswers[i].IdNodeA) break;
                     if(shipmentsPath.EdgesList[i].IdNodeB != edgeAnswers[i].IdNodeB) break;
-                    if(shipmentsPath.EdgesList[i].Length != edgeAnswers[i].Length / Scale) break;
+                    if(measuresList[i] != edgeAnswers[i].Length / Scale) break;
                 }
-                if (i == 0) return true;
+                if (i == -1) return true;
 
             }
             return false;
+
         }
 
         public List<ShipmentEdge> GetEdgesByIdNode(int idNode)
         {
             return Edges.FindAll(e => e.IdNodeA == idNode || e.IdNodeB == idNode);
         }
+
+       
     }
 
     public class ShipmentNode

@@ -24,7 +24,6 @@ public class MapGenerator : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        lines = new List<VectorLine>();
 
 /*
         LocatePlaces();
@@ -69,16 +68,13 @@ public class MapGenerator : MonoBehaviour {
         List<MapPlace> locatedPlaces = new List<MapPlace>(Places.Count);
         SetFirstPlace(nodes[0], xMax, yMax);
         locatedPlaces.Add(Places[0]);
-/*
-        nodes.Sort((node, otherNode) => ShipmentsView.instance.Model.GetEdgesByIdNode(node.Id).Count - ShipmentsView.instance.Model.GetEdgesByIdNode(otherNode.Id).Count);
-*/
         int i = 1;
         for (; i < nodes.Count; i++)
         {
             /*
                         if(nodes[i].Id == 0) continue;
             */
-            Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0]);
+            Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0], i != nodes.Count - 1);
             List<int> edgeDistances = new List<int>();
          /*   List<MapPlace> listOfPlaces =
                 locatedPlaces.FindAll(
@@ -100,7 +96,7 @@ public class MapGenerator : MonoBehaviour {
             {
                 LocatePlace(Places[i], xMax, yMax);
                
-            } while (!CheckEdgeDistances(Places[i], listOfPlaces, edgeDistances) || !CheckMinDistances(Places[i], locatedPlaces, distanceMin));
+            } while (!CheckEdgeDistances(Places[i], listOfPlaces, edgeDistances) || !CheckMinDistances(Places[i], locatedPlaces, distanceMin * 2));
             Places[i].gameObject.SetActive(true);
         }
         for (int j = Places.Count - 1; j >= i; j--)
@@ -111,7 +107,7 @@ public class MapGenerator : MonoBehaviour {
 
     private void SetFirstPlace(ShipmentNode node, float xMax, float yMax)
     {
-        Places[0].SetData(node.Id, PlacesSprites[node.Id], CrosSprites[node.Type == ShipmentNodeType.Other ? 1 : 0]);
+        Places[0].SetData(node.Id, PlacesSprites[node.Id], CrosSprites[node.Type == ShipmentNodeType.Other ? 1 : 0], false);
         Places[0].transform.localPosition = new Vector2(-xMax, yMax);
     }
 
@@ -142,6 +138,7 @@ public class MapGenerator : MonoBehaviour {
         foreach (MapPlace locatedPlace in locatedPlaces)
         {
             float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
+            float refDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
             /*
                         float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
 
@@ -156,19 +153,28 @@ public class MapGenerator : MonoBehaviour {
 
 
 
-    private void LocatePlace(MapPlace mapPlace, float xMax, float yMax)
-    {
+    public void LocatePlace(MapPlace mapPlace, float xMax, float yMax)
+    {/*
         mapPlace.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1 : -1)*Random.Range(0, xMax),
-            (Randomizer.RandomBoolean() ? 1 : -1)*Random.Range(0, yMax));
+            (Randomizer.RandomBoolean() ? 1 : -1)*Random.Range(0, yMax));*/
+
+        mapPlace.transform.localPosition = new Vector2(Random.Range(0, xMax),
+            (Randomizer.RandomBoolean() ? 1 : -1)*Random.Range(-yMax, 0));
     }
 
 
     public void TraceEdges(List<ShipmentEdge> edges)
     {
+        if (lines == null)
+        {
+            lines = new List<VectorLine>();
+
+        }
         foreach (VectorLine line in lines)
         {
             line.rectTransform.gameObject.SetActive(false);
         }
+
 
         foreach (ShipmentEdge shipmentEdge in edges)
         {
@@ -189,5 +195,62 @@ public class MapGenerator : MonoBehaviour {
 
         }
         Ruler.transform.SetAsLastSibling();
+    }
+
+    public void SafeLocatePlaces(List<ShipmentNode> nodes, List<ShipmentEdge> edges)
+    {
+        foreach (MapPlace mapPlace in Places.GetRange(1, Places.Count - 1))
+        {
+            mapPlace.Id = -1;
+        }
+
+
+        float scaleFactor = FindObjectOfType<Canvas>().scaleFactor;
+        float edge = Places[0].GetComponent<RectTransform>().sizeDelta.x;
+        float distanceMin = Mathf.Sqrt(2) * edge;
+        Vector2 mapSize = Map.GetComponent<RectTransform>().sizeDelta;
+        float xMax = mapSize.x * scaleFactor - edge;
+        float yMax = mapSize.y * scaleFactor - edge;
+
+        List<MapPlace> locatedPlaces = new List<MapPlace>(Places.Count);
+        SetFirstPlace(nodes[0], xMax, yMax);
+        locatedPlaces.Add(Places[0]);
+        int i = 1;
+        for (; i < nodes.Count; i++)
+        {
+            Places[i].gameObject.SetActive(true);
+
+
+         
+            do
+            {
+             
+                SafeLocatePlace(Places[i], Places[i - 1], xMax, yMax);
+
+            } while (!CheckMinDistances(Places[i], locatedPlaces, distanceMin));
+            Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0], i != nodes.Count - 1);
+
+        }
+        for (int j = Places.Count - 1; j >= i; j--)
+        {
+            Places[j].gameObject.SetActive(false);
+        }
+    }
+
+    private void SafeLocatePlace(MapPlace toLocate, MapPlace located,  float xMax, float yMax)
+    {
+        Vector2 otherPosition = located.CrossReference.transform.position;
+   
+        float f;
+        do
+        {
+            toLocate.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, xMax), (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, yMax));
+            var referenceDistance = Vector2.Distance(toLocate.CrossReference.transform.position, otherPosition);
+            f = referenceDistance / Ruler.GetUnityDistances();
+        } while (f < 1.8 || Math.Abs(f % 1) > 0.1);
+        
+        ShipmentsView.instance.measuresList.Add(Mathf.RoundToInt(f));
+
+        
     }
 }
