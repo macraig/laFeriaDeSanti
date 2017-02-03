@@ -99,11 +99,13 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		public void NextClick(){
 			currentRule++;
+			PlaySoundClick ();
 			SetRule();
 		}
 
 		public void PreviousClick(){
 			currentRule--;
+			PlaySoundClick ();
 			SetRule();
 		}
 

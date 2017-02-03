@@ -64,7 +64,7 @@ public class PlagasActivityView : LevelView {
 
 	public void OkClick() {
 		PlayWhackSound ();
-		Invoke ("CheckWhack",0.2f);
+		Invoke ("CheckWhack",0.5f);
 
 	}
 
@@ -73,11 +73,12 @@ public class PlagasActivityView : LevelView {
 		int column = model.GetColumn(letter.text);
 
 		if(model.HasTime()){
+			
 			TimeOkClick(row, column);
 			SetLives(model.GetLives());
 		} else {
 			NoTimeOkClick(row, column);
-			SetLives(0);
+//			SetLives(0);
 		}
 	}
 
@@ -109,7 +110,7 @@ public class PlagasActivityView : LevelView {
 
 	void TimeOkClick(int row, int column) {
 		if (model.IsCorrectTime(row, column)){
-			model.Correct();
+//			model.Correct();
 //			PlayRightSound();
 			SmackMole(model.GetSlot(row, column));
 			//ShowRightAnswerAnimation();
@@ -118,7 +119,7 @@ public class PlagasActivityView : LevelView {
 		} else {
 			//ShowWrongAnswerAnimation();
 			PlayWrongSound();
-			model.Wrong();
+//			model.Wrong();
 			model.OneLessLife();
 
 			if(model.NoMoreLives()){
