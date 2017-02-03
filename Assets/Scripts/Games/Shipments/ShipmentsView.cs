@@ -19,6 +19,7 @@ namespace Assets.Scripts.Games.Shipments
         public Color UnfocusedColor;
         public Text ScaleText;
         private int _currentFocus;
+        public List<int> measuresList;
 
         public ShipmentsModel Model { get; set; }
 
@@ -36,6 +37,7 @@ namespace Assets.Scripts.Games.Shipments
             Model = new ShipmentsModel();
             _currentFocus = 1;
             HighlightCurrentFocus();
+            measuresList = new List<int>();
             Next(true);
         }
 
@@ -126,14 +128,34 @@ namespace Assets.Scripts.Games.Shipments
 
         public override void Next(bool first = false)
         {
+            measuresList.Clear();
             Model.NextExercise();
-            MapGenerator.LocatePlaces(Model.Nodes, Model.Edges);
+            MapGenerator.SafeLocatePlaces(Model.Nodes, Model.Edges);
+
+          /*  if (first)
+            {
+                MapGenerator.LocatePlaces(Model.Nodes, Model.Edges);
+            }
+            else
+            {
+            }*/
+           
+            
             MapGenerator.TraceEdges(Model.Edges);
             ScaleText.text = Model.Scale + " kg";
+            ClearAnswers();
 
 
         }
 
+        private void ClearAnswers()
+        {
+            foreach (ShipmentsAnswerCell shipmentsAnswerCell in GetAnswerCells())
+            {
+                if(shipmentsAnswerCell.Value == 0) continue;
+                shipmentsAnswerCell.Clear();
+            }
+        }
 
 
         private List<ShipmentsAnswerCell> GetAnswerCells()
@@ -175,7 +197,7 @@ namespace Assets.Scripts.Games.Shipments
             return true;
         }
 
-        public void OnClickMapPlace(int id)
+        public void OnClickMapPlace(int id, bool isIntermediate)
         {
             ShipmentsAnswerCell cell = GetCurrentAnswerCell();
             if (cell.Type == AnswerCellType.Numeric)
@@ -188,8 +210,18 @@ namespace Assets.Scripts.Games.Shipments
                 cell.Value = id;
                 cell.GetComponent<Image>().sprite = AnswerCellSprites[id];
                 OnClickAnswerCell(_currentFocus + 1);
+              /*  if (isIntermediate && _currentFocus%2 == 1)
+                {
+                    ShipmentsAnswerCell cell2 = GetAnswerCells()[_currentFocus + 2];
+                    cell2.Value = id;
+                    cell2.GetComponent<Image>().sprite = AnswerCellSprites[id];
 
+
+                }*/
             }
+
+
+            
         }
 
         public void UpdateTryButton()

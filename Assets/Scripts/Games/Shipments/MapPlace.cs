@@ -6,6 +6,7 @@ public class MapPlace : MonoBehaviour
 {
     public Image CrossReference;
     private int _id;
+    private bool _isIntermediate;
 
     public int Id
     {
@@ -15,19 +16,20 @@ public class MapPlace : MonoBehaviour
 
     void Start()
     {
-        Id = -1;
-        GetComponent<Button>().onClick.AddListener(OnClickMapPlace);
+        Button.ButtonClickedEvent click = GetComponent<Button>().onClick;
+         click.AddListener(OnClickMapPlace);
     }
 
-    public void SetData(int id, Sprite placesSprite, Sprite crossSprite)
+    public void SetData(int id, Sprite placesSprite, Sprite crossSprite, bool isIntermediate)
     {
         this.Id = id;
         CrossReference.sprite = crossSprite;
         GetComponent<Image>().sprite = placesSprite;
+        _isIntermediate = isIntermediate;
     }
 
     private void OnClickMapPlace()
     {
-        ShipmentsView.instance.OnClickMapPlace(_id);
+        ShipmentsView.instance.OnClickMapPlace(_id, _isIntermediate);
     }
 }

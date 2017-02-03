@@ -35,6 +35,11 @@ namespace Assets.Scripts.Games.Shipments
             Image image = GetComponent<Image>();
             image.sprite = UnfilledSprite;
             image.color = UnfilledColor;
+            _value = -1;
+            if (Type == AnswerCellType.Numeric)
+            {
+                GetComponentInChildren<Text>().text = "-";
+            }
         }
 
         public void Unpaint()
