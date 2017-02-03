@@ -40,6 +40,10 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			}
 		}
 
+		public PartModel Model(){
+			return model;
+		}
+
 		public void SetModel(PartModel partModel, List<Sprite> parts) {
 			model = partModel;
 

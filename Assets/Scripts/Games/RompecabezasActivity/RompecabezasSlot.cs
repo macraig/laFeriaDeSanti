@@ -10,7 +10,7 @@ using Assets.Scripts.Common;
 public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 	public RompecabezasActivityView view;
 	private Part current;
-	private bool isStartEndSlot;
+	private bool isEndSlot;
 
 	public void OnDrop(PointerEventData eventData) {
 		Part target = Part.itemBeingDragged;
@@ -28,12 +28,15 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 		}
 	}
 
-	public void StartEndSlot(bool s){
-		isStartEndSlot = s;
+	public Part GetCurrent(){
+		return current;
+	}
+
+	public void EndSlot(bool s){
+		isEndSlot = s;
 	}
 
 	public void SetStart(PartModel start) {
-		StartEndSlot(true);
 		switch(start.direction) {
 		case Direction.DOWN:
 			GetComponent<Image>().sprite = view.PartSprite(3);
@@ -51,7 +54,7 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 	}
 
 	public void SetEnd(PartModel end) {
-		StartEndSlot(true);
+		EndSlot(true);
 		switch(end.previousDir) {
 		case Direction.DOWN:
 			GetComponent<Image>().sprite = view.PartSprite(6);
@@ -66,5 +69,9 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 			GetComponent<Image>().sprite = view.PartSprite(4);
 			break;
 		}
+	}
+
+	public bool IsEnd() {
+		return isEndSlot;
 	}
 }

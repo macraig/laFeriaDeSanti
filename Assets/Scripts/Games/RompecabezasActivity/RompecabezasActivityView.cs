@@ -121,7 +121,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		void ResetTiles() {
 			tiles.ForEach(t => {
 				t.sprite = parts[EMPTY_TILE];
-				t.GetComponent<RompecabezasSlot>().StartEndSlot(false);
+				t.GetComponent<RompecabezasSlot>().EndSlot(false);
 			});
 		}
 
@@ -162,8 +162,44 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		}
 
 		bool IsCorrect() {
+			List<PartModel> startParts = model.CurrentLvl().StartParts();
+
+			foreach(PartModel startPart in startParts) {
+				int newRow = startPart.row;
+				int newCol = startPart.col;
+
+				Direction dir = startPart.direction;
+
+				while(true){
+					newRow = DirectionPlusRow(dir, newRow);
+					newCol = DirectionPlusCol(dir, newCol);
+
+					RompecabezasSlot slot = tiles[TileNumber(newRow, newCol)].GetComponent<RompecabezasSlot>();
+
+					if(slot.IsEnd()) break;
+
+					Part currentPart = slot.GetCurrent();
+
+					if(currentPart == null) return false;
+					if(currentPart.Model().previousDir != dir) return false;
+
+					dir = currentPart.Model().direction;
+				}
+			}
 			
 			return true;
+		}
+
+		int DirectionPlusRow(Direction d, int row) {
+			if(d == Direction.UP) return row - 1;
+			if(d == Direction.DOWN) return row + 1;
+			return row;
+		}
+
+		int DirectionPlusCol(Direction d, int col) {
+			if(d == Direction.LEFT) return col - 1;
+			if(d == Direction.RIGHT) return col + 1;
+			return col;
 		}
 
 		public Sprite PartSprite(int index){
