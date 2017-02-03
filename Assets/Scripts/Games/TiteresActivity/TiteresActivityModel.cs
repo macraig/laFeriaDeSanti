@@ -11,6 +11,8 @@ public class TiteresActivityModel : LevelModel {
 	//time is in seconds
 	public const int START_TIME = 60, CORRECT_SCENE_TIME = 15;
 	public static List<string> NAMES = new List<string>{ "INÉS", "PEDRO", "ARTURO", "LUCÍA" };
+	public static List<string> OBJECT_NAMES = new List<string>{ "de la palmera", "de la vaca", "del hongo", "del cactus","del pingüino",
+		"del zorro","del tronco","del cactus","del tractor","de los huesos"};
 	private int timer;
 	private bool withTime;
 
@@ -29,6 +31,8 @@ public class TiteresActivityModel : LevelModel {
 		return currentLvl == lvls.Count;
 	}
 
+
+
 	void StartLevels(bool withTime = false) {
 		lvls = new List<TiteresLevel>();
 		JSONArray lvlsJson = JSON.Parse(Resources.Load<TextAsset>("Jsons/TiteresActivity/levels").text).AsObject["levels"].AsArray;
@@ -44,6 +48,8 @@ public class TiteresActivityModel : LevelModel {
 	public bool HasTime() {
 		return withTime;
 	}
+
+
 
 	public void NextLvl(){
 		currentLvl++;

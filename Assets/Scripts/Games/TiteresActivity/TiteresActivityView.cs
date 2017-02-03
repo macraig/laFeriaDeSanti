@@ -14,15 +14,17 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		public Randomizer objectLandscapeRandomizer;
 
-		private Sprite[] objects, landscapes;
-		private int currentRule;
+		private Sprite[] objects;
+		private Material[] landscapes;
+		private int currentRule, currentObjectLandscape;
 		bool timerActive;
 		private TiteresActivityModel model;
 
 		public void Start(){
 			model = new TiteresActivityModel();
 			objects = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/objects");
-			landscapes = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/landscapes");
+			landscapes = Resources.LoadAll<Material>("Sprites/TiteresActivity/Materials");
+			objectLandscapeRandomizer = Randomizer.New (landscapes.Length-1);
 			Begin();
 		}
 
@@ -43,7 +45,10 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		void SetCurrentLevel() {
 			currentRule = 0;
-			//TODO randomize landscape and object.
+			currentObjectLandscape = objectLandscapeRandomizer.Next();
+			landscape.material = landscapes[currentObjectLandscape];
+			obj.sprite = objects [currentObjectLandscape];
+
 			if(model.HasTime()){
 				TimeLevel(model.CurrentLvl());
 				model.WithTime();
@@ -111,7 +116,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		void SetRule() {
 			List<TiteresDirection> actions = model.CurrentLvl().ActionsToShow();
-			rules.text = actions[currentRule].GetText(actions);
+			rules.text = actions[currentRule].GetText(actions,currentObjectLandscape);
 			CheckButtons();
 		}
 

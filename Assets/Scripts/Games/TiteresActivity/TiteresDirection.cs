@@ -16,14 +16,22 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 		difficulty = diff;
 	}
 
-	public string GetText(List<TiteresDirection> actions) {
-		string result = TiteresActivityModel.NAMES[actions.IndexOf(this)] + " ESTÁ ";
+	public string GetText(List<TiteresDirection> actions, int objectIndex) {
+		string puppetName = TiteresActivityModel.NAMES [actions.IndexOf (this)];
+		string result = puppetName + " ESTÁ ";
 
 		if(action == TiteresAction.SIT) {
-			//TODO shit!
-			result += "SENTADA ";
+			
+			if (puppetName == "PEDRO" || puppetName == "ARTURO")
+				result += "SENTADO ";
+			else
+				result += "SENTADA ";
+			
 		} else if(action == TiteresAction.STANDING){
-			result += "PARADA ";
+			if (puppetName == "PEDRO" || puppetName == "ARTURO")
+				result += "PARADO ";
+			else
+				result += "PARADA ";
 		}
 
 		if(direction == Direction.LEFT) {
@@ -39,8 +47,7 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 		if(relativeToPuppetNumber != -1){
 			result += "DE " + TiteresActivityModel.NAMES[relativeToPuppetNumber];
 		} else {
-			//TODO object?
-			result += "DEL OBJETO ";
+			result += TiteresActivityModel.OBJECT_NAMES[objectIndex].ToUpper();
 		}
 
 		if(action == TiteresAction.LEFT_ARM){
