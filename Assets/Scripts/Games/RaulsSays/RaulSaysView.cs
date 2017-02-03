@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Sound;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -55,16 +56,24 @@ namespace Assets.Scripts.Games
 
         public GameObject clock;
         public GameObject repeatSoundButton;
+		private AudioClip signSound;
         // Use this for initialization
         void Start()
         {
-            words = new Text[2];
+            
+			words = new Text[2];
 
             words[0] = wordHolder.transform.GetChild(0).gameObject.GetComponent<Text>();
             words[1] = wordHolder.transform.GetChild(1).gameObject.GetComponent<Text>();
+			signSound = Resources.Load<AudioClip> ("Audio/RaulActivity/sign");
+
         }
 
-     
+		override public void HideExplanation(){
+			PlaySoundClick ();
+			explanationPanel.SetActive (false);
+
+		}
 
         public void SetLevel1()
         {
@@ -141,7 +150,8 @@ namespace Assets.Scripts.Games
 
         public void ShowWordOption(int answer, string[] wordToShow, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
         {
-            firstArrowIndicator.color = Color.clear;
+			PlaySignSound ();
+			firstArrowIndicator.color = Color.clear;
             secondArrowIndicator.color = Color.clear;
 
 
@@ -182,7 +192,8 @@ namespace Assets.Scripts.Games
 
         public void ShowArrowOption(int answer, Sprite[] spriteToShow, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
         {
-            firstArrowIndicator.color = Color.white;
+			PlaySignSound ();
+			firstArrowIndicator.color = Color.white;
             firstArrowIndicator.sprite = spriteToShow[0];
 
             SetNeutralArms();
@@ -334,5 +345,9 @@ namespace Assets.Scripts.Games
             }
             objectToRotate.transform.rotation = toAngle;
         }
+
+		private void PlaySignSound(){
+			SoundController.GetController ().PlayClip (signSound);
+		}
     }
 }

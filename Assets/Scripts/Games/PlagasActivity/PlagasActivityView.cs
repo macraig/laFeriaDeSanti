@@ -12,14 +12,18 @@ using System;
 
 public class PlagasActivityView : LevelView {
 	public Button okBtn;
-	public List<Image> tiles, clocks, lives;
+	public List<Image> tiles, clocks;
+	public List<GameObject> lives;
 	public Text letter, number;
 
 	private Sprite[] tileSprites;
 	private bool keyboardActive;
 	private Randomizer veggieRandomizer = Randomizer.New(3, 1), moleRandomizer = Randomizer.New(6, 4);
 	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7;
+
+	private AudioClip whackSound, whackMoleSound;
 	private PlagasActivityModel model;
+
 
 	bool timerActive = false;
 
@@ -42,11 +46,29 @@ public class PlagasActivityView : LevelView {
 		number.text = "";
 	}
 
+	public void OnNumberClick(){
+		PlayDropSound ();
+		number.text = "";
+		CheckOk ();
+	}
+
+	public void OnLetterClick(){
+		PlayDropSound ();
+		letter.text = "";
+		CheckOk ();
+	}
+
 	void ClocksActive(bool active) {
 		clocks.ForEach((c) => c.gameObject.SetActive(active));
 	}
 
 	public void OkClick() {
+		PlayWhackSound ();
+		Invoke ("CheckWhack",0.2f);
+
+	}
+
+	private void CheckWhack(){
 		int row = model.GetRow(number.text);
 		int column = model.GetColumn(letter.text);
 
@@ -61,7 +83,8 @@ public class PlagasActivityView : LevelView {
 
 	void SetLives(int livesModel) {
 		for(int i = 0; i < lives.Count; i++) {
-			lives[i].gameObject.SetActive(livesModel > i);
+//			lives[i].SetActive(livesModel > i);
+			lives[i].GetComponent<Button>().interactable = (livesModel > i);
 		}
 	}
 
@@ -87,7 +110,7 @@ public class PlagasActivityView : LevelView {
 	void TimeOkClick(int row, int column) {
 		if (model.IsCorrectTime(row, column)){
 			model.Correct();
-			PlayRightSound();
+//			PlayRightSound();
 			SmackMole(model.GetSlot(row, column));
 			//ShowRightAnswerAnimation();
 
@@ -106,6 +129,8 @@ public class PlagasActivityView : LevelView {
 	}
 
 	void SmackMole(int slot) {
+		
+		PlayWhackedMoleSound ();
 		tiles[slot].sprite = tileSprites[SMACKED_MOLE_SPRITE];
 		clocks[slot].gameObject.SetActive(false);
 
@@ -125,8 +150,19 @@ public class PlagasActivityView : LevelView {
 	public void Start(){
 		model = new PlagasActivityModel();
 		tileSprites = Resources.LoadAll<Sprite>("Sprites/PlagasActivity/tiles");
+		whackSound = Resources.Load<AudioClip> ("Audio/PlagasActivity/whack");
+		whackMoleSound = Resources.Load<AudioClip> ("Audio/PlagasActivity/whackedMole");
 		timerActive = false;
 		Begin();
+	}
+
+	private void PlayWhackSound(){
+		SoundController.GetController ().PlayClip (whackSound);
+	}
+
+
+	private void PlayWhackedMoleSound(){
+		SoundController.GetController ().PlayClip (whackMoleSound);
 	}
 
 	public void Begin(){
@@ -136,6 +172,7 @@ public class PlagasActivityView : LevelView {
 	private void SetCurrentLevel() {
 		//deberia ser con herencia, pero odio c# :)
 		if(model.HasTime()){
+			lives.ForEach ((GameObject g) => g.SetActive (true));
 			TimeLevel(model.CurrentLvl());
 			SetLives(model.GetLives());
 		} else {
@@ -236,11 +273,13 @@ public class PlagasActivityView : LevelView {
 	}
 
 	public void LetterClick(string l){
+		PlaySoundClick ();
 		letter.text = l;
 		CheckOk();
 	}
 
 	public void NumberClick(string n){
+		PlaySoundClick ();
 		number.text = n;
 		CheckOk();
 	}
@@ -253,7 +292,8 @@ public class PlagasActivityView : LevelView {
 		return letter.text.Length == 1 && number.text.Length == 1;
 	}
 
-	public void RestartGame(){
+	override public void RestartGame(){
+		base.RestartGame ();
 		Start();
 	}
 

@@ -95,6 +95,6 @@ public class TiteresLevel {
 	}
 
 	public List<TiteresDirection> ActionsToShow() {
-		return actions;
+		return actionsToShow;
 	}
 }

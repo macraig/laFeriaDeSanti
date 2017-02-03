@@ -87,7 +87,7 @@ namespace Assets.Scripts.Games
 		}
 
 
-		public void HideExplanation(){
+		virtual public void HideExplanation(){
 			PlaySoundClick ();
 			explanationPanel.SetActive (false);
 			if (first) {
