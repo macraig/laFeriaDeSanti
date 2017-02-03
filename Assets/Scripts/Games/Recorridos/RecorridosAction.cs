@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-public class RecorridosButton : MonoBehaviour {
+
+public class RecorridosAction : MonoBehaviour {
 
     public enum ActionToDo { Up, Down, Left, Right, Remove,Start}
 
