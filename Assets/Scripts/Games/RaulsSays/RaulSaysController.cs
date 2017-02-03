@@ -1,8 +1,9 @@
 ﻿using Assets.Scripts.Sound;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Metrics.Model;
 using UnityEngine;
-//Picadura de la Cobra Gay
+
 namespace Assets.Scripts.Games
 {
     public class RaulSaysController : MonoBehaviour
@@ -19,6 +20,7 @@ namespace Assets.Scripts.Games
 
         [SerializeField]
         AudioClip[] audios;
+	
 
 
         [SerializeField]
@@ -37,6 +39,7 @@ namespace Assets.Scripts.Games
         private Dictionary<Stages,RaulStage> stageDictionary;
 
         private int currentTime;
+		private bool first = true;
 
         void Awake()
         {
@@ -52,7 +55,8 @@ namespace Assets.Scripts.Games
         // Use this for initialization
         void Start()
         {
-            incorrectAnswers = 0;
+			MetricsController.GetController().GameStart();	
+			incorrectAnswers = 0;
 
             view = GetComponent<RaulSaysView>();
 
@@ -67,19 +71,31 @@ namespace Assets.Scripts.Games
             stageDictionary.Add(Stages.Word, new RaulWordStage());
             currentLevelCounter = -1;
             currentLevel = new RaulLevel(animalSprites);
-            ChangeToNextLevel();
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
+		
+			ShowExplanation ();
+		
 
         }
+
+		void ShowExplanation(){
+			view.ShowExplanation ();
+		}
+
+		public void HideExplanation(){
+			view.HideExplanation ();
+			if (first) {
+				ChangeToNextLevel ();
+				first = false;
+			}
+
+		}
+
 
         public void CorrectOptionChosen()
         {
             SoundController.GetController().PlayRightAnswerSound();
             correctAnswers++;
+			MetricsController.GetController ().AddRightAnswer ();
             view.ShowCorrectAnimation();
 
             if(correctAnswers == 3 && currentLevelCounter != 2)
@@ -117,7 +133,7 @@ namespace Assets.Scripts.Games
         {
             SoundController.GetController().PlayFailureSound();
             incorrectAnswers++;
-
+			MetricsController.GetController ().AddWrongAnswer ();
             view.ShowIncorrectAnimation();
 
             if (currentLevelCounter != 2)
@@ -188,12 +204,16 @@ namespace Assets.Scripts.Games
                 RandomizeStage(2);
             }else
             {
-                RestartGame();
-                //ACA TENES QUE POINER EL ENDGAME MARIAAAAAAAAAAAAAAAAAA 
+                
+				EndGame ();
                 
             }
             
         }
+
+		private void EndGame(){
+			view.EndGame (0, 0, 1250);
+		}
 
         private IEnumerator GetNextOption(RaulStage newStage, float timeToWait)
         {
@@ -236,8 +256,14 @@ namespace Assets.Scripts.Games
         public void RestartGame()
         {
             currentLevelCounter = -1;
-            ChangeToNextLevel();
+			first = true;
+			view.HideInGameMenu ();
+			ShowExplanation ();
+
+
         }
+
+
 
 
     }

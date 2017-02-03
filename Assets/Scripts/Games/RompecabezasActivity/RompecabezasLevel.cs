@@ -44,7 +44,7 @@ public class RompecabezasLevel {
 
 		while(parts.Count < (partQuantity + 2)){
 			newCol = DirectionPlusCol(newDir, newCol);
-			newRow = DirectionPlusRow(newDir, startRow);
+			newRow = DirectionPlusRow(newDir, newRow);
 
 			Randomizer dirRand = Randomizer.New(dirs.Length - 1);
 			Direction oldDir = newDir;

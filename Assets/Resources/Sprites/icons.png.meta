@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 52242c50ca81d3b41a54c8bf0c938d84
-timeCreated: 1484656403
-licenseType: Free
+timeCreated: 1486122792
+licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
     21300000: FDS-elementos-22_0
@@ -73,6 +73,14 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
   - buildTarget: Android
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: WebGL
     maxTextureSize: 2048
     textureFormat: -1
     textureCompression: 1
