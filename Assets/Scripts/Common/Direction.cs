@@ -2,6 +2,6 @@
 
 namespace Assets.Scripts.Common {
 	public enum Direction {
-		UP, DOWN, LEFT, RIGHT
+		UP, DOWN, LEFT, RIGHT, NULL
 	}
 }
