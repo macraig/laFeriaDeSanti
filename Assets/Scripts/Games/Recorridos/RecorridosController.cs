@@ -414,7 +414,6 @@ namespace Assets.Scripts.Games
         IEnumerator ResetList(float timeToReset, bool buttonState)
         {
             yield return new WaitForSeconds(timeToReset);
-            view.LightValue(currentValueAnalyzed, false, Color.clear);
             actionsToDo = new List<RecorridosAction>();
             view.ResetStackView();
             EnableButtonState(buttonState);

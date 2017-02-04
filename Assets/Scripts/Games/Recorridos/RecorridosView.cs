@@ -109,6 +109,7 @@ public class RecorridosView : MonoBehaviour {
         foreach(GameObject stackImage in stackImages)
         {
             stackImage.SetActive(false);
+            stackImage.GetComponent<Image>().color = Color.white;
         }
         currentAvailableInstructionSpot = 0;
         MovingDown();
