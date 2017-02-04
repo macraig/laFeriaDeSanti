@@ -9,11 +9,11 @@
 		"partQuantity": "6",
 		"distractionParts": "2"
 	}, {
-		"hasTwoRoads": "false",
+		"hasTwoRoads": "true",
 		"partQuantity": "6",
 		"distractionParts": "0"
 	}, {
-		"hasTwoRoads": "false",
+		"hasTwoRoads": "true",
 		"partQuantity": "6",
 		"distractionParts": "2"
 	}]

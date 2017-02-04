@@ -6,15 +6,17 @@ using Assets.Scripts.Sound;
 using UnityEngine.UI;
 using Assets.Scripts.Games.RompecabezasActivity;
 using Assets.Scripts.Common;
+using System.Collections.Generic;
 
-public class RompecabezasSlot : MonoBehaviour, IDropHandler {
+public class RompecabezasSlot : MonoBehaviour, IDropHandler, IPointerClickHandler {
 	public RompecabezasActivityView view;
 	private Part current;
-	private bool isEndSlot;
+	private bool isEndSlot, isStartSlot;
+	private Sprite startSprite;
 
 	public void OnDrop(PointerEventData eventData) {
 		Part target = Part.itemBeingDragged;
-		if(target != null) {
+		if(target != null && !isStartSlot && !isEndSlot) {
 			SoundController.GetController().PlayDropSound();
 
 			if(current != null){
@@ -28,6 +30,10 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 		}
 	}
 
+	public void Start(){
+		startSprite = GetComponent<Image>().sprite;
+	}
+
 	public Part GetCurrent(){
 		return current;
 	}
@@ -36,7 +42,20 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 		isEndSlot = s;
 	}
 
+	public void StartSlot(bool b) {
+		isStartSlot = b;
+	}
+
+	public void OnPointerClick(PointerEventData eventData) {
+		if(current != null){
+			current.gameObject.SetActive(true);
+			current = null;
+			ResetSprite();
+		}
+	}
+
 	public void SetStart(PartModel start) {
+		StartSlot(true);
 		switch(start.direction) {
 		case Direction.DOWN:
 			GetComponent<Image>().sprite = view.PartSprite(3);
@@ -73,5 +92,9 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler {
 
 	public bool IsEnd() {
 		return isEndSlot;
+	}
+
+	public void ResetSprite() {
+		GetComponent<Image>().sprite = startSprite;
 	}
 }

@@ -120,8 +120,9 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		void ResetTiles() {
 			tiles.ForEach(t => {
-				t.sprite = parts[EMPTY_TILE];
+				t.GetComponent<RompecabezasSlot>().ResetSprite();
 				t.GetComponent<RompecabezasSlot>().EndSlot(false);
+				t.GetComponent<RompecabezasSlot>().StartSlot(false);
 			});
 		}
 
@@ -181,9 +182,13 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 					Part currentPart = slot.GetCurrent();
 
 					if(currentPart == null) return false;
-					if(currentPart.Model().previousDir != dir) return false;
 
-					dir = currentPart.Model().direction;
+					if(currentPart.Model().direction == dir) {
+						dir = currentPart.Model().previousDir;
+					} else if(currentPart.Model().previousDir == dir) {
+						dir = currentPart.Model().direction;
+					} else
+						return false;
 				}
 			}
 			

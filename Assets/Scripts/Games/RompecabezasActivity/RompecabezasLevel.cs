@@ -21,12 +21,165 @@ public class RompecabezasLevel {
 	}
 
 	void BuildTwoRoadLevel() {
-		
+		parts = new List<PartModel>();
+		Direction[] dirs = new Direction[] {Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.UP};
+		bool isCross = Randomizer.RandomBoolean();
+		//Double part will be in any of the 4 middles tiles. This could be improved by moving the whole puzzle when ready.
+		int doubleRow = Randomizer.RandomInRange(3, 2);
+		int doubleCol = Randomizer.RandomInRange(3, 2);
+
+		Debug.Log("Double part: col " + doubleCol + " row " + doubleRow);
+
+		PartModel doublePart = new PartModel(Direction.NULL, Direction.NULL, doubleCol, doubleRow, true, isCross);
+		parts.Add(doublePart);
+
+		//The algorithm will consist in adding a part to each direction of the double part until i'm out 
+		//of parts to add, the we will add de start and end parts.
+		Direction wheelDir = RandomDirection(dirs);
+		Debug.Log(wheelDir);
+
+		//We need to keep track of which direction we are adding the parts so we can flatten them afterwards and add start and end parts.
+		Dictionary<Direction, List<PartModel>> wheel = new Dictionary<Direction, List<PartModel>>();
+		Direction dir = wheelDir;
+		bool done = false;
+
+		while(parts.Count < partQuantity){
+			if(done){
+				wheelDir = NextDir(dirs, wheelDir);
+				dir = wheelDir;
+				Debug.Log(wheelDir);
+				done = false;
+			}
+
+			if(!wheel.ContainsKey(wheelDir)) {
+
+				doubleCol = DirectionPlusCol(dir, doubleCol);
+				doubleRow = DirectionPlusRow(dir, doubleRow);
+
+				//first part doesnt cross anything, ever.
+				Randomizer dirRand = Randomizer.New(dirs.Length - 1);
+				Direction oldDir = dir;
+				for(int i = 0; i < dirs.Length; i++) {
+					dir = dirs[dirRand.Next()];
+					if(isApplicable(dir, doubleCol, doubleRow) && !IsSameWay(oldDir, dir)){
+						PartModel newPart = new PartModel(dir, oldDir, doubleCol, doubleRow);
+						if(!parts.Contains(newPart)) {
+							parts.Add(newPart);
+							wheel[wheelDir] = new List<PartModel>();
+							wheel[wheelDir].Add(newPart);
+							done = true;
+							break;
+						}
+					}
+				}
+			} else {
+				PartModel lastPart = wheel[wheelDir][wheel[wheelDir].Count - 1];
+				dir = lastPart.direction;
+
+				doubleCol = DirectionPlusCol(dir, doubleCol);
+				doubleRow = DirectionPlusRow(dir, doubleRow);
+
+				Randomizer dirRand = Randomizer.New(dirs.Length - 1);
+				Direction oldDir = dir;
+				bool doneInner = false;
+				for(int i = 0; i < dirs.Length; i++) {
+					dir = dirs[dirRand.Next()];
+					if(isApplicable(dir, doubleCol, doubleRow) && !IsSameWay(oldDir, dir)){
+						PartModel newPart = new PartModel(dir, oldDir, doubleCol, doubleRow);
+						PartModel wouldBeEndPart = new PartModel(Direction.NULL, Direction.NULL, DirectionPlusCol(dir, doubleCol), DirectionPlusRow(dir, doubleRow));
+						if(!parts.Contains(newPart) && !parts.Contains(wouldBeEndPart)) {
+							parts.Add(newPart);
+							wheel[wheelDir].Add(newPart);
+							doneInner = true;
+							break;
+						}
+					}
+				}
+				if(!doneInner) {
+					//If I reach this segment it means that I have no way out. In that case, restart BuildLevel(). We should use a path algorithm.
+					BuildTwoRoadLevel();return;
+				}
+			}
+		}
+
+		if(!AddDoubleEndStartParts(wheel, doublePart)) { BuildTwoRoadLevel();return; }
+
+		AddDistractors();
+
+		parts = Randomizer.RandomizeList(parts);
+	}
+
+	bool AddDoubleEndStartParts(Dictionary<Direction, List<PartModel>> wheel, PartModel doublePart) {
+		bool firstCross = Randomizer.RandomBoolean();
+		bool secondCross = Randomizer.RandomBoolean();
+
+		if(doublePart.isCross){
+			if(!AddStart(wheel, firstCross ? Direction.LEFT : Direction.RIGHT) ||
+				!AddEnd(wheel, firstCross ? Direction.RIGHT : Direction.LEFT) ||
+				!AddStart(wheel, secondCross ? Direction.UP : Direction.DOWN) ||
+				!AddEnd(wheel, secondCross ? Direction.DOWN : Direction.UP))
+				return false;
+		} else if(doublePart.isLeftUp){
+			if(!AddStart(wheel, firstCross ? Direction.LEFT : Direction.UP) ||
+				!AddEnd(wheel, firstCross ? Direction.UP : Direction.LEFT) ||
+				!AddStart(wheel, secondCross ? Direction.RIGHT : Direction.DOWN) ||
+				!AddEnd(wheel, secondCross ? Direction.DOWN : Direction.RIGHT))
+				return false;
+		} else {
+			if(!AddStart(wheel, firstCross ? Direction.LEFT : Direction.DOWN) ||
+				!AddEnd(wheel, firstCross ? Direction.DOWN : Direction.LEFT) ||
+				!AddStart(wheel, secondCross ? Direction.RIGHT : Direction.UP) ||
+				!AddEnd(wheel, secondCross ? Direction.UP : Direction.RIGHT))
+				return false;
+		}
+
+		return true;
+	}
+
+	bool AddStart(Dictionary<Direction, List<PartModel>> wheel, Direction direction) {
+		PartModel lastPart = wheel[direction][wheel[direction].Count - 1];
+
+		PartModel start = new PartModel(OppositDir(lastPart.direction), Direction.NULL, DirectionPlusCol(lastPart.direction, lastPart.col), DirectionPlusRow(lastPart.direction, lastPart.row));
+
+		if(parts.Contains(start)) return false;
+		else {
+			parts.Add(start);
+			return true;
+		}
+	}
+
+	bool AddEnd(Dictionary<Direction, List<PartModel>> wheel, Direction direction) {
+		PartModel lastPart = wheel[direction][wheel[direction].Count - 1];
+
+		PartModel end = new PartModel(Direction.NULL, lastPart.direction, DirectionPlusCol(lastPart.direction, lastPart.col), DirectionPlusRow(lastPart.direction, lastPart.row));
+
+		if(parts.Contains(end)) return false;
+		else {
+			parts.Add(end);
+			return true;
+		}
+	}
+
+	Direction OppositDir(Direction direction) {
+		if(direction == Direction.UP) return Direction.DOWN;
+		if(direction == Direction.DOWN) return Direction.UP;
+		if(direction == Direction.LEFT) return Direction.RIGHT;
+		if(direction == Direction.RIGHT) return Direction.LEFT;
+		return Direction.NULL;
+	}
+
+	Direction NextDir(Direction[] dirs, Direction dir) {
+		int idx = Array.IndexOf(dirs, dir);
+		if(dirs.Length - 1 == idx)
+			idx = 0;
+		else
+			idx++;
+		return dirs[idx];
 	}
 
 	void BuildLevel() {
 		parts = new List<PartModel>();
-		Direction[] dirs = (Direction[]) Enum.GetValues(typeof(Direction));
+		Direction[] dirs = new Direction[] {Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.UP};
 		Randomizer r = Randomizer.New(GRID - 1);
 
 		//Set start wall and direction. Set start part.
@@ -69,13 +222,13 @@ public class RompecabezasLevel {
 		//End part doesn't go anywhere.
 		parts[parts.Count - 1].direction = Direction.NULL;
 
-		PrintParts();
+		AddDistractors();
+
+		parts = Randomizer.RandomizeList(parts);
 	}
 
-	void PrintParts() {
-		foreach(var p in parts) {
-			Debug.Log("De " + p.previousDir + " a " + p.direction);
-		}
+	void AddDistractors() {
+		
 	}
 
 	bool IsSameWay(Direction oldDir, Direction newDir) {
@@ -105,10 +258,10 @@ public class RompecabezasLevel {
 	}
 
 	bool isApplicable(Direction d, int col, int row) {
-		if(d == Direction.LEFT && col <= 1) return false;
-		if(d == Direction.RIGHT && col >= 4) return false;
-		if(d == Direction.UP && row <= 1) return false;
-		if(d == Direction.DOWN && row >= 4) return false;
+		if(d == Direction.LEFT && col <= 0) return false;
+		if(d == Direction.RIGHT && col >= 5) return false;
+		if(d == Direction.UP && row <= 0) return false;
+		if(d == Direction.DOWN && row >= 5) return false;
 		return true;
 	}
 
@@ -117,15 +270,13 @@ public class RompecabezasLevel {
 	}
 
 	public List<PartModel> StartParts(){
-		//TODO multiple starts.
-		return parts.GetRange(0, 1);
+		return parts.FindAll(p => p.previousDir == Direction.NULL && p.direction != Direction.NULL);
 	}
 	public List<PartModel> EndParts(){
-		//TODO multiple starts.
-		return parts.GetRange(parts.Count - 1, 1);
+		return parts.FindAll(p => p.direction == Direction.NULL && p.previousDir != Direction.NULL);
 	}
 
 	public List<PartModel> DraggerParts() {
-		return parts.GetRange(1, parts.Count - 2);
+		return parts.FindAll(p => p.isDouble || (p.direction != Direction.NULL && p.previousDir != Direction.NULL));
 	}
 }
