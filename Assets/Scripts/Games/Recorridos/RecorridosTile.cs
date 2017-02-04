@@ -111,7 +111,7 @@ public class RecorridosTile {
                 RecorridosController.instance.EndGame(false);
                 break;
             case RecorridosController.RecorridosTileEnum.Hole:
-                RecorridosController.instance.FallInHole();
+                RecorridosController.instance.BackToStart();
                 break;
             default:
                 RecorridosController.instance.MovePuppet();
