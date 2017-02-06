@@ -14,12 +14,14 @@ namespace Assets.Scripts.Games.Shipments
         public MapGenerator MapGenerator;
         public GameObject[] AnswerRowGameObjects;
         public Sprite[] AnswerCellSprites;
-        public Button TryButton;
+        public Button OkButton;
+        public Button NextButton;
         public Color FocusedColor;
         public Color UnfocusedColor;
         public Text ScaleText;
         private int _currentFocus;
-        public List<int> measuresList;
+        public Image StartPlace;
+        public Image FinishPlace;
 
         public ShipmentsModel Model { get; set; }
 
@@ -35,19 +37,19 @@ namespace Assets.Scripts.Games.Shipments
             AddCellLiseners();
             GetAnswerCells()[0].Value = 0;
             Model = new ShipmentsModel();
-            _currentFocus = 1;
+            
             HighlightCurrentFocus();
-            measuresList = new List<int>();
+            menuBtn.onClick.AddListener(OnClickMenuBtn);
             Next(true);
         }
 
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow)) { OnClickAnswerCell(_currentFocus + 1); }        
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) { OnClickAnswerCell(_currentFocus - 1); }        
-            if (Input.GetKeyDown(KeyCode.UpArrow)) { OnClickAnswerCell(_currentFocus - 3); }        
-            if (Input.GetKeyDown(KeyCode.DownArrow)) { OnClickAnswerCell(_currentFocus + 3); }
+            if (Input.GetKeyDown(KeyCode.RightArrow)) { ChangeFocusCell(_currentFocus + 1); }        
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) { ChangeFocusCell(_currentFocus - 1); }        
+            if (Input.GetKeyDown(KeyCode.UpArrow)) { ChangeFocusCell(_currentFocus - 3); }        
+            if (Input.GetKeyDown(KeyCode.DownArrow)) { ChangeFocusCell(_currentFocus + 3); }
             else if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0)) { OnClickNumberBtn(0); }
             else if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) { OnClickNumberBtn(1); }
             else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) { OnClickNumberBtn(2); }
@@ -90,13 +92,7 @@ namespace Assets.Scripts.Games.Shipments
         public void OnClickClear()
         {
             SoundController.GetController().PlayTypingSound();
-            ShipmentsAnswerCell cell = GetCurrentAnswerCell();
-            cell.Value = -1;
-            if (cell.Type == AnswerCellType.Numeric)
-            {
-                cell.GetComponentInChildren<Text>().text = "-";
-            }
-            cell.Clear();
+            GetCurrentAnswerCell().Clear();
         }
 
         private ShipmentsAnswerCell GetCurrentAnswerCell()
@@ -104,7 +100,7 @@ namespace Assets.Scripts.Games.Shipments
             return GetAnswerCells()[_currentFocus];
         }
 
-        public void OnClickAnswerCell(int cell)
+        public void ChangeFocusCell(int cell)
         {
             if(cell < 1 || cell > GetAnswerCells().Count - 1) return;
             PlaySoundClick();
@@ -121,31 +117,26 @@ namespace Assets.Scripts.Games.Shipments
         private void UnhighlightCurrentFocus()
         {
             GetCurrentAnswerCell().Unpaint();
-/*
-            GetAnswerCells()[_currentFocus].GetComponent<Button>().image.color = UnfocusedColor;
-*/
         }
 
         public override void Next(bool first = false)
         {
-            measuresList.Clear();
+            if(!first) PlaySoundClick();
+            OkButton.gameObject.SetActive(true);
+            OkButton.enabled = true;
+            NextButton.gameObject.SetActive(false);
             Model.NextExercise();
             MapGenerator.SafeLocatePlaces(Model.Nodes, Model.Edges);
-
-          /*  if (first)
-            {
-                MapGenerator.LocatePlaces(Model.Nodes, Model.Edges);
-            }
-            else
-            {
-            }*/
-           
-            
+                     
             MapGenerator.TraceEdges(Model.Edges);
-            ScaleText.text = Model.Scale + " kg";
+            ScaleText.text = Model.Scale + " km";
             ClearAnswers();
-
-
+            StartPlace.sprite =
+                MapGenerator.Places.Find(e => e.Type == ShipmentNodeType.Start).GetComponent<Image>().sprite;
+            FinishPlace.sprite =
+                MapGenerator.Places.Find(e => e.Type == ShipmentNodeType.Finish).GetComponent<Image>().sprite;
+            _currentFocus = 1;
+            ChangeFocusCell(1);
         }
 
         private void ClearAnswers()
@@ -197,7 +188,7 @@ namespace Assets.Scripts.Games.Shipments
             return true;
         }
 
-        public void OnClickMapPlace(int id, bool isIntermediate)
+        public void OnClickMapPlace(int id, ShipmentNodeType type)
         {
             ShipmentsAnswerCell cell = GetCurrentAnswerCell();
             if (cell.Type == AnswerCellType.Numeric)
@@ -209,24 +200,47 @@ namespace Assets.Scripts.Games.Shipments
                 SoundController.GetController().PlayTypingSound();
                 cell.Value = id;
                 cell.GetComponent<Image>().sprite = AnswerCellSprites[id];
-                OnClickAnswerCell(_currentFocus + 1);
-              /*  if (isIntermediate && _currentFocus%2 == 1)
+                List<ShipmentsAnswerCell> cells = GetAnswerCells();
+                if (type == ShipmentNodeType.Other && _currentFocus + 2 < cells.Count && _currentFocus%3 == 1)
                 {
-                    ShipmentsAnswerCell cell2 = GetAnswerCells()[_currentFocus + 2];
+                    ShipmentsAnswerCell cell2 = cells[_currentFocus + 2];
                     cell2.Value = id;
                     cell2.GetComponent<Image>().sprite = AnswerCellSprites[id];
+                }
+                else if (type == ShipmentNodeType.Other && _currentFocus -2 > 0 && _currentFocus % 3 == 0)
+                {
+                    ShipmentsAnswerCell cell2 = cells[_currentFocus - 2];
+                    cell2.Value = id;
+                    cell2.GetComponent<Image>().sprite = AnswerCellSprites[id];
+                }
+                FocusNextEmptyCell();
 
-
-                }*/
             }
 
 
             
         }
 
+        private void FocusNextEmptyCell()
+        {
+            List<ShipmentsAnswerCell> cells = GetAnswerCells();
+            for (int i = _currentFocus + 1; i < cells.Count; i++)
+            {
+                if (cells[i].Value != -1) continue;
+                ChangeFocusCell(i);
+                return;
+            }
+            for (int i = 1; i < _currentFocus; i++)
+            {
+                if (cells[i].Value != -1) continue;
+                ChangeFocusCell(i);
+                return;
+            }
+        }
+
         public void UpdateTryButton()
         {
-            TryButton.interactable = AnsweStateIsValid();
+            OkButton.interactable = AnsweStateIsValid();
         }
 
         private void AddCellLiseners()
@@ -239,8 +253,15 @@ namespace Assets.Scripts.Games.Shipments
                 cells[i].GetComponent<Button>().onClick.AddListener(
                     () =>
                     {
-                        OnClickAnswerCell(i1);
+                        MapPlace mapPlace = MapGenerator.Places.Find(e => e.Id == cells[i1].Value);
+                        if(cells[i1].Value != 1 && mapPlace != null)
+                        {
+                            if (mapPlace.Type == ShipmentNodeType.Other && i1 + 2 < cells.Count && i1 % 3 == 1) cells[i1 + 2].Clear();
+                            else if (mapPlace.Type == ShipmentNodeType.Other && i1 - 2 > 0 && i1 % 3 == 0) cells[i1 - 2].Clear();
+                        }
                         
+                        cells[i1].Clear();
+                        ChangeFocusCell(i1);
                     }
 
                     );
@@ -249,6 +270,7 @@ namespace Assets.Scripts.Games.Shipments
 
         public void OnClickOk()
         {
+            OkButton.enabled = false;
             PlaySoundClick();
             List<ShipmentEdge> edgeAnswers = new List<ShipmentEdge>();
 
@@ -279,12 +301,14 @@ namespace Assets.Scripts.Games.Shipments
 
         public override void OnRightAnimationEnd()
         {
-            base.OnRightAnimationEnd();
+            OkButton.gameObject.SetActive(false);
+            NextButton.gameObject.SetActive(true);
         }
 
         public override void OnWrongAnimationEnd()
         {
             base.OnWrongAnimationEnd();
+            OkButton.enabled = true;
         }
     }
 }

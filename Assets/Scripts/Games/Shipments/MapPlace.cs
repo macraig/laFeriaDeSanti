@@ -5,8 +5,8 @@ using UnityEngine.UI;
 public class MapPlace : MonoBehaviour
 {
     public Image CrossReference;
+    public string Name;
     private int _id;
-    private bool _isIntermediate;
 
     public int Id
     {
@@ -14,22 +14,24 @@ public class MapPlace : MonoBehaviour
         set { _id = value; }
     }
 
+    public ShipmentNodeType Type { get; set; }
+
     void Start()
     {
         Button.ButtonClickedEvent click = GetComponent<Button>().onClick;
          click.AddListener(OnClickMapPlace);
     }
 
-    public void SetData(int id, Sprite placesSprite, Sprite crossSprite, bool isIntermediate)
+    public void SetData(int id, Sprite placesSprite, Sprite crossSprite, ShipmentNodeType type)
     {
         this.Id = id;
         CrossReference.sprite = crossSprite;
         GetComponent<Image>().sprite = placesSprite;
-        _isIntermediate = isIntermediate;
+        Type = type;
     }
 
     private void OnClickMapPlace()
     {
-        ShipmentsView.instance.OnClickMapPlace(_id, _isIntermediate);
+        ShipmentsView.instance.OnClickMapPlace(_id, Type);
     }
 }

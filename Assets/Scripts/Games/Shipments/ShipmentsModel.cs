@@ -15,6 +15,7 @@ namespace Assets.Scripts.Games.Shipments
         private List<ShipmentNode> _nodes; 
         private List<ShipmentEdge> _edges;
         private List<ShipmentsPath> _solutionPaths;
+        private bool lastCorrect;
 
 
         public ShipmentsModel()
@@ -22,7 +23,8 @@ namespace Assets.Scripts.Games.Shipments
             _nodes = new List<ShipmentNode>();
             _edges = new List<ShipmentEdge>();
             _solutionPaths = new List<ShipmentsPath>();
-            _currentLevel = 1;
+            _currentLevel = 0;
+            lastCorrect = true;
         }
 
         public List<ShipmentNode> Nodes
@@ -45,11 +47,12 @@ namespace Assets.Scripts.Games.Shipments
             int maxLongEdge;
             List<int> edgesBySolutionPath;
             float extraEdgeProbability;
-            Scale = Random.Range(3, 11);
+            Scale = Randomizer.RandomBoolean() ? 5 : 10;
             _solutionPaths.Clear();
             Nodes.Clear();
             Edges.Clear();
-            
+            Debug.Log("current lvl: " + (_currentLevel+1));
+
             switch (_currentLevel)
             {
                 case 0:
@@ -58,33 +61,69 @@ namespace Assets.Scripts.Games.Shipments
                     edgesBySolutionPath = new List<int>(solutionPaths) {1};
                     extraEdgeProbability = 0;
                     maxLongEdge = 10;
-                    _currentLevel++;
                     break;
                 case 1:
-                    nodes = Random.Range(2, 5);
+                    nodes = Random.Range(3, 6);
                     solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths) { nodes - 1 };
+                    edgesBySolutionPath = new List<int>(solutionPaths) { 2 };
                     extraEdgeProbability = 0;
                     maxLongEdge = 5;
 
                     break;
                 default:
-                    nodes = Random.Range(4, 6);
-                    solutionPaths = 2;
-                    edgesBySolutionPath = new List<int>(solutionPaths) { 1, 2};
+                    nodes = Random.Range(4, 7);
+                    solutionPaths = 1;
+                    edgesBySolutionPath = new List<int>(solutionPaths)
+                    { Mathf.CeilToInt((nodes- 1) * Random.Range(0.5f, 1)), Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)) };
                     extraEdgeProbability = 0;
                     maxLongEdge = 4;
-
+              
+                    break;
+           /*     case 3:
+                    nodes = Random.Range(6, 9);
+                    solutionPaths = Random.Range(2, 4);
+                    edgesBySolutionPath = new List<int>(solutionPaths);
+                    for (int i = edgesBySolutionPath.Capacity - 1; i >= 0; i--)
+                    {
+                        edgesBySolutionPath.Add(Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)));
+                    }
+                    extraEdgeProbability = 0.5f;
+                    maxLongEdge = 4;
 
                     break;
+                case 4:
+                    nodes = Random.Range(6, 9);
+                    solutionPaths = Random.Range(2, 4);
+                    edgesBySolutionPath = new List<int>(solutionPaths);
+                    for (int i = edgesBySolutionPath.Capacity - 1; i >= 0; i--)
+                    {
+                        edgesBySolutionPath.Add(Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)));
+                    }
+                    extraEdgeProbability = 0.5f;
+                    maxLongEdge = 4;
+
+                    break;
+                default:
+                    nodes = Random.Range(6, 9);
+                    solutionPaths = Random.Range(2, 4);
+                    edgesBySolutionPath = new List<int>(solutionPaths);
+                    for (int i = edgesBySolutionPath.Capacity - 1; i >= 0; i--)
+                    {
+                        edgesBySolutionPath.Add(Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)));
+                    }
+                    extraEdgeProbability = 0.5f;
+                    maxLongEdge = 4;
+
+                    break;*/
             }
+           
             GenerateNodes(nodes);
             GenerateSolutionPaths(solutionPaths, edgesBySolutionPath);
             GenerateEdgesToSolutionPaths(maxLongEdge);
 
             GenerateExtraEdges(extraEdgeProbability, maxLongEdge);
-            Debug.Log("cost: " + _solutionPaths[0].GetTotalCost());
-
+           /* _currentLevel++;
+            if (_currentLevel == 6) _currentLevel = 0;*/
         }
 
         private void GenerateExtraEdges(float extraEdgeProbability, int maxLong)
@@ -125,7 +164,6 @@ namespace Assets.Scripts.Games.Shipments
                         {
                             IdNodeA = shipmentsPath.NodesList[i].Id,
                             IdNodeB = shipmentsPath.NodesList[i + 1].Id,
-                            Length = Random.Range(2, maxLong + 1)
                         };
                         Edges.Add(shipmentEdge);
                     }
@@ -208,8 +246,22 @@ namespace Assets.Scripts.Games.Shipments
 
         public bool IsCorrectAnswer(List<ShipmentEdge> edgeAnswers)
         {
+/*
             List<int> measuresList = ShipmentsView.instance.measuresList;
-            foreach (ShipmentsPath shipmentsPath in _solutionPaths)
+*/
+            for (int i = 0; i < edgeAnswers.Count; i++)
+            {
+                edgeAnswers[i].Length = edgeAnswers[i].Length/Scale;
+                ShipmentEdge edge = Edges.Find(e => e.Equals(edgeAnswers[i]));
+                if (edge == null) return false;
+            }
+            bool isCorrectAnswer = edgeAnswers[edgeAnswers.Count - 1].IdNodeB == Nodes.Find(e => e.Type == ShipmentNodeType.Finish).Id;
+            if (lastCorrect) _currentLevel++;
+            lastCorrect = isCorrectAnswer;
+            return isCorrectAnswer;
+
+
+            /*    foreach (ShipmentsPath shipmentsPath in _solutionPaths)
             {
                 if(shipmentsPath.EdgesList.Count != edgeAnswers.Count) continue;
                 int i = shipmentsPath.EdgesList.Count - 1;
@@ -217,12 +269,12 @@ namespace Assets.Scripts.Games.Shipments
                 {
                     if(shipmentsPath.EdgesList[i].IdNodeA != edgeAnswers[i].IdNodeA) break;
                     if(shipmentsPath.EdgesList[i].IdNodeB != edgeAnswers[i].IdNodeB) break;
-                    if(measuresList[i] != edgeAnswers[i].Length / Scale) break;
+                    if(shipmentsPath.EdgesList[i].Length != edgeAnswers[i].Length / Scale) break;
                 }
                 if (i == -1) return true;
 
             }
-            return false;
+            return false;*/
 
         }
 
@@ -259,7 +311,11 @@ namespace Assets.Scripts.Games.Shipments
 
         public int Length { get; set; }
 
+        public bool Equals(ShipmentEdge otherEdge)
+        {
+            return Length == otherEdge.Length && (IdNodeA == otherEdge.IdNodeA && IdNodeB == otherEdge.IdNodeB) || (IdNodeB == otherEdge.IdNodeA && IdNodeA == otherEdge.IdNodeB);
 
+        }
     }
 }
 
