@@ -1,7 +1,7 @@
 ﻿using System;
 using Assets.Scripts.Common;
 using System.Collections.Generic;
-using UnityEngine.UI;
+using UnityEngine;
 
 public class TiteresDirection : IEquatable<TiteresDirection> {
 	public Direction direction;
@@ -54,6 +54,56 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 			result += "LEVANTANDO EL BRAZO IZQUIERDO";
 		} else if(action == TiteresAction.RIGHT_ARM){
 			result += "LEVANTANDO EL BRAZO DERECHO";
+		}
+
+		return result;
+	}
+
+	public List<AudioClip> GetAudios(List<TiteresDirection> actions, int objectIndex,
+		Dictionary<string,AudioClip> puppetAudios,Dictionary<string,AudioClip> puppetEndAudios,
+		Dictionary<string,AudioClip> positionAudios,List<AudioClip> objectAudios) {
+
+		List<AudioClip> result = new List<AudioClip> ();
+		string puppetName = TiteresActivityModel.NAMES [actions.IndexOf (this)];
+
+		result.Add(puppetAudios[puppetName.ToLower()]);
+		result.Add (positionAudios["esta"]);
+			
+
+		if(action == TiteresAction.SIT) {
+
+			if (puppetName == "PEDRO" || puppetName == "ARTURO")
+				result.Add (positionAudios["sentado"]);
+			else
+				result.Add (positionAudios["sentada"]);
+
+		} else if(action == TiteresAction.STANDING){
+			if (puppetName == "PEDRO" || puppetName == "ARTURO")
+				result.Add (positionAudios["parado"]);
+			else
+				result.Add (positionAudios["parada"]);
+		}
+
+		if(direction == Direction.LEFT) {
+			result.Add (positionAudios["izquierda"]);
+		} else if (direction == Direction.RIGHT){
+			result.Add (positionAudios["derecha"]);
+		} else if (direction == Direction.UP){
+			result.Add (positionAudios["arriba"]);
+		} else if (direction == Direction.DOWN){
+			result.Add (positionAudios["debajo"]);
+		}
+
+		if(relativeToPuppetNumber != -1){
+			result.Add (puppetEndAudios[TiteresActivityModel.NAMES[relativeToPuppetNumber].ToLower()]);
+		} else {
+			result.Add(objectAudios[objectIndex]);
+		}
+
+		if(action == TiteresAction.LEFT_ARM){
+			result.Add (positionAudios["levantandoizquierdo"]);
+		} else if(action == TiteresAction.RIGHT_ARM){
+			result.Add (positionAudios["levantandoderecho"]);
 		}
 
 		return result;

@@ -19,7 +19,7 @@ public class TiteresLevel {
 	void SetActions(List<int> difficulties, bool withTime) {
 		actions = new List<TiteresDirection>();
 		Direction[] dirs = (Direction[]) Enum.GetValues(typeof(Direction));
-		Randomizer dirRandomizer = Randomizer.New(dirs.Length - 1);
+		Randomizer dirRandomizer = Randomizer.New(dirs.Length - 2);
 		TiteresDirection newDir = null;
 
 		while(actions.Count < difficulties.Count) {

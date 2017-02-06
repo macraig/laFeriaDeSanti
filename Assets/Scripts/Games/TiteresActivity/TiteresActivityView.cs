@@ -38,7 +38,6 @@ namespace Assets.Scripts.Games.TiteresActivity {
 			} else {
 				ResetPuppets();
 				SetCurrentLevel();
-
 				CheckOk();
 			}
 		}
@@ -99,7 +98,10 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		void ResetPuppets() {
-			draggers.ForEach((d) => d.GetComponent<TiteresDragger>().SetToInitialPosition());
+			foreach (Image dragger in draggers) {
+				dragger.GetComponent<TiteresDragger>().SetToInitialPosition ();
+				dragger.GetComponent<TiteresDragger>().ResetPuppetSprite ();
+			}
 		}
 
 		public void NextClick(){

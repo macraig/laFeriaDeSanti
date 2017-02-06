@@ -13,13 +13,14 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 	private bool droppedInLandscape;
 	//Position where dragger starts in screen.
 	private Vector3 initialPosition;
-
+	private int starterSpriteIndex;
 	public List<Sprite> puppets;
 
 	public void Start(){
 		initialPosition = transform.position;
 		droppedInLandscape = false;
 		puppets = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/TiteresActivity/puppets"));
+		starterSpriteIndex = puppets.IndexOf (GetComponent<Image> ().sprite);
 	}
 
 	public void SetActive(bool isActive){
@@ -59,6 +60,7 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
 	public void SetToInitialPosition() {
 		transform.position = initialPosition;
+
 	}
 
 	public bool IsDroppedInLandscape() {
@@ -74,5 +76,9 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 		else index++;
 
 		GetComponent<Image>().sprite = puppets[index];
+	}
+
+	public void ResetPuppetSprite(){
+		GetComponent<Image>().sprite = puppets[starterSpriteIndex];
 	}
 }
