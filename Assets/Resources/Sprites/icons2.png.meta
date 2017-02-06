@@ -1,27 +1,15 @@
 fileFormatVersion: 2
-guid: 4be553f83862e7f43a288f14a53830ce
-timeCreated: 1486393255
+guid: 1024e4c420137054fa489d6db3386656
+timeCreated: 1486389233
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: PlagasActivity-01_0
-    21300002: PlagasActivity-01_1
-    21300004: PlagasActivity-01_2
-    21300006: PlagasActivity-01_3
-    21300008: PlagasActivity-01_4
-    21300010: PlagasActivity-01_5
-    21300012: PlagasActivity-01_6
-    21300014: PlagasActivity-01_7
-    21300016: tiles_0
-    21300018: tiles_1
-    21300020: tiles_2
-    21300022: tiles_3
-    21300024: tiles_4
-    21300026: tiles_5
-    21300028: tiles_6
-    21300030: tiles_7
-    21300032: tiles_8
-    21300034: tiles_9
+    21300000: icons2_0
+    21300002: icons2_1
+    21300004: icons2_2
+    21300006: icons2_3
+    21300008: icons2_4
+    21300010: icons2_5
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -96,132 +84,80 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tiles_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 152
-        width: 149
-        height: 148
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: tiles_1
-      rect:
-        serializedVersion: 2
-        x: 151
-        y: 152
-        width: 149
-        height: 148
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: tiles_2
-      rect:
-        serializedVersion: 2
-        x: 302
-        y: 151
-        width: 149
-        height: 149
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: tiles_3
-      rect:
-        serializedVersion: 2
-        x: 453
-        y: 151
-        width: 149
-        height: 149
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: tiles_4
-      rect:
-        serializedVersion: 2
-        x: 604
-        y: 151
-        width: 149
-        height: 149
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: tiles_5
+      name: icons2_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 149
-        height: 149
+        width: 490
+        height: 309
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: tiles_6
+      name: icons2_1
       rect:
         serializedVersion: 2
-        x: 151
+        x: 490
         y: 0
-        width: 150
-        height: 149
+        width: 490
+        height: 309
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: tiles_7
+      name: icons2_2
       rect:
         serializedVersion: 2
-        x: 302
+        x: 980
         y: 0
-        width: 149
-        height: 150
+        width: 490
+        height: 309
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: tiles_8
+      name: icons2_3
       rect:
         serializedVersion: 2
-        x: 453
+        x: 1470
         y: 0
-        width: 149
-        height: 150
+        width: 490
+        height: 309
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: tiles_9
+      name: icons2_4
       rect:
         serializedVersion: 2
-        x: 603
+        x: 1960
         y: 0
-        width: 151
-        height: 150
+        width: 490
+        height: 309
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: icons2_5
+      rect:
+        serializedVersion: 2
+        x: 2450
+        y: 0
+        width: 490
+        height: 309
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
