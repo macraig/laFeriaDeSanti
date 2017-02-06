@@ -22,6 +22,7 @@ namespace Assets.Scripts.Games
 		//Right and wrong animations
 		public Image rightAnimation;
 		public Image wrongAnimation;
+		public GameObject nextLevelAnimation;
 		//First turn
 		protected bool first = true;
 
@@ -156,6 +157,12 @@ namespace Assets.Scripts.Games
 			ViewController.GetController ().LoadEndPanel ();
 		}
 
+		virtual public void ShowNextLevelAnimation(){
+			nextLevelAnimation.transform.SetAsLastSibling ();
+			nextLevelAnimation.GetComponent<TransitionScript>().ShowAnimation();
+			SoundController.GetController ().PlaySwitchSound();
+		}
+
 		virtual public void ShowRightAnswerAnimation(){
 			rightAnimation.transform.SetAsLastSibling ();
 			rightAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
@@ -168,6 +175,11 @@ namespace Assets.Scripts.Games
 			SoundController.GetController ().PlayFailureSound ();
 		}
 
+		virtual public void OnNextLevelAnimationEnd(){
+			EnableComponents (true);
+//			Next ();
+		}
+
 		virtual public void OnRightAnimationEnd(){
 			EnableComponents (true);
 			Next ();
@@ -176,6 +188,8 @@ namespace Assets.Scripts.Games
 		virtual public void OnWrongAnimationEnd(){
 			EnableComponents (true);
 		}
+
+
 
 		//Override to deactivate or activate components before and after right/wrong animations
 		virtual public void EnableComponents(bool enable){

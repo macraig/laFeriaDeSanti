@@ -101,9 +101,10 @@ namespace Assets.Scripts.Games
             if(correctAnswers == 3 && currentLevelCounter != 2)
             {
                 RaulStage nextStage = GetNextStage();
+				view.ShowNextLevelAnimation ();
                 if(nextStage == null)
-                {
-                    ChangeToNextLevel();
+				{
+					ChangeToNextLevel();
                 }else
                 {
                     StartCoroutine(GetNextOption(nextStage, 2));

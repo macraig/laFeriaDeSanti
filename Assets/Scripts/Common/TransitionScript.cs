@@ -13,7 +13,7 @@ public class TransitionScript : MonoBehaviour {
 		public void OnAnimationEnd()
 		{
 			gameObject.SetActive(false);
-//			levelView.OnRightAnimationEnd();
+			levelView.OnNextLevelAnimationEnd();
 		}
 
 		public void ShowAnimation()

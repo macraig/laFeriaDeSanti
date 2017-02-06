@@ -56,6 +56,7 @@ namespace Assets.Scripts.Games
 
         public GameObject clock;
         public GameObject repeatSoundButton;
+		public GameObject placaClockSound;
 		private AudioClip signSound;
         // Use this for initialization
         void Start()
@@ -77,7 +78,8 @@ namespace Assets.Scripts.Games
 
         public void SetLevel1()
         {
-            clock.SetActive(false);
+			placaClockSound.SetActive (false);
+			clock.SetActive(false);
             image8Result.SetActive(false);
             image4Result.SetActive(true);
             resultToModify = image4Result;
@@ -119,7 +121,8 @@ namespace Assets.Scripts.Games
 
         public void SetLevel3()
         {
-            clock.SetActive(true);
+			placaClockSound.SetActive (true);
+			clock.SetActive(true);
             taskImages = new List<GameObject>();
             image8Result.SetActive(true);
             image4Result.SetActive(false);
@@ -139,7 +142,8 @@ namespace Assets.Scripts.Games
 
         public void SetArrowStage()
         {
-            repeatSoundButton.SetActive(false);
+			placaClockSound.SetActive (false);
+			repeatSoundButton.SetActive(false);
             wordHolder.SetActive(false);
             firstArrowIndicator.gameObject.SetActive(true);
             secondArrowIndicator.gameObject.SetActive(true);
@@ -215,7 +219,8 @@ namespace Assets.Scripts.Games
 
         public void SetWordStage()
         {
-            repeatSoundButton.SetActive(false);
+			placaClockSound.SetActive (false);
+			repeatSoundButton.SetActive(false);
             if (words == null)
             {
                 words = new Text[2];
@@ -272,7 +277,7 @@ namespace Assets.Scripts.Games
 
         public void SetAudioStage()
         {
-
+			placaClockSound.SetActive (true);
             repeatSoundButton.SetActive(true);
             firstArrowIndicator.gameObject.SetActive(false);
             secondArrowIndicator.gameObject.SetActive(false);
