@@ -156,13 +156,13 @@ namespace Assets.Scripts.Games
 			ViewController.GetController ().LoadEndPanel ();
 		}
 
-		internal void ShowRightAnswerAnimation(){
+		virtual public void ShowRightAnswerAnimation(){
 			rightAnimation.transform.SetAsLastSibling ();
 			rightAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
 			SoundController.GetController ().PlayRightAnswerSound ();
 		}
 
-		internal void ShowWrongAnswerAnimation(){
+		virtual public void ShowWrongAnswerAnimation(){
 			wrongAnimation.transform.SetAsLastSibling ();
 			wrongAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
 			SoundController.GetController ().PlayFailureSound ();

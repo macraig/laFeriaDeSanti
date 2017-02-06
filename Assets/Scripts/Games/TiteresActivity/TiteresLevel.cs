@@ -76,7 +76,7 @@ public class TiteresLevel {
 	TiteresAction RandomAction(bool sitStand) {
 		return (sitStand ? new List<TiteresAction>{ TiteresAction.SIT, TiteresAction.STANDING } : 
 			new List<TiteresAction> { TiteresAction.LEFT_ARM, TiteresAction.RIGHT_ARM })
-				[Randomizer.RandomInRange(1)];
+				[Randomizer.RandomInRange(2)];
 	}
 
 	List<int> RandomizeDifficulties(List<int> personQuantity, List<List<int>> diffs) {

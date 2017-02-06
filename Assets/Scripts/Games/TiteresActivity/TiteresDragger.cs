@@ -16,6 +16,8 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 	private int starterSpriteIndex;
 	public List<Sprite> puppets;
 
+	public TiteresActivityView view;
+
 	public void Start(){
 		initialPosition = transform.position;
 		droppedInLandscape = false;
@@ -29,6 +31,8 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
 	public void OnBeginDrag(PointerEventData eventData) {
 		if (active) {
+			SoundController.GetController ().SetConcatenatingAudios (false);
+			view.soundBtn.interactable = true;
 			SoundController.GetController().PlayDragSound();
 			itemBeingDragged = this;
 			startPosition = transform.position;
@@ -44,6 +48,8 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
 	public void OnEndDrag(PointerEventData eventData = null) {
 		if (active) {
+			SoundController.GetController ().SetConcatenatingAudios (false);
+			view.soundBtn.interactable = true;
 			SoundController.GetController().PlayDropSound();
 			itemBeingDragged = null;
 			GetComponent<CanvasGroup> ().blocksRaycasts = true;
@@ -59,6 +65,7 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 	}
 
 	public void SetToInitialPosition() {
+		droppedInLandscape = false;
 		transform.position = initialPosition;
 
 	}

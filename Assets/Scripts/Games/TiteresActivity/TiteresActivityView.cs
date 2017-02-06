@@ -3,19 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Common;
+using Assets.Scripts.Sound;
 
 namespace Assets.Scripts.Games.TiteresActivity {
 	public class TiteresActivityView : LevelView {
 		public Text clock, rules;
+		public Image clockImage;
 		public Button next, previous, okBtn, soundBtn;
 
 		public Image obj, landscape;
 		public List<Image> draggers;
+		public Image puppetsCharacter;
 
 		public Randomizer objectLandscapeRandomizer;
 
-		private Sprite[] objects;
+		private Sprite[] objects, characterSprites;
 		private Material[] landscapes;
+		private List<AudioClip> audios;
 		private int currentRule, currentObjectLandscape;
 		bool timerActive;
 		private TiteresActivityModel model;
@@ -23,13 +27,21 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		public void Start(){
 			model = new TiteresActivityModel();
 			objects = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/objects");
+			characterSprites = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/puppetWinLose");
 			landscapes = Resources.LoadAll<Material>("Sprites/TiteresActivity/Materials");
+
 			objectLandscapeRandomizer = Randomizer.New (landscapes.Length-1);
 			Begin();
 		}
 
 		public void Begin(){
 			ShowExplanation();
+		}
+
+		override public void ShowInGameMenu(){
+			base.ShowInGameMenu ();
+			SoundController.GetController ().SetConcatenatingAudios (false);
+			soundBtn.interactable = true;
 		}
 
 		override public void Next(bool first = false){
@@ -58,14 +70,17 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		void NormalLevel(TiteresLevel lvl) {
 			clock.gameObject.SetActive(false);
-
+			clockImage.gameObject.SetActive(false);
 			SetRule();
 		}
 
 		void TimeLevel(TiteresLevel lvl) {
 			clock.gameObject.SetActive(true);
+			clockImage.gameObject.SetActive(true);
 			SetClock();
 			StartTimer(true);
+			SetRule ();
+
 		}
 
 		void StartTimer(bool first = false) {
@@ -106,12 +121,16 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		public void NextClick(){
 			currentRule++;
+			SoundController.GetController ().SetConcatenatingAudios (false);
+			soundBtn.interactable = true;
 			PlaySoundClick ();
 			SetRule();
 		}
 
 		public void PreviousClick(){
 			currentRule--;
+			SoundController.GetController ().SetConcatenatingAudios (false);
+			soundBtn.interactable = true;
 			PlaySoundClick ();
 			SetRule();
 		}
@@ -119,8 +138,12 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		void SetRule() {
 			List<TiteresDirection> actions = model.CurrentLvl().ActionsToShow();
 			rules.text = actions[currentRule].GetText(actions,currentObjectLandscape);
+			audios = actions[currentRule].GetAudios(actions,currentObjectLandscape,model.GetPuppetAudios(),
+				model.GetPuppetEndAudios(),model.GetPositionAudios(),model.GetObjectAudios());
+
 			CheckButtons();
 		}
+			
 
 		void CheckButtons() {
 			next.interactable = currentRule != (draggers.Count - 1);
@@ -128,10 +151,16 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		public void SoundClick(){
-			
+			soundBtn.interactable = false;
+			SoundController.GetController ().ConcatenateAudios (audios,EndSoundMethod);
+		}
+
+		public void EndSoundMethod(){
+			soundBtn.interactable = true;
 		}
 
 		public void OkClick() {
+			okBtn.interactable = false;
 			if(model.HasTime()){
 				TimeOkClick();
 			} else {
@@ -143,14 +172,17 @@ namespace Assets.Scripts.Games.TiteresActivity {
 			timerActive = false;
 			if(IsCorrect()){
 				//correct
+				SoundController.GetController ().SetConcatenatingAudios (false);
+				soundBtn.interactable = true;
 				ShowRightAnswerAnimation();
-				model.Correct();
 				model.CorrectTimer();
 				SetClock();
 				model.NextLvl();
 			} else {
-				PlayWrongSound();
-				model.Wrong();
+				SoundController.GetController ().SetConcatenatingAudios (false);
+				soundBtn.interactable = true;
+				puppetsCharacter.sprite = characterSprites [1];
+
 				EndGame(60, 0, 1250);
 			}
 		}
@@ -158,12 +190,18 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		void NoTimeOkClick() {
 			if(IsCorrect()){
 				//correct
-				ShowRightAnswerAnimation();
+				SoundController.GetController ().SetConcatenatingAudios (false);
+				soundBtn.interactable = true;
 				model.Correct();
 				model.NextLvl();
+				ShowRightAnswerAnimation();
+
 			} else {
-				PlayWrongSound();
+				SoundController.GetController ().SetConcatenatingAudios (false);
+				soundBtn.interactable = true;
+				ShowWrongAnswerAnimation ();
 				model.Wrong();
+
 			}
 		}
 
@@ -234,18 +272,43 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		public void CheckOk(){
+			bool isOk = true;
+
 			foreach(Image d in draggers) {
 				if(!d.GetComponent<TiteresDragger>().IsDroppedInLandscape()){
-					okBtn.interactable = false;
-					return;
+					isOk = false;
+					break;
 				}
 			}
-			okBtn.interactable = true;
+			okBtn.interactable = isOk;
+
 		}
 
-		public void RestartGame(){
+		public override void RestartGame(){
 			ResetPuppets();
 			Start();
 		}
+
+		override public void ShowRightAnswerAnimation(){
+			base.ShowRightAnswerAnimation ();
+			puppetsCharacter.sprite = characterSprites [2];
+		}
+
+		override public void ShowWrongAnswerAnimation(){
+			base.ShowWrongAnswerAnimation ();
+			puppetsCharacter.sprite = characterSprites [1];
+		}
+
+		override public void OnRightAnimationEnd(){
+			base.OnRightAnimationEnd ();
+			puppetsCharacter.sprite = characterSprites [0];
+		}
+
+		override public void OnWrongAnimationEnd(){
+			base.OnWrongAnimationEnd ();
+			okBtn.interactable = true;
+			puppetsCharacter.sprite = characterSprites [0];
+		}
+
 	}
 }

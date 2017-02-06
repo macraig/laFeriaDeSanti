@@ -18,9 +18,11 @@ namespace Assets.Scripts.Sound{
 		[SerializeField]
 		private AudioClip clickSound,switchSound,typeSound;
 
+        [SerializeField] private AudioClip[] _musicNotesClips;
 
 
-	    public AudioSource mySource;
+
+        public AudioSource mySource;
 	    public AudioSource musicSource;
 	    public List<List<AudioClip>> instructionSounds;
 
@@ -138,7 +140,11 @@ namespace Assets.Scripts.Sound{
 			action = f;
 			currentAudio = null;
 			playingAudios = audios;
-			Invoke ("PlayCurrentAudios", 0.1f);
+			Invoke ("PlayCurrentAudios", 0.01f);
+		}
+
+		public void SetConcatenatingAudios(bool concatenating){
+			concatenatingAudios = concatenating;
 		}
 
 		public void PlayCurrentAudios(){
@@ -150,12 +156,8 @@ namespace Assets.Scripts.Sound{
 				else if (currentAudioIndex == playingAudios.Count - 1) {
 					currentAudio = null;
 					concatenatingAudios = false;
-                    if (action != null)
-                    {
-                        action.Invoke();
-
-                    }
-                    return;
+					action.Invoke ();
+					return;
 				} else {
 					currentAudioIndex++;
 					currentAudio = playingAudios [currentAudioIndex];
@@ -168,6 +170,37 @@ namespace Assets.Scripts.Sound{
 
 		}
 
+        public void PlayMusicNote(string name)
+        {
+
+            switch (name)
+            {
+                case "RED":
+                    PlayClip(_musicNotesClips[0]);
+                    return;
+                case "YELLOW":
+                    PlayClip(_musicNotesClips[1]);
+                    return;
+                case "CYAN":
+                    PlayClip(_musicNotesClips[2]);
+                    return;
+                case "GREEN":
+                    PlayClip(_musicNotesClips[3]);
+                    return;
+                case "PINK":
+                    PlayClip(_musicNotesClips[4]);
+                    return;
+                case "BLUE":
+                    PlayClip(_musicNotesClips[5]);
+                    return;
+                case "BROWN":
+                    PlayClip(_musicNotesClips[6]);
+                    return;
+            }
+            // case blank
+            PlayDropSound();
+           
+        }
     }
 
 }

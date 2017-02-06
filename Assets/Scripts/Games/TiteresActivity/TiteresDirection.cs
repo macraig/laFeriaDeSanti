@@ -8,6 +8,7 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 	public TiteresAction action;
 	public int relativeToPuppetNumber;
 	public int difficulty;
+	 
 
 	public TiteresDirection(Direction d, TiteresAction a, int r, int diff) {
 		direction = d;
@@ -51,10 +52,11 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 		}
 
 		if(action == TiteresAction.LEFT_ARM){
-			result += "LEVANTANDO EL BRAZO IZQUIERDO";
+			result += " LEVANTANDO EL BRAZO IZQUIERDO";
 		} else if(action == TiteresAction.RIGHT_ARM){
-			result += "LEVANTANDO EL BRAZO DERECHO";
+			result += " LEVANTANDO EL BRAZO DERECHO";
 		}
+		result+=".";
 
 		return result;
 	}
@@ -64,7 +66,7 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 		Dictionary<string,AudioClip> positionAudios,List<AudioClip> objectAudios) {
 
 		List<AudioClip> result = new List<AudioClip> ();
-		string puppetName = TiteresActivityModel.NAMES [actions.IndexOf (this)];
+		string puppetName = TiteresActivityModel.SIMPLE_NAMES [actions.IndexOf (this)];
 
 		result.Add(puppetAudios[puppetName.ToLower()]);
 		result.Add (positionAudios["esta"]);
@@ -72,13 +74,13 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 
 		if(action == TiteresAction.SIT) {
 
-			if (puppetName == "PEDRO" || puppetName == "ARTURO")
+			if (puppetName == "pedro" || puppetName == "arturo")
 				result.Add (positionAudios["sentado"]);
 			else
 				result.Add (positionAudios["sentada"]);
 
 		} else if(action == TiteresAction.STANDING){
-			if (puppetName == "PEDRO" || puppetName == "ARTURO")
+			if (puppetName == "pedro" || puppetName == "arturo")
 				result.Add (positionAudios["parado"]);
 			else
 				result.Add (positionAudios["parada"]);
@@ -95,7 +97,7 @@ public class TiteresDirection : IEquatable<TiteresDirection> {
 		}
 
 		if(relativeToPuppetNumber != -1){
-			result.Add (puppetEndAudios[TiteresActivityModel.NAMES[relativeToPuppetNumber].ToLower()]);
+			result.Add (puppetEndAudios[TiteresActivityModel.SIMPLE_NAMES[relativeToPuppetNumber].ToLower()]);
 		} else {
 			result.Add(objectAudios[objectIndex]);
 		}
