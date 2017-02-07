@@ -20,8 +20,6 @@ namespace Assets.Scripts.Games
 
         [SerializeField]
         AudioClip[] audios;
-	
-
 
         [SerializeField]
         Sprite[] animalSprites;
@@ -38,7 +36,9 @@ namespace Assets.Scripts.Games
 
         private Dictionary<Stages,RaulStage> stageDictionary;
 
+		private int timeCorrectAnswers;
         private int currentTime;
+		private bool timeLevel = false;
 		private bool first = true;
 
         void Awake()
@@ -95,13 +95,18 @@ namespace Assets.Scripts.Games
         {
             SoundController.GetController().PlayRightAnswerSound();
             correctAnswers++;
-			MetricsController.GetController ().AddRightAnswer ();
+
+			if (!timeLevel)
+				MetricsController.GetController ().AddRightAnswer ();
+			else
+				timeCorrectAnswers++;
+			view.RefreshCorrectCounter (timeCorrectAnswers);
             view.ShowCorrectAnimation();
 
             if(correctAnswers == 3 && currentLevelCounter != 2)
             {
                 RaulStage nextStage = GetNextStage();
-				view.ShowNextLevelAnimation ();
+				StartCoroutine(ShowNextLevelAnimation(0.5f));
                 if(nextStage == null)
 				{
 					ChangeToNextLevel();
@@ -134,8 +139,9 @@ namespace Assets.Scripts.Games
         {
             SoundController.GetController().PlayFailureSound();
             incorrectAnswers++;
-			MetricsController.GetController ().AddWrongAnswer ();
-            view.ShowIncorrectAnimation();
+			if(!timeLevel) MetricsController.GetController ().AddWrongAnswer ();
+            
+			view.ShowIncorrectAnimation();
 
             if (currentLevelCounter != 2)
             {
@@ -185,8 +191,7 @@ namespace Assets.Scripts.Games
             {
                 entry.Value.UpdateLevelValues(currentLevelCounter);
             }
-
-
+				
             currentLevel.SetNewLevelValue(currentLevelCounter);
 
             if (currentLevelCounter == 0)
@@ -199,7 +204,8 @@ namespace Assets.Scripts.Games
             }
             else if(currentLevelCounter == 2)
             {
-                correctAnswers = 0;
+				timeCorrectAnswers = 0;
+				timeLevel = true;
                 currentTime = 26;
                 view.SetTime(currentTime);
                 RandomizeStage(2);
@@ -236,6 +242,11 @@ namespace Assets.Scripts.Games
             }
         }
 
+		private IEnumerator ShowNextLevelAnimation(float timeToWait){
+			yield return new WaitForSeconds(timeToWait);
+			view.ShowNextLevelAnimation ();
+		}
+
         public void RepeatLastSound()
         {
             ((RaulSoundStage)currentLevel.CurrentStage).RepeatLastSound();
@@ -258,6 +269,8 @@ namespace Assets.Scripts.Games
         {
             currentLevelCounter = -1;
 			first = true;
+			timeLevel = false;
+			timeCorrectAnswers = 0;
 			view.HideInGameMenu ();
 			ShowExplanation ();
 

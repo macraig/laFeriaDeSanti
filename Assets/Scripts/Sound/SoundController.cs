@@ -116,6 +116,16 @@ namespace Assets.Scripts.Sound{
 	    musicSource.Stop();
     }
 
+		public void PlayLevelMusic(AudioSource mySource, AudioClip clip){
+			mySource.clip = clip;
+			mySource.Play();      
+		}
+
+		public void StopLevelMusic(AudioSource mySource)
+		{
+			mySource.Stop();
+		}
+
         public void StopSound()
             {
 	            mySource.Stop();
@@ -156,7 +166,7 @@ namespace Assets.Scripts.Sound{
 				else if (currentAudioIndex == playingAudios.Count - 1) {
 					currentAudio = null;
 					concatenatingAudios = false;
-					action.Invoke ();
+					if(action!=null)action.Invoke ();
 					return;
 				} else {
 					currentAudioIndex++;

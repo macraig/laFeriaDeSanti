@@ -26,6 +26,8 @@ namespace Assets.Scripts.Games
 		//First turn
 		protected bool first = true;
 
+		private AudioClip tictocClip;
+		public AudioSource timeLevelSource;
 
 		// This method is used as the game's loop
 		abstract public void Next(bool first = false);
@@ -152,9 +154,11 @@ namespace Assets.Scripts.Games
 
 
 		public void EndGame(int minSeconds, int pointsPerSecond, int pointsPerError){
+			StopTimeLevelMusic ();
 			MetricsController.GetController().GameFinished(minSeconds, pointsPerSecond, pointsPerError);
 //			ShowEndPanel ();
 			ViewController.GetController ().LoadEndPanel ();
+		
 		}
 
 		virtual public void ShowNextLevelAnimation(){
@@ -195,6 +199,15 @@ namespace Assets.Scripts.Games
 		virtual public void EnableComponents(bool enable){
 			menuBtn.interactable = enable;
 //			soundBtn.interactable = enable;
+		}
+
+		public void PlayTimeLevelMusic(){
+			tictocClip = Resources.Load<AudioClip> ("Audio/General/tictac");
+			SoundController.GetController ().PlayLevelMusic (timeLevelSource,tictocClip);
+		}
+
+		public void StopTimeLevelMusic(){
+			SoundController.GetController ().StopLevelMusic (timeLevelSource);
 		}
 
 

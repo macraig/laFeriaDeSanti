@@ -38,6 +38,8 @@ namespace Assets.Scripts.Games
 
         [SerializeField]
         GameObject wordHolder;
+		[SerializeField]
+		Text timeCounter;
 
         Text[] words;
 
@@ -56,8 +58,9 @@ namespace Assets.Scripts.Games
 
         public GameObject clock;
         public GameObject repeatSoundButton;
-		public GameObject placaClockSound;
+		public GameObject placaClock,placaSound;
 		private AudioClip signSound;
+
         // Use this for initialization
         void Start()
         {
@@ -73,13 +76,13 @@ namespace Assets.Scripts.Games
 		override public void HideExplanation(){
 			PlaySoundClick ();
 			explanationPanel.SetActive (false);
-
+			menuBtn.enabled = true;
 		}
 
         public void SetLevel1()
         {
-			placaClockSound.SetActive (false);
-			clock.SetActive(false);
+			
+			placaClock.SetActive (false);
             image8Result.SetActive(false);
             image4Result.SetActive(true);
             resultToModify = image4Result;
@@ -121,14 +124,16 @@ namespace Assets.Scripts.Games
 
         public void SetLevel3()
         {
-			placaClockSound.SetActive (true);
-			clock.SetActive(true);
+			menuBtn.interactable = false;
+
+			placaClock.SetActive (true);
             taskImages = new List<GameObject>();
             image8Result.SetActive(true);
             image4Result.SetActive(false);
             time.gameObject.SetActive(true);
             timeLogo.SetActive(true);
-            time.text = "25 s";
+            time.text = "25";
+
             resultToModify = image8Result;
             for (int i = 0; i < image8Task.transform.childCount; i++)
             {
@@ -136,14 +141,16 @@ namespace Assets.Scripts.Games
                 taskImages.Add(image8Task.transform.GetChild(i).gameObject);
             }
 
+			PlayTimeLevelMusic ();
+
+
 
 
         }
 
         public void SetArrowStage()
         {
-			placaClockSound.SetActive (false);
-			repeatSoundButton.SetActive(false);
+			placaSound.SetActive(false);
             wordHolder.SetActive(false);
             firstArrowIndicator.gameObject.SetActive(true);
             secondArrowIndicator.gameObject.SetActive(true);
@@ -219,8 +226,7 @@ namespace Assets.Scripts.Games
 
         public void SetWordStage()
         {
-			placaClockSound.SetActive (false);
-			repeatSoundButton.SetActive(false);
+			placaSound.SetActive(false);
             if (words == null)
             {
                 words = new Text[2];
@@ -277,8 +283,7 @@ namespace Assets.Scripts.Games
 
         public void SetAudioStage()
         {
-			placaClockSound.SetActive (true);
-            repeatSoundButton.SetActive(true);
+			placaSound.SetActive (true);
             firstArrowIndicator.gameObject.SetActive(false);
             secondArrowIndicator.gameObject.SetActive(false);
             wordHolder.SetActive(false);
@@ -288,9 +293,7 @@ namespace Assets.Scripts.Games
         {
             ChangeButtonState(false);
 
-
             SetNeutralArms();
-
 
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.2f, 0));
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, 60), 0.2f, 0.2f));
@@ -353,6 +356,16 @@ namespace Assets.Scripts.Games
 
 		private void PlaySignSound(){
 			SoundController.GetController ().PlayClip (signSound);
+		}
+
+		public void RefreshCorrectCounter(int correctAnswers){
+			timeCounter.text = correctAnswers.ToString();
+		}
+
+		override public void EnableComponents(bool enable){
+			Debug.Log ("No enabled components");
+//				menuBtn.interactable = enable;
+			//			soundBtn.interactable = enable;
 		}
     }
 }
