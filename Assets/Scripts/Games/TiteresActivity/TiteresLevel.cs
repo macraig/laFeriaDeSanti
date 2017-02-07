@@ -54,7 +54,10 @@ public class TiteresLevel {
 			if(!actions.Contains(newDir) && newDir != null) actions.Add(newDir);
 		}
 
-		actionsToShow = withTime ? Randomizer.RandomizeList(actions) : actions;
+		actionsToShow = actions;
+		if (withTime)
+			Randomizer.RandomizeList (actionsToShow);
+		
 	}
 
 	Tuple<Direction, int> RandomRelativeDir() {

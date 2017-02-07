@@ -31,6 +31,7 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
 	public void OnBeginDrag(PointerEventData eventData) {
 		if (active) {
+			transform.SetAsLastSibling ();
 			SoundController.GetController ().SetConcatenatingAudios (false);
 			view.soundBtn.interactable = true;
 			SoundController.GetController().PlayDragSound();

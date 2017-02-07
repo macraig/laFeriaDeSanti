@@ -21,21 +21,29 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		private Material[] landscapes;
 		private List<AudioClip> audios;
 		private int currentRule, currentObjectLandscape;
-		bool timerActive;
+		bool timerActive,switchTime;
 		private TiteresActivityModel model;
+
 
 		public void Start(){
 			model = new TiteresActivityModel();
 			objects = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/objects");
 			characterSprites = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/puppetWinLose");
 			landscapes = Resources.LoadAll<Material>("Sprites/TiteresActivity/Materials");
-
+			menuBtn.interactable = true;
 			objectLandscapeRandomizer = Randomizer.New (landscapes.Length-1);
+			switchTime = true;
 			Begin();
 		}
 
 		public void Begin(){
 			ShowExplanation();
+		}
+
+		public override void RestartGame(){
+			base.RestartGame ();
+			ResetPuppets();
+			Start();
 		}
 
 		override public void ShowInGameMenu(){
@@ -61,11 +69,23 @@ namespace Assets.Scripts.Games.TiteresActivity {
 			obj.sprite = objects [currentObjectLandscape];
 
 			if(model.HasTime()){
+				if (switchTime) {
+					ShowNextLevelAnimation ();
+					switchTime = false;
+				}
+
+				menuBtn.interactable = false;
 				TimeLevel(model.CurrentLvl());
-				model.WithTime();
+
 			} else {
 				NormalLevel(model.CurrentLvl());
 			}
+		}
+
+		override public void OnNextLevelAnimationEnd(){
+			PlayTimeLevelMusic ();
+			menuBtn.interactable = false;
+			//model.WithTime();
 		}
 
 		void NormalLevel(TiteresLevel lvl) {
@@ -80,7 +100,6 @@ namespace Assets.Scripts.Games.TiteresActivity {
 			SetClock();
 			StartTimer(true);
 			SetRule ();
-
 		}
 
 		void StartTimer(bool first = false) {
@@ -284,10 +303,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		}
 
-		public override void RestartGame(){
-			ResetPuppets();
-			Start();
-		}
+	
 
 		override public void ShowRightAnswerAnimation(){
 			base.ShowRightAnswerAnimation ();

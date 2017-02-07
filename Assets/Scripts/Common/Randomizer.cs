@@ -60,6 +60,8 @@ namespace Assets.Scripts.Common {
 			return l.OrderBy(x => rnd.Next()).ToList();
 		}
 
+
+
 		public static bool RandomBoolean(){ return Randomizer.RandomInRange(100) < 50; }
 	}
 }
