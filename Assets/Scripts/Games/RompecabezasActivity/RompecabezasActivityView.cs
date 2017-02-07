@@ -8,14 +8,15 @@ using Assets.Scripts.Common;
 
 namespace Assets.Scripts.Games.RompecabezasActivity {
 	public class RompecabezasActivityView : LevelView {
-		public Text clock;
+		public Text clock, timeCounter;
 		public Button okBtn;
 		public Image lampImage;
+		public GameObject clockPlaca;
 
 		public List<Image> tiles;
 		public List<Part> draggers;
 
-		bool timerActive;
+		bool timerActive,switchTime;
 		private int timeAnswers;
 		private List<Sprite> parts,lamps;
 
@@ -28,6 +29,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			parts = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/tiles"));
 			lamps = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/lamps"));
 			timeAnswers = 0;
+			switchTime = true;
 			Begin();
 		}
 
@@ -47,16 +49,27 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		void SetCurrentLevel() {
 			if(model.HasTime()){
-				TimeLevel(model.CurrentLvl());
-				model.WithTime();
+				if (switchTime) {
+					Invoke("ShowNextLevelAnimation",0.2f) ;
+					switchTime = false;
+				} else {
+					TimeLevel(model.CurrentLvl());
+				}
+				menuBtn.interactable = false;
+
 			} else {
 				NormalLevel(model.CurrentLvl());
 			}
 		}
 
-		void NormalLevel(RompecabezasLevel lvl) {
-			clock.gameObject.SetActive(false);
+		override public void OnNextLevelAnimationEnd(){
+			base.OnNextLevelAnimationEnd ();
+			PlayTimeLevelMusic ();
+			TimeLevel(model.CurrentLvl());
+		}
 
+		void NormalLevel(RompecabezasLevel lvl) {
+			clockPlaca.SetActive(false);
 			SetStartParts(lvl.StartParts());
 			SetEndParts(lvl.EndParts());
 
@@ -90,7 +103,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		}
 
 		void TimeLevel(RompecabezasLevel lvl) {
-			clock.gameObject.SetActive(true);
+			clockPlaca.SetActive(true);
 			SetClock();
 			StartTimer(true);
 
@@ -147,13 +160,13 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		void TimeOkClick() {
 			timerActive = false;
-			clock.gameObject.SetActive(false);
 			if(IsCorrect()){
 				//correct
 				lampImage.sprite = lamps[1];
 				model.NextLvl();
 				ShowRightAnswerAnimation();
 				timeAnswers++;
+				timeCounter.text = timeAnswers.ToString ();
 //				model.Correct();
 				SetClock();
 			} else {
@@ -214,7 +227,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		}
 
 		Direction GetNextDirection(PartModel m, Direction dir) {
-			//vamos a cablearlo.....
+			
 
 			//if(m.direction == m.previousDir && (m.direction == dir || m.direction == OppositeDir(dir))) return dir;
 
@@ -258,7 +271,8 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			return parts[index];
 		}
 
-		public void RestartGame(){
+		override public void RestartGame(){
+			base.RestartGame ();
 			ResetTiles();
 			Start();
 		}
@@ -266,6 +280,11 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		override public void OnWrongAnimationEnd(){
 			base.OnWrongAnimationEnd ();
 			if(model.HasTime())EndGame(0, 0, 1250);
+		}
+
+		override public void EnableComponents(bool enable){
+			base.EnableComponents (enable);
+			okBtn.interactable = enable;
 		}
 
 	}

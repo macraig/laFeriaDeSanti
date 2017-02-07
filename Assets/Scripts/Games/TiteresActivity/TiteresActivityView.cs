@@ -70,12 +70,14 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 			if(model.HasTime()){
 				if (switchTime) {
-					ShowNextLevelAnimation ();
+					Invoke("ShowNextLevelAnimation",0.2f) ;
 					switchTime = false;
+				} else {
+					TimeLevel(model.CurrentLvl());
 				}
 
 				menuBtn.interactable = false;
-				TimeLevel(model.CurrentLvl());
+
 
 			} else {
 				NormalLevel(model.CurrentLvl());
@@ -85,7 +87,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		override public void OnNextLevelAnimationEnd(){
 			PlayTimeLevelMusic ();
 			menuBtn.interactable = false;
-			//model.WithTime();
+			TimeLevel(model.CurrentLvl());
 		}
 
 		void NormalLevel(TiteresLevel lvl) {
@@ -196,7 +198,6 @@ namespace Assets.Scripts.Games.TiteresActivity {
 				ShowRightAnswerAnimation();
 				model.CorrectTimer();
 				SetClock();
-				model.NextLvl();
 			} else {
 				SoundController.GetController ().SetConcatenatingAudios (false);
 				soundBtn.interactable = true;
@@ -212,7 +213,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 				SoundController.GetController ().SetConcatenatingAudios (false);
 				soundBtn.interactable = true;
 				model.Correct();
-				model.NextLvl();
+
 				ShowRightAnswerAnimation();
 
 			} else {
@@ -316,6 +317,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		}
 
 		override public void OnRightAnimationEnd(){
+			model.NextLvl();
 			base.OnRightAnimationEnd ();
 			puppetsCharacter.sprite = characterSprites [0];
 		}

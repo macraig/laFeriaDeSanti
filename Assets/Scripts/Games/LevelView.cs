@@ -162,18 +162,22 @@ namespace Assets.Scripts.Games
 		}
 
 		virtual public void ShowNextLevelAnimation(){
+
+			EnableComponents (false);
 			nextLevelAnimation.transform.SetAsLastSibling ();
 			nextLevelAnimation.GetComponent<TransitionScript>().ShowAnimation();
 			SoundController.GetController ().PlaySwitchSound();
 		}
 
 		virtual public void ShowRightAnswerAnimation(){
+			EnableComponents (false);
 			rightAnimation.transform.SetAsLastSibling ();
 			rightAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
 			SoundController.GetController ().PlayRightAnswerSound ();
 		}
 
 		virtual public void ShowWrongAnswerAnimation(){
+			EnableComponents (false);
 			wrongAnimation.transform.SetAsLastSibling ();
 			wrongAnimation.GetComponent<AnswerAnimationScript>().ShowAnimation();
 			SoundController.GetController ().PlayFailureSound ();
