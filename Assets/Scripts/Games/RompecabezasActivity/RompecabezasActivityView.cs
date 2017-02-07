@@ -10,12 +10,15 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 	public class RompecabezasActivityView : LevelView {
 		public Text clock;
 		public Button okBtn;
+		public Image lampImage;
 
 		public List<Image> tiles;
 		public List<Part> draggers;
 
 		bool timerActive;
-		private List<Sprite> parts;
+		private int timeAnswers;
+		private List<Sprite> parts,lamps;
+
 		private RompecabezasActivityModel model;
 
 		public const int EMPTY_TILE = 26;
@@ -23,6 +26,8 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		public void Start(){
 			model = new RompecabezasActivityModel();
 			parts = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/tiles"));
+			lamps = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/lamps"));
+			timeAnswers = 0;
 			Begin();
 		}
 
@@ -34,6 +39,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			if(model.GameEnded()) {
 				EndGame(60, 0, 1250);
 			} else {
+				lampImage.sprite = lamps [0];
 				ResetTiles();
 				SetCurrentLevel();
 			}
@@ -144,25 +150,28 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			clock.gameObject.SetActive(false);
 			if(IsCorrect()){
 				//correct
+				lampImage.sprite = lamps[1];
 				model.NextLvl();
 				ShowRightAnswerAnimation();
-				model.Correct();
+				timeAnswers++;
+//				model.Correct();
 				SetClock();
 			} else {
-				PlayWrongSound();
-				model.Wrong();
-				EndGame(60, 0, 1250);
+				ShowWrongAnswerAnimation ();
+//				model.Wrong();
+
 			}
 		}
 
 		void NoTimeOkClick() {
 			if(IsCorrect()){
 				//correct
+				lampImage.sprite = lamps[1];
 				ShowRightAnswerAnimation();
 				model.Correct();
 				model.NextLvl();
 			} else {
-				PlayWrongSound();
+				ShowWrongAnswerAnimation ();
 				model.Wrong();
 			}
 		}
@@ -253,5 +262,11 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			ResetTiles();
 			Start();
 		}
+
+		override public void OnWrongAnimationEnd(){
+			base.OnWrongAnimationEnd ();
+			if(model.HasTime())EndGame(0, 0, 1250);
+		}
+
 	}
 }

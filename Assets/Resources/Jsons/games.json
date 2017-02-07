@@ -16,7 +16,7 @@
 		"id": "3",
 		"icon": "2",
 		"name": "Rompecabezas",
-		"description": "Acomodamos las piezas en la posición adecuada para completar el rompecabezas\n\nResolver problemas espaciales usando imágenes mentales y gráficas.", 
+		"description": "Acomodamos las piezas en la posición adecuada para completar el rompecabezas.\n\nResolver problemas espaciales usando imágenes mentales y gráficas.", 
 		"prefabName":"RompecabezasActivity"
 	}, {
 		"id": "4",
