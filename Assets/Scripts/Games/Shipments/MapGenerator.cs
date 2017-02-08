@@ -14,12 +14,15 @@ public class MapGenerator : MonoBehaviour {
     public Ruler Ruler;
 
     public Texture dottedLineMaterial;
-    public Material DottedLineMateriallMaterial;
+    public Material[] DottedLineMateriallMaterial;
+    public int lastMaterial;
 
     public Sprite[] CrosSprites;
     public Sprite[] PlacesSprites;
 
     private List<VectorLine> lines;
+
+    private int iterations = 0;
 
     // Use this for initialization
     void Start()
@@ -50,6 +53,7 @@ public class MapGenerator : MonoBehaviour {
         }*/
     }
 
+/*
     public void LocatePlaces(List<ShipmentNode> nodes, List<ShipmentEdge> edges)
     {
         foreach (MapPlace mapPlace in Places.GetRange(1, Places.Count - 1))
@@ -73,7 +77,7 @@ public class MapGenerator : MonoBehaviour {
         {
             /*
                         if(nodes[i].Id == 0) continue;
-            */
+            #1#
             Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0], nodes[i].Type);
             List<int> edgeDistances = new List<int>();
          /*   List<MapPlace> listOfPlaces =
@@ -84,7 +88,7 @@ public class MapGenerator : MonoBehaviour {
                             .Find(f => f.IdNodeA == e.Id || f.IdNodeB == e.Id);
                         if (shipmentEdge != null) edgeDistances.Add(shipmentEdge);
                         return shipmentEdge != null;
-                    });*/
+                    });#1#
             List<MapPlace> listOfPlaces = locatedPlaces.FindAll(
                 e =>
                 {
@@ -104,6 +108,7 @@ public class MapGenerator : MonoBehaviour {
             Places[j].gameObject.SetActive(false);
         }
     }
+*/
 
     private void SetFirstPlace(ShipmentNode node, float xMax, float yMax)
     {
@@ -135,22 +140,20 @@ public class MapGenerator : MonoBehaviour {
     private bool CheckMinDistances(MapPlace mapPlace, List<MapPlace> locatedPlaces, float distanceMin)
     {
 
-        Debug.Log("checking min distances");
-
-        foreach (MapPlace locatedPlace in locatedPlaces)
+       Debug.Log("checking min distances");
+        iterations++;
+        if (iterations > 100)
         {
-            if(locatedPlace.Id == mapPlace.Id) continue;;
-            float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
-            float refDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
-            /*
-                        float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
-
-                        float f = referenceDistance / Ruler.GetUnityDistances();
-            */
-            if (distance < distanceMin /*|| Math.Abs(f % 1) > 0.1 || Mathf.RoundToInt(f) > 10*/)
-                return false;          
+            return false;
         }
-        
+          foreach (MapPlace locatedPlace in locatedPlaces)
+         {
+             if(locatedPlace.Id == mapPlace.Id) continue;;
+             float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
+             if (distance < distanceMin)
+                 return false;          
+         }
+
         return true;
     }
 
@@ -189,7 +192,9 @@ public class MapGenerator : MonoBehaviour {
 
             line.SetCanvas(FindObjectOfType<Canvas>());
 
-            line.material = DottedLineMateriallMaterial;
+            line.material = DottedLineMateriallMaterial[lastMaterial++];
+            if (lastMaterial == DottedLineMateriallMaterial.Length) lastMaterial = 0;
+            line.material.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
             line.textureScale = 1f;
             line.textureScale = 1f;
             line.Draw();
@@ -202,6 +207,8 @@ public class MapGenerator : MonoBehaviour {
 
     public void SafeLocatePlaces(List<ShipmentNode> nodes, List<ShipmentEdge> edges)
     {
+        iterations = 0;
+
         ResetIds();
         float edge = Places[0].GetComponent<RectTransform>().sizeDelta.x / 2;
         float distanceMin = Mathf.Sqrt(2) * edge;
@@ -210,26 +217,27 @@ public class MapGenerator : MonoBehaviour {
         float yMax = mapSize.y - edge;
         List<MapPlace> locatedPlaces = new List<MapPlace>(Places.Count);
 
-        /*SetFirstPlace(nodes[0], xMax, yMax);
-        locatedPlaces.Add(Places[0]);*/
         int i = 0;
         nodes.Sort((node1, node2) => ShipmentsView.instance.Model.GetEdgesByIdNode(node2.Id).Count - ShipmentsView.instance.Model.GetEdgesByIdNode(node1.Id).Count);
         for (; i < nodes.Count; i++)
         {
             Places[i].gameObject.SetActive(true);
             Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0], nodes[i].Type);
+            if (iterations >= 100)
+            {
+                iterations = 0;
 
-            do
-            {             
-                SafeLocatePlace(Places[i], locatedPlaces, ShipmentsView.instance.Model.GetEdgesByIdNode(nodes[i].Id), xMax, yMax, distanceMin);
-            } while (!CheckMinDistances(Places[i], locatedPlaces, distanceMin));
-
-
+                locatedPlaces.Clear();
+                foreach (ShipmentEdge a in edges)
+                {
+                    a.Length = 0;
+                }
+                SafeLocatePlaces(nodes, edges);
+                return;
+            }
+            SafeLocatePlace(Places[i], locatedPlaces, ShipmentsView.instance.Model.GetEdgesByIdNode(nodes[i].Id), xMax, yMax, distanceMin);
         }
-        if (locatedPlaces.Count != nodes.Count)
-        {
-            Debug.Log("Error");
-        }
+
         // Oculto los places no usados
         for (int j = Places.Count - 1; j >= i; j--)
         {
@@ -250,94 +258,24 @@ public class MapGenerator : MonoBehaviour {
 
     private void SafeLocatePlace(MapPlace toLocate, List<MapPlace> locatedPlaces, List<ShipmentEdge> toLocateEdges, float xMax, float yMax, float distanceMin)
     {
-        Debug.Log("Locating place");
-        foreach (ShipmentEdge edge in toLocateEdges)
+        List<MapPlace> prevPlaces = ObtainLocatedNodesPrev(locatedPlaces, toLocateEdges);
+        if(prevPlaces.Count > 2) throw new Exception("Mmmhhh tiene muchas restricciones previas. Revisar la generación del grafo.");
+        switch (prevPlaces.Count)
         {
-            MapPlace located = locatedPlaces.Find(e => (e.Id != toLocate.Id) &&  (e.Id == edge.IdNodeA || e.Id == edge.IdNodeB));
-            if (located == null)
-            {
-                continue;
-            }
-            /*
-                        Vector2 otherPosition = located.CrossReference.transform.position;
-            */
-            Vector2 otherPosition = located.transform.position;
-
-            float f;
-            float x;
-            float y;
-            do
-            {
-                toLocate.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, xMax), (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, yMax));
-                float a = Ruler.GetUnityDistances();
-                float distance = edge.Length == 0 ? Random.Range(3, 9) : edge.Length;
-
-                if (Randomizer.RandomBoolean())
+            case 2:
+                LocatePlaceWithTwoRestricitons(toLocate, prevPlaces, locatedPlaces, xMax, yMax, distanceMin);
+                break;
+            case 1:
+                LocatePlaceWithOneRestriction(toLocate, prevPlaces, locatedPlaces, xMax, yMax, distanceMin);
+                break;
+            default:
+                do
                 {
-                    // x random
-                    x = toLocate.transform.position.x;
-
-                    
-                    float f1 = distance*a;
-                    float f2 = x - otherPosition.x;
-                    while (Mathf.Abs(f1) < Mathf.Abs(f2))
-                    {
-                        if (edge.Length != 0)
-                        {
-                            throw new Exception("Edge have to b resized but the node is located");
-                        }
-                        distance++;
-                        f1 = distance*a;
-                    }
-                    float sqrt = Mathf.Sqrt(Mathf.Pow(f1, 2) - Mathf.Pow(f2, 2));
-                    y = -sqrt + otherPosition.y;
-                    /*
-                                    var referenceDistance = Vector2.Distance(toLocate.CrossReference.transform.position, otherPosition);
-                    */
-                }
-                else
-                {
-                    // y random
-                    y = toLocate.transform.position.y;
-
-                    float f1 = distance * a;
-                    float f2 = y - otherPosition.y;
-                    while (Mathf.Abs(f1) < Mathf.Abs(f2))
-                    {
-                        if (edge.Length != 0)
-                        {
-                            throw new Exception("Edge have to b resized but the node is located");
-                        }
-         
-                        distance++;
-                        f1 = distance * a;
-                    }
-                    float sqrt = Mathf.Sqrt(Mathf.Pow(f1, 2) - Mathf.Pow(f2, 2));
-                    x = -sqrt + otherPosition.x;
-                    /*
-                                    var referenceDistance = Vector2.Distance(toLocate.CrossReference.transform.position, otherPosition);
-                    */
-                }
-
-
-                toLocate.transform.position = new Vector2(x, y);
-                var referenceDistance = Vector2.Distance(toLocate.transform.position, otherPosition);
-
-                f = referenceDistance / a;
-            } while (f < 1.8 || Math.Abs(f % 1) > 0.1 || f > 8.1 || Math.Abs(toLocate.transform.localPosition.y) >= yMax || Math.Abs(toLocate.transform.localPosition.x) >= xMax);
-
-            edge.Length = (int) f;
-            if(!locatedPlaces.Exists(e=> e.Id == toLocate.Id)) locatedPlaces.Add(toLocate);
+                    toLocate.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, xMax), (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, yMax));
+                } while (EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, 5));
+                break;
         }
-
-        if (!locatedPlaces.Exists(e => e.Id == toLocate.Id))
-        {
-            do
-            {
-                toLocate.transform.localPosition = new Vector2((Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, xMax), (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, yMax));
-            } while (!CheckMinDistances(toLocate, locatedPlaces, distanceMin));
-            locatedPlaces.Add(toLocate);
-        }
+        locatedPlaces.Add(toLocate);
 
 
         /*
@@ -355,4 +293,196 @@ public class MapGenerator : MonoBehaviour {
         ShipmentsView.instance.measuresList.Add((int)f);*/
     }
 
+    private void LocatePlaceWithOneRestriction(MapPlace toLocate, List<MapPlace> prevPlaces, List<MapPlace> locatedPlaces, float xMax, float yMax, float distanceMin)
+    {
+
+        MapPlace located = prevPlaces[0];
+        Vector2 otherPosition = located.transform.position;
+        ShipmentEdge edge = ShipmentsView.instance.Model.GetEdgesByIdNode(toLocate.Id).Find(e =>
+            e.IdNodeA == located.Id || e.IdNodeB == located.Id);
+        float f;
+        do
+        {
+            toLocate.transform.localPosition =
+                new Vector2((Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0.1f * xMax, 0.9f * xMax),
+                    (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0.1f * yMax, 0.9f * yMax));
+            float a = Ruler.GetUnityDistances();
+            float distance = edge.Length == 0 ? Random.Range(3, 9) : edge.Length;
+
+            float x;
+            float y;
+            if (Randomizer.RandomBoolean())
+            {
+                // x random
+                x = toLocate.transform.position.x;
+                float f1 = distance * a;
+                float f2 = x - otherPosition.x;
+                while (Mathf.Abs(f1) < Mathf.Abs(f2))
+                {
+                    if (edge.Length != 0)
+                    {
+                        throw new Exception("Edge have to b resized but the node is located");
+                    }
+                    if (distance < 10)
+                    {
+                        distance++;
+                    }
+                    else
+                    {
+                        toLocate.transform.localPosition =
+                            new Vector2((Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, x), 0);
+
+                        x = toLocate.transform.position.x;
+                        f2 = x - otherPosition.x;
+                    }
+                    f1 = distance * a;
+                }
+                float sqrt = Mathf.Sqrt(Mathf.Pow(f1, 2) - Mathf.Pow(f2, 2));
+                y = -sqrt + otherPosition.y;
+            }
+            else
+            {
+                // y random
+                y = toLocate.transform.position.y;
+
+                float f1 = distance * a;
+                float f2 = y - otherPosition.y;
+                while (Mathf.Abs(f1) < Mathf.Abs(f2))
+                {
+                    if (edge.Length != 0)
+                    {
+                        throw new Exception("Edge have to b resized but the node is located");
+                    }
+
+                    if (distance < 10)
+                    {
+                        distance++;
+                    }
+                    else
+                    {
+                        toLocate.transform.localPosition = new Vector2(0,
+                            (Randomizer.RandomBoolean() ? 1 : -1) * Random.Range(0, yMax));
+
+                        y = toLocate.transform.position.y;
+                        f2 = y - otherPosition.y;
+                    }
+                    f1 = distance * a;
+                }
+                float sqrt = Mathf.Sqrt(Mathf.Pow(f1, 2) - Mathf.Pow(f2, 2));
+                x = -sqrt + otherPosition.x;
+            }
+
+
+            toLocate.transform.position = new Vector2(x, y);
+            var referenceDistance = Vector2.Distance(toLocate.transform.position, otherPosition);
+
+            f = referenceDistance / a;
+        } while (EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, f));
+
+        edge.Length = (int)f;
+
+    }
+
+    private bool EdgeIsIncorrect(MapPlace toLocate, List<MapPlace> locatedPlaces, float xMax, float yMax, float distanceMin, float f)
+    {
+       
+    
+        iterations++;
+        Debug.Log("iterations: " + iterations);
+        if (iterations > 100)
+        {
+            return false;
+
+        }
+        return f < 1.9 || Math.Abs(f % 1) > 0.08 || f > 9.1 || Math.Abs(toLocate.transform.localPosition.y) >= yMax || Math.Abs(toLocate.transform.localPosition.x) >= xMax || !CheckMinDistances(toLocate, locatedPlaces, distanceMin);
+
+
+       
+
+    }
+
+    private void LocatePlaceWithTwoRestricitons(MapPlace toLocate, List<MapPlace> prevPlaces, List<MapPlace> locatedPlaces, float xMax, float yMax, float distanceMin)
+    {
+        float x;
+        float y;
+        MapPlace placed1 = prevPlaces[0];
+        MapPlace placed2 = prevPlaces[1];
+
+        float dis = Vector2.Distance(placed2.transform.position, placed1.transform.position);
+        int edgeLength1;
+        int edgeLength2;
+        do
+        {
+            edgeLength1 = Random.Range(3, 10);
+            edgeLength2 = Random.Range(3, 10);
+            float d1 = edgeLength1 * Ruler.GetUnityDistances();
+            float d2 = edgeLength2 * Ruler.GetUnityDistances();
+
+            float c = placed1.transform.position.x;
+            float d = placed1.transform.position.y;
+            float a = placed2.transform.position.x;
+            float b = placed2.transform.position.y;
+
+            // greg is a fun name, it is only an abbreviation of a calculus 
+            var f1 = Mathf.Pow(d2, 2);
+            float greg = Mathf.Pow(d1, 2) - f1 - Mathf.Pow(a, 2) - Mathf.Pow(d - b, 2) + Mathf.Pow(c, 2);
+
+            float bascaraA = 1 + Mathf.Pow(a - c, 2) / (Mathf.Pow(d - b, 2));
+            float bascaraB = (greg * (a - c) / (Mathf.Pow(d - b, 2))) - 2 * c;
+            float bascaraC = Mathf.Pow(greg, 2) / (4 * Mathf.Pow(d - b, 2)) - f1 + Mathf.Pow(c, 2);
+            if (Randomizer.RandomBoolean())
+            {
+                x = (-bascaraB + Mathf.Sqrt(Mathf.Pow(bascaraB, 2) - 4 * bascaraA * bascaraC)) / (2 * bascaraA);
+
+            }
+            else
+            {
+                x = (-bascaraB - Mathf.Sqrt(Mathf.Pow(bascaraB, 2) - 4 * bascaraA * bascaraC)) / (2 * bascaraA);
+            }
+            float f2 = Mathf.Pow((x - c), 2);
+            y = Mathf.Sqrt(f1 - f2) + d;
+            if(!float.IsNaN(x) && !float.IsNaN(x)) toLocate.transform.position = new Vector2(x, y);
+ 
+        } while (float.IsNaN(x) || float.IsNaN(x) || EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, 5));
+        List<ShipmentEdge> edges = ShipmentsView.instance.Model.GetEdgesByIdNode(toLocate.Id);
+        edges.Find(e => e.IdNodeA == placed1.Id || e.IdNodeB == placed1.Id).Length = edgeLength1;
+        edges.Find(e => e.IdNodeA == placed2.Id || e.IdNodeB == placed2.Id).Length = edgeLength2;
+    }
+
+    private List<MapPlace> ObtainLocatedNodesPrev(List<MapPlace> locatedPlaces, List<ShipmentEdge> toLocateEdges)
+    {
+        return locatedPlaces.FindAll(e => toLocateEdges.Exists(f => f.IdNodeA == e.Id || f.IdNodeB == e.Id));
+    }
+
+    private MapTriangle FindTriangle(MapPlace toLocate, List<MapPlace> locatedPlaces, List<ShipmentEdge> allEdges)
+    {
+        MapTriangle mapTriangle = new MapTriangle();
+
+        List<ShipmentEdge> edgesByIdNode = ShipmentsView.instance.Model.GetEdgesByIdNode(toLocate.Id);
+
+        List<MapPlace> vertices = locatedPlaces.FindAll(e => edgesByIdNode.Exists(f => f.IdNodeA == e.Id || f.IdNodeB == e.Id));
+        if (vertices.Count < 2) return null;
+        if (vertices.Count > 2) throw new Exception("mmmh many vertexes");
+
+        ShipmentEdge edge = allEdges.Find(
+            e =>
+                (e.IdNodeA == vertices[0].Id && e.IdNodeB == vertices[1].Id) ||
+                (e.IdNodeB == vertices[0].Id && e.IdNodeA == vertices[1].Id));
+        mapTriangle.Nodes = new List<int>(2);
+        mapTriangle.Edges = new List<ShipmentEdge>(3);
+        mapTriangle.Nodes.AddRange(new []{ toLocate.Id, vertices[0].Id, vertices[1].Id });
+        mapTriangle.Edges.AddRange(new []
+        {
+            edge, edgesByIdNode.Find(e => e.IdNodeA == vertices[0].Id || e.IdNodeB == vertices[0].Id),
+            edgesByIdNode.Find(e => e.IdNodeA == vertices[1].Id || e.IdNodeB == vertices[1].Id)
+        });
+        return mapTriangle;
+    }
+}
+
+class MapTriangle
+{
+    public List<ShipmentEdge> Edges { get; set; }
+
+    public List<int> Nodes { get; set; }
 }

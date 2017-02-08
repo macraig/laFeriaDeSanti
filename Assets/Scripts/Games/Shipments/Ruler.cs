@@ -64,8 +64,19 @@ public class Ruler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
                     SetPivot(rectTransform, Vector2.up);
                 }
                 else
+
+
+
                 {
-                    rectTransform.rotation = Quaternion.identity;;   
+/*
+                    SetPivot(rectTransform, new Vector2());
+*/
+
+/*
+                    float distance = (Input.mousePosition.x, Input.mousePosition.y);
+*/
+
+                    rectTransform.rotation = Quaternion.identity;;
                     SetPivot(rectTransform, Vector2.one / 2);
 
                 }

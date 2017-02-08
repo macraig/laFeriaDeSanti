@@ -22,6 +22,7 @@ namespace Assets.Scripts.Games.Shipments
         private int _currentFocus;
         public Image StartPlace;
         public Image FinishPlace;
+        public Image Player;
 
         public ShipmentsModel Model { get; set; }
 

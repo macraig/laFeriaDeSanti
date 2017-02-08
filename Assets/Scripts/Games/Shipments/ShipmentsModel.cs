@@ -10,7 +10,7 @@ namespace Assets.Scripts.Games.Shipments
     public class ShipmentsModel : LevelModel
     {
 
-        private const int NODES = 8;
+        private const int NODES = 16;
         private int _currentLevel;
         private List<ShipmentNode> _nodes; 
         private List<ShipmentEdge> _edges;
@@ -23,7 +23,7 @@ namespace Assets.Scripts.Games.Shipments
             _nodes = new List<ShipmentNode>();
             _edges = new List<ShipmentEdge>();
             _solutionPaths = new List<ShipmentsPath>();
-            _currentLevel = 0;
+            _currentLevel = 3;
             lastCorrect = true;
         }
 
@@ -44,7 +44,6 @@ namespace Assets.Scripts.Games.Shipments
         {
             int nodes;
             int solutionPaths;
-            int maxLongEdge;
             List<int> edgesBySolutionPath;
             float extraEdgeProbability;
             Scale = Randomizer.RandomBoolean() ? 5 : 10;
@@ -60,23 +59,21 @@ namespace Assets.Scripts.Games.Shipments
                     solutionPaths = 1;
                     edgesBySolutionPath = new List<int>(solutionPaths) {1};
                     extraEdgeProbability = 0;
-                    maxLongEdge = 10;
                     break;
                 case 1:
                     nodes = Random.Range(3, 6);
                     solutionPaths = 1;
                     edgesBySolutionPath = new List<int>(solutionPaths) { 2 };
                     extraEdgeProbability = 0;
-                    maxLongEdge = 5;
 
                     break;
                 default:
-                    nodes = Random.Range(4, 7);
-                    solutionPaths = 1;
+                    nodes = 6;
+                    solutionPaths = 2;
                     edgesBySolutionPath = new List<int>(solutionPaths)
-                    { Mathf.CeilToInt((nodes- 1) * Random.Range(0.5f, 1)), Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)) };
+                    { Mathf.CeilToInt((nodes / 2 - 1) * Random.Range(0.5f, 1)),
+                        Mathf.CeilToInt((nodes / 2 - 1) * Random.Range(0.5f, 1)) };
                     extraEdgeProbability = 0;
-                    maxLongEdge = 4;
               
                     break;
            /*     case 3:
@@ -118,11 +115,30 @@ namespace Assets.Scripts.Games.Shipments
             }
            
             GenerateNodes(nodes);
-            GenerateSolutionPaths(solutionPaths, edgesBySolutionPath);
-            GenerateEdgesToSolutionPaths(maxLongEdge);
+            ShipmentsPath shipmentsPath = new ShipmentsPath();
+            shipmentsPath.NodesList = new List<ShipmentNode>(4);
+            shipmentsPath.NodesList.Add(Nodes[0]);
+            shipmentsPath.NodesList.Add(Nodes[1]);
+            shipmentsPath.NodesList.Add(Nodes[2]);
+            shipmentsPath.NodesList.Add(Nodes[Nodes.Count - 1]);
 
+            ShipmentsPath shipmentsPath2 = new ShipmentsPath();
+            shipmentsPath2.NodesList = new List<ShipmentNode>(4);
+            shipmentsPath2.NodesList.Add(Nodes[0]);
+            shipmentsPath2.NodesList.Add(Nodes[3]);
+            shipmentsPath2.NodesList.Add(Nodes[4]);
+            shipmentsPath2.NodesList.Add(Nodes[Nodes.Count - 1]);
+            _solutionPaths.Add(shipmentsPath);
+            _solutionPaths.Add(shipmentsPath2);
+/*
+            GenerateSolutionPaths(solutionPaths, edgesBySolutionPath);
+*/
+            GenerateEdgesToSolutionPaths();
+
+/*
             GenerateExtraEdges(extraEdgeProbability, maxLongEdge);
-           /* _currentLevel++;
+*/
+          /* _currentLevel++;
             if (_currentLevel == 6) _currentLevel = 0;*/
         }
 
@@ -149,7 +165,7 @@ namespace Assets.Scripts.Games.Shipments
             }
         }
 
-        private void GenerateEdgesToSolutionPaths(int maxLong)
+        private void GenerateEdgesToSolutionPaths()
         {
             foreach (ShipmentsPath shipmentsPath in _solutionPaths)
             {
@@ -196,8 +212,14 @@ namespace Assets.Scripts.Games.Shipments
                 // es -3 xq el 0 y el ultimo ya estan fijos
                 for (int j = shipmentsPath.NodesList.Capacity - 3; j >= 0; j--)
                 {
-                    shipmentsPath.NodesList.Add(Nodes[nodeRandomizer.Next()]);
-                }  
+                    ShipmentNode shipmentNode = Nodes[nodeRandomizer.Next()];
+                    while (_solutionPaths.Find(e => e.NodesList.Exists(f => f.Id == shipmentNode.Id)) != null)
+                    {
+                        shipmentNode = Nodes[nodeRandomizer.Next()];
+                    }
+                                      
+                    shipmentsPath.NodesList.Add(shipmentNode);
+                }
                 // Agrego el ultimo
                 shipmentsPath.NodesList.Add(Nodes[Nodes.Count - 1]);   
                 _solutionPaths.Add(shipmentsPath);          
