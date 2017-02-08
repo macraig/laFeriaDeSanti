@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.Common;
 
 namespace Assets.Scripts.Games.Recorridos
 {
@@ -35,6 +36,8 @@ public class RecorridosView : LevelView {
     public Text nutTextCounter;
 
     private Image playerImage;
+	public GameObject bombAnimation;
+
     private void Start()
     {
         stackImages = new List<GameObject>();
@@ -46,6 +49,17 @@ public class RecorridosView : LevelView {
         }
         currentAvailableInstructionSpot = 0;
     }
+
+	override public void HideExplanation(){
+		PlaySoundClick ();
+		explanationPanel.SetActive (false);
+		menuBtn.enabled = true;
+	}
+
+		public void ShowPlayer ()
+		{
+			playerImage.gameObject.SetActive (true);
+		}
 
     public void AddInstruction(RecorridosAction actionToAdd)
     {
@@ -147,6 +161,14 @@ public class RecorridosView : LevelView {
         nutTextCounter.text = newValue.ToString();
     }
 
+		public void ShowBombAnimation ()
+		{
+			playerImage.gameObject.SetActive (false);
+			bombAnimation.transform.SetAsLastSibling ();
+			bombAnimation.GetComponent<BombAnimationScript>().ShowAnimation();
+//			SoundController.GetController ().PlaySwitchSound();
+		}
+
     internal void MovingLeft()
     {
         playerImage.sprite = movingLeft;
@@ -167,5 +189,7 @@ public class RecorridosView : LevelView {
         playerImage.sprite = movingDown;
 
     }
+
+
 	}
 }

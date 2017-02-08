@@ -108,8 +108,9 @@ public class RecorridosTile {
             case RecorridosController.RecorridosTileEnum.Fire:
                 RecorridosController.instance.BackToStart();
                 break;
-            case RecorridosController.RecorridosTileEnum.Bomb:
-                RecorridosController.instance.EndGame(false);
+			case RecorridosController.RecorridosTileEnum.Bomb:
+				RecorridosController.instance.Explode ();
+
                 break;
             case RecorridosController.RecorridosTileEnum.Hole:
                 RecorridosController.instance.BackToStart();

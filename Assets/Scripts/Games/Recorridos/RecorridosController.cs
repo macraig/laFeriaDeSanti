@@ -123,9 +123,20 @@ namespace Assets.Scripts.Games.Recorridos
             view.SetNutTextCounter(nutCount);
         }
 
+		public void Explode()
+		{
+			view.ShowBombAnimation ();
+		}
+
+		public void OnBombAnimationEnd(){
+			
+			 EndGame(false);
+		}
+
         private void ResetGame()
         {
-            nutCount = 0;
+			view.ShowPlayer ();
+			nutCount = 0;
 
             int rowCounter = 0;
 
@@ -325,12 +336,7 @@ namespace Assets.Scripts.Games.Recorridos
 
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
+     
         public void AddAction(RecorridosAction recorridosButton)
         {
             switch (recorridosButton.currentAction)

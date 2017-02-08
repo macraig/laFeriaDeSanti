@@ -14,15 +14,6 @@ public class RecorridosAction : MonoBehaviour {
     public int indexInList;
  
 
-    // Use this for initialization
-    void Start () {
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     public void DoAction()
     {
         RecorridosController.instance.AddAction(this);
