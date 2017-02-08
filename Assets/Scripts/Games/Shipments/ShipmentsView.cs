@@ -22,7 +22,9 @@ namespace Assets.Scripts.Games.Shipments
         private int _currentFocus;
         public Image StartPlace;
         public Image FinishPlace;
-        public Image Player;
+
+        public GameObject Player;
+        public Image[] PlayeSprites;
 
         public ShipmentsModel Model { get; set; }
 
@@ -138,6 +140,14 @@ namespace Assets.Scripts.Games.Shipments
                 MapGenerator.Places.Find(e => e.Type == ShipmentNodeType.Finish).GetComponent<Image>().sprite;
             _currentFocus = 1;
             ChangeFocusCell(1);
+            SetPlayerToPlace(0);
+        }
+
+        private void SetPlayerToPlace(int i)
+        {
+            MapPlace place = MapGenerator.Places.Find(e => e.Id == i);
+            Player.transform.SetParent(place.transform);
+            Player.transform.localPosition = Vector2.zero;
         }
 
         private void ClearAnswers()
@@ -275,8 +285,8 @@ namespace Assets.Scripts.Games.Shipments
             PlaySoundClick();
             List<ShipmentEdge> edgeAnswers = new List<ShipmentEdge>();
 
-            int i = 0;
-            for (; i < AnswerRowGameObjects.Length; i++)
+            
+            for (int i = 0; i < AnswerRowGameObjects.Length; i++)
             {
                 GameObject answerRowGameObject = AnswerRowGameObjects[i];
                 List<ShipmentsAnswerCell> answerCells = answerRowGameObject.GetComponentsInChildren<ShipmentsAnswerCell>().ToList();
@@ -290,6 +300,18 @@ namespace Assets.Scripts.Games.Shipments
                 edgeAnswers.Add(shipmentEdge);
             }
 
+            for (int i = 0; i < 0; i++)
+            {
+                ShipmentEdge edge =
+                    Model.Edges.Find(
+                        e => (e.IdNodeA == edgeAnswers[i].IdNodeA && e.IdNodeB == edgeAnswers[i].IdNodeB) ||
+                            (e.IdNodeB == edgeAnswers[i].IdNodeB && e.IdNodeA == edgeAnswers[i].IdNodeA));
+                CheckEdgeAnswer(edge, edgeAnswers[i]);
+                
+                
+
+            }
+
             if (Model.IsCorrectAnswer(edgeAnswers))
             {
                 ShowRightAnswerAnimation();
@@ -298,6 +320,23 @@ namespace Assets.Scripts.Games.Shipments
             {
                 ShowWrongAnswerAnimation();
             }
+        }
+
+        private void CheckEdgeAnswer(ShipmentEdge realEdge, ShipmentEdge answerEdge)
+        {
+            if (realEdge == null)
+            {
+                // no hay arista
+                
+            }
+/*
+            else
+
+            {
+               /* int answerValue = answerEdge.Length +  / Model.Scale;
+
+                if(answerValue)
+            }*/
         }
 
         public override void OnRightAnimationEnd()
