@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-
+namespace Assets.Scripts.Games.Recorridos
+{
 public class RecorridosTile {
 
     private RecorridosController.RecorridosTileEnum type;
@@ -118,4 +119,6 @@ public class RecorridosTile {
                 break;
         }
     }
+	}
 }
+

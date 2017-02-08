@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+namespace Assets.Scripts.Games.Recorridos
+{
 public class RecorridosAction : MonoBehaviour {
 
     public enum ActionToDo { Up, Down, Left, Right, Remove,Start}
@@ -29,4 +30,5 @@ public class RecorridosAction : MonoBehaviour {
 
 
 
+}
 }

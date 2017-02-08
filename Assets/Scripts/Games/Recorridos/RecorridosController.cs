@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Scripts.Games
+namespace Assets.Scripts.Games.Recorridos
 {
     public class RecorridosController : MonoBehaviour
     {
@@ -45,7 +45,9 @@ namespace Assets.Scripts.Games
         private Vector2 initialPupperGridPosition;
         private List<RecorridosTile> pathTiles;
         private int nutCount;
-        private void Awake()
+		private bool first = true;
+       
+		private void Awake()
         {
             if (instance == null)
             {
@@ -81,8 +83,22 @@ namespace Assets.Scripts.Games
             gridSpace = new RecorridosTile[7][];
             view = GetComponent<RecorridosView>();
             view.SetPlayerImage(player.GetComponent<Image>());
-            ResetGame();
+          
+			ShowExplanation ();
         }
+
+		void ShowExplanation(){
+			view.ShowExplanation ();
+		}
+
+		public void HideExplanation(){
+			view.HideExplanation ();
+			if (first) {
+				ResetGame();
+				first = false;
+			}
+
+		}
 
         public void FallInHole()
         {

@@ -4,9 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RecorridosView : MonoBehaviour {
+namespace Assets.Scripts.Games.Recorridos
+{
+public class RecorridosView : LevelView {
 
-    public GameObject instructionsStack;
+		#region implemented abstract members of LevelView
+
+		public override void Next(bool first = false) {
+			throw new NotImplementedException();
+		}
+
+		#endregion
+
+		public GameObject instructionsStack;
 
     private List<GameObject> stackImages;
     private int currentAvailableInstructionSpot;
@@ -157,4 +167,5 @@ public class RecorridosView : MonoBehaviour {
         playerImage.sprite = movingDown;
 
     }
+	}
 }
