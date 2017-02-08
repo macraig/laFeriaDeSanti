@@ -10,7 +10,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 	public class RompecabezasActivityView : LevelView {
 		public Text clock, timeCounter;
 		public Button okBtn;
-		public Image lampImage;
+		public Image lampImage,puppetImage;
 		public GameObject clockPlaca;
 
 		public List<Image> tiles;
@@ -18,8 +18,8 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		bool timerActive,switchTime;
 		private int timeAnswers;
-		private List<Sprite> parts,lamps;
-
+		private List<Sprite> parts,transparentParts,lamps,puppetSprites;
+		private int lampIndex;
 		private RompecabezasActivityModel model;
 
 		public const int EMPTY_TILE = 26;
@@ -27,9 +27,12 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		public void Start(){
 			model = new RompecabezasActivityModel();
 			parts = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/tiles"));
+			transparentParts = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/tiles2"));
 			lamps = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/lamps"));
+			puppetSprites = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/puppet"));
 			timeAnswers = 0;
 			switchTime = true;
+
 			Begin();
 		}
 
@@ -41,7 +44,9 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			if(model.GameEnded()) {
 				EndGame(60, 0, 1250);
 			} else {
-				lampImage.sprite = lamps [0];
+				puppetImage.sprite = puppetSprites [0];
+				lampIndex = Randomizer.RandomInRange (3)*2;
+				lampImage.sprite = lamps [lampIndex];
 				ResetTiles();
 				SetCurrentLevel();
 			}
@@ -162,7 +167,8 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			timerActive = false;
 			if(IsCorrect()){
 				//correct
-				lampImage.sprite = lamps[1];
+				lampImage.sprite = lamps[lampIndex+1];
+				puppetImage.sprite = puppetSprites [1];
 				model.NextLvl();
 				ShowRightAnswerAnimation();
 				timeAnswers++;
@@ -170,6 +176,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 //				model.Correct();
 				SetClock();
 			} else {
+				puppetImage.sprite = puppetSprites [2];
 				ShowWrongAnswerAnimation ();
 //				model.Wrong();
 
@@ -179,11 +186,13 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		void NoTimeOkClick() {
 			if(IsCorrect()){
 				//correct
-				lampImage.sprite = lamps[1];
+				lampImage.sprite = lamps[lampIndex+1];
+				puppetImage.sprite = puppetSprites [1];
 				ShowRightAnswerAnimation();
 				model.Correct();
 				model.NextLvl();
 			} else {
+				puppetImage.sprite = puppetSprites [2];
 				ShowWrongAnswerAnimation ();
 				model.Wrong();
 			}
@@ -267,8 +276,13 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 			return col;
 		}
 
+		public int GetSpriteIndex (Sprite sprite)
+		{
+			return parts.IndexOf (sprite);
+		}
+
 		public Sprite PartSprite(int index){
-			return parts[index];
+			return transparentParts[index];
 		}
 
 		override public void RestartGame(){
@@ -278,6 +292,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		}
 
 		override public void OnWrongAnimationEnd(){
+			puppetImage.sprite = puppetSprites [0];
 			base.OnWrongAnimationEnd ();
 			if(model.HasTime())EndGame(0, 0, 1250);
 		}

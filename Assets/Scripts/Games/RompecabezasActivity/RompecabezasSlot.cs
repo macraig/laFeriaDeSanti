@@ -24,7 +24,7 @@ public class RompecabezasSlot : MonoBehaviour, IDropHandler, IPointerClickHandle
 			}
 
 			current = target;
-			this.GetComponent<Image>().sprite = target.GetComponent<Image>().sprite;
+			this.GetComponent<Image>().sprite = view.PartSprite(view.GetSpriteIndex(target.GetComponent<Image>().sprite));
 			target.gameObject.SetActive(false);
 			target.OnEndDrag();
 		}
