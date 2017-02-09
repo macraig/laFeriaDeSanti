@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Sound;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +18,7 @@ namespace Assets.Scripts.Games.Shipments
         public Sprite[] AnswerCellSprites;
         public Button OkButton;
         public Button NextButton;
+        public Button[] NumberButtons;
         public Color FocusedColor;
         public Color UnfocusedColor;
         public Text ScaleText;
@@ -24,7 +27,13 @@ namespace Assets.Scripts.Games.Shipments
         public Image FinishPlace;
 
         public GameObject Player;
-        public Image[] PlayeSprites;
+        public Sprite[] PlayeSprites;
+        private float _durationPerUnity = 0.5f;
+
+        public AudioClip BoatSound;
+
+        private int _gold;
+        public Text GoldeText;
 
         public ShipmentsModel Model { get; set; }
 
@@ -44,15 +53,18 @@ namespace Assets.Scripts.Games.Shipments
             HighlightCurrentFocus();
             menuBtn.onClick.AddListener(OnClickMenuBtn);
             Next(true);
+            _gold = 0;
         }
 
 
         void Update()
         {
+            
             if (Input.GetKeyDown(KeyCode.RightArrow)) { ChangeFocusCell(_currentFocus + 1); }        
             if (Input.GetKeyDown(KeyCode.LeftArrow)) { ChangeFocusCell(_currentFocus - 1); }        
             if (Input.GetKeyDown(KeyCode.UpArrow)) { ChangeFocusCell(_currentFocus - 3); }        
             if (Input.GetKeyDown(KeyCode.DownArrow)) { ChangeFocusCell(_currentFocus + 3); }
+            else if(!GetCurrentAnswerCell().GetComponent<Button>().enabled) return;
             else if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0)) { OnClickNumberBtn(0); }
             else if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) { OnClickNumberBtn(1); }
             else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) { OnClickNumberBtn(2); }
@@ -140,14 +152,21 @@ namespace Assets.Scripts.Games.Shipments
                 MapGenerator.Places.Find(e => e.Type == ShipmentNodeType.Finish).GetComponent<Image>().sprite;
             _currentFocus = 1;
             ChangeFocusCell(1);
-            SetPlayerToPlace(0);
+            SetPlayerToFirstPlace();
+            EnableGameButtons(true);
+            Player.transform.SetAsLastSibling();
         }
 
-        private void SetPlayerToPlace(int i)
+        private void SetPlayerToFirstPlace()
         {
-            MapPlace place = MapGenerator.Places.Find(e => e.Id == i);
-            Player.transform.SetParent(place.transform);
-            Player.transform.localPosition = Vector2.zero;
+            MapPlace place = MapGenerator.Places.Find(e => e.Id == 0);
+            Player.transform.position = place.transform.position;
+            Player.GetComponent<Image>().sprite = GetNeutralBoatSprite();
+        }
+
+        private Sprite GetNeutralBoatSprite()
+        {
+            return PlayeSprites[0];
         }
 
         private void ClearAnswers()
@@ -282,7 +301,9 @@ namespace Assets.Scripts.Games.Shipments
         public void OnClickOk()
         {
             OkButton.enabled = false;
+
             PlaySoundClick();
+            EnableGameButtons(false);
             List<ShipmentEdge> edgeAnswers = new List<ShipmentEdge>();
 
             
@@ -300,43 +321,129 @@ namespace Assets.Scripts.Games.Shipments
                 edgeAnswers.Add(shipmentEdge);
             }
 
-            for (int i = 0; i < 0; i++)
-            {
-                ShipmentEdge edge =
-                    Model.Edges.Find(
-                        e => (e.IdNodeA == edgeAnswers[i].IdNodeA && e.IdNodeB == edgeAnswers[i].IdNodeB) ||
-                            (e.IdNodeB == edgeAnswers[i].IdNodeB && e.IdNodeA == edgeAnswers[i].IdNodeA));
-                CheckEdgeAnswer(edge, edgeAnswers[i]);
-                
-                
+            ContinueCorrection(edgeAnswers, 0);
 
+        
+        }
+
+        private void EnableGameButtons(bool enable)
+        {
+            foreach (ShipmentsAnswerCell cell in GetAnswerCells())
+            {
+                cell.GetComponent<Button>().enabled = enable;
             }
 
-            if (Model.IsCorrectAnswer(edgeAnswers))
+            foreach (Button numberButton in NumberButtons)
             {
-                ShowRightAnswerAnimation();
+                numberButton.enabled = enable;
+            }
+            MapGenerator.Ruler.GetComponent<Button>().enabled = enable;
+        }
+
+        private void CheckEdgeAnswer(ShipmentEdge realEdge, List<ShipmentEdge> edgeAnswers, int index)
+        {
+            SoundController.GetController().PlayClip(BoatSound);
+            // no hay arista
+            if (realEdge == null)
+            {
+                AnswerEdgeNotExists(
+                    MapGenerator.Places.Find(e => e.Id == edgeAnswers[index].IdNodeB).transform.position, 2, edgeAnswers);
+                return;
+            };
+
+            var answerEdge = edgeAnswers[index];
+            MapPlace destine = MapGenerator.Places.Find(e => e.Id == answerEdge.IdNodeB);
+
+            int answerValue = answerEdge.Length / (Model.Scale);
+            int rest = answerEdge.Length % Model.Scale;
+
+            // caso correcto
+            if (answerValue == realEdge.Length && rest == 0)
+            {
+                Player.transform.DOMove(destine.transform.position, GetDuration(realEdge.Length))
+                    .OnComplete(() => ContinueCorrection(edgeAnswers, ++index));
+            }
+            // se pasó
+            else if (answerValue >= realEdge.Length) AnswerEdgeTooLong(destine.transform.position, realEdge.Length, edgeAnswers);
+
+            // se quedó corto
+            else AnswerEdgeTooShort(destine.transform.position, realEdge.Length, edgeAnswers);
+        }
+
+        private void AnswerEdgeNotExists(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
+        {
+            Player.transform.DOMove(destine - (destine - Player.transform.position) * 0.8f, GetDuration(length)).OnComplete(
+               () =>
+               {
+                   BadEdgeAnswerEnd();
+                   FinalCheckAnswer(edgeAnswers);
+               });
+        }
+
+        private void ContinueCorrection(List<ShipmentEdge> edgeAnswers, int index)
+        {
+            if (index == edgeAnswers.Count)
+            {
+                FinalCheckAnswer(edgeAnswers);
             }
             else
             {
-                ShowWrongAnswerAnimation();
+                ShipmentEdge edge =
+                   Model.Edges.Find(
+                       e =>
+                       {
+                           var shipmentEdge = edgeAnswers[index];
+                           return (e.IdNodeA == shipmentEdge.IdNodeA && e.IdNodeB == shipmentEdge.IdNodeB) ||
+                                  (e.IdNodeB == shipmentEdge.IdNodeA && e.IdNodeA == shipmentEdge.IdNodeB);
+                       });
+                CheckEdgeAnswer(edge, edgeAnswers, index);
             }
         }
 
-        private void CheckEdgeAnswer(ShipmentEdge realEdge, ShipmentEdge answerEdge)
+        private void FinalCheckAnswer(List<ShipmentEdge> edgeAnswers)
         {
-            if (realEdge == null)
-            {
-                // no hay arista
-                
-            }
-/*
-            else
+            if (Model.IsCorrectAnswer(edgeAnswers)) ShowRightAnswerAnimation();
+            else ShowWrongAnswerAnimation();
+        }
 
-            {
-               /* int answerValue = answerEdge.Length +  / Model.Scale;
+        private void AnswerEdgeTooShort(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
+        {
+            Player.transform.DOMove(destine - (destine - Player.transform.position) * 0.2f, GetDuration(length)).OnComplete(
+                () =>
+                {
+                    BadEdgeAnswerEnd();
+                    FinalCheckAnswer(edgeAnswers);
+                });
+        }
 
-                if(answerValue)
-            }*/
+        private void BadEdgeAnswerEnd()
+        {
+            Player.GetComponent<Image>().sprite = GetBrokenBoatSprite();
+            Invoke("SetPlayerToFirstPlace", 1.5f);
+        }
+
+
+        private void AnswerEdgeTooLong(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
+        {
+            Player.transform.DOMove(destine + (destine - Player.transform.position) * 0.2f, GetDuration(length)).OnComplete(
+                () =>
+                {
+                    BadEdgeAnswerEnd();
+                    FinalCheckAnswer(edgeAnswers);
+                }                  
+            );
+        }
+
+        
+
+        private Sprite GetBrokenBoatSprite()
+        {
+            return PlayeSprites[1];
+        }
+
+        private float GetDuration(int length)
+        {
+            return length*_durationPerUnity;
         }
 
         public override void OnRightAnimationEnd()
@@ -348,7 +455,9 @@ namespace Assets.Scripts.Games.Shipments
         public override void OnWrongAnimationEnd()
         {
             base.OnWrongAnimationEnd();
+            BadEdgeAnswerEnd();
             OkButton.enabled = true;
+            EnableGameButtons(true);
         }
     }
 }

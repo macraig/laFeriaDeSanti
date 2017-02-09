@@ -408,7 +408,6 @@ public class MapGenerator : MonoBehaviour {
         MapPlace placed1 = prevPlaces[0];
         MapPlace placed2 = prevPlaces[1];
 
-        float dis = Vector2.Distance(placed2.transform.position, placed1.transform.position);
         int edgeLength1;
         int edgeLength2;
         do
@@ -417,11 +416,11 @@ public class MapGenerator : MonoBehaviour {
             edgeLength2 = Random.Range(3, 10);
             float d1 = edgeLength1 * Ruler.GetUnityDistances();
             float d2 = edgeLength2 * Ruler.GetUnityDistances();
-
-            float c = placed1.transform.position.x;
-            float d = placed1.transform.position.y;
-            float a = placed2.transform.position.x;
-            float b = placed2.transform.position.y;
+            float a = placed1.transform.position.x;
+            float b = placed1.transform.position.y;
+            float c = placed2.transform.position.x;
+            float d = placed2.transform.position.y;
+            
 
             // greg is a fun name, it is only an abbreviation of a calculus 
             var f1 = Mathf.Pow(d2, 2);
@@ -441,9 +440,9 @@ public class MapGenerator : MonoBehaviour {
             }
             float f2 = Mathf.Pow((x - c), 2);
             y = Mathf.Sqrt(f1 - f2) + d;
-            if(!float.IsNaN(x) && !float.IsNaN(x)) toLocate.transform.position = new Vector2(x, y);
+            if(!float.IsNaN(x) && !float.IsNaN(y)) toLocate.transform.position = new Vector2(x, y);
  
-        } while (float.IsNaN(x) || float.IsNaN(x) || EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, 5));
+        } while (float.IsNaN(x) || float.IsNaN(y) || EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, 5));
         List<ShipmentEdge> edges = ShipmentsView.instance.Model.GetEdgesByIdNode(toLocate.Id);
         edges.Find(e => e.IdNodeA == placed1.Id || e.IdNodeB == placed1.Id).Length = edgeLength1;
         edges.Find(e => e.IdNodeA == placed2.Id || e.IdNodeB == placed2.Id).Length = edgeLength2;
