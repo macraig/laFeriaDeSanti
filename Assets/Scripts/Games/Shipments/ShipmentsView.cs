@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Sound;
@@ -10,6 +11,8 @@ namespace Assets.Scripts.Games.Shipments
 {
     public class ShipmentsView : LevelView
     {
+        public Text clock;
+        public Image clockImage;
 
         public static ShipmentsView instance; 
 
@@ -33,9 +36,18 @@ namespace Assets.Scripts.Games.Shipments
         public AudioClip BoatSound;
 
         private int _gold;
+        public AudioClip GoldSound;
+        public AudioClip DropGoldSound;
         public Text GoldeText;
 
         public ShipmentsModel Model { get; set; }
+
+        private int attempsToGenerate;
+
+        private List<ShipmentEdge> _edgesAnswers;
+        private int indexToCorrect;
+        bool timerActive, switchTime;
+
 
         void Awake()
         {
@@ -53,7 +65,8 @@ namespace Assets.Scripts.Games.Shipments
             HighlightCurrentFocus();
             menuBtn.onClick.AddListener(OnClickMenuBtn);
             Next(true);
-            _gold = 0;
+            attempsToGenerate = 0;
+            _edgesAnswers = new List<ShipmentEdge>();
         }
 
 
@@ -136,13 +149,37 @@ namespace Assets.Scripts.Games.Shipments
 
         public override void Next(bool first = false)
         {
-            if(!first) PlaySoundClick();
+
+            attempsToGenerate = 0;
+            if (!first) PlaySoundClick();
+            EnableComponents(true);
             OkButton.gameObject.SetActive(true);
             OkButton.enabled = true;
             NextButton.gameObject.SetActive(false);
             Model.NextExercise();
             MapGenerator.SafeLocatePlaces(Model.Nodes, Model.Edges);
-                     
+
+            while (!MapGenerator.CheckAllDistances(Model.Edges))
+            {
+                if (attempsToGenerate > 10)
+                {
+                    Model.RemainExercises++;
+                    
+                    Model.NextExercise();
+                } else if (attempsToGenerate > 50)
+                {
+                    throw new Exception("Dificil de generar");
+
+                }
+                foreach (ShipmentEdge edge in Model.Edges)
+                {
+                    edge.Length = 0;
+                }
+                MapGenerator.SafeLocatePlaces(Model.Nodes, Model.Edges);
+                attempsToGenerate++;
+            }
+
+
             MapGenerator.TraceEdges(Model.Edges);
             ScaleText.text = Model.Scale + " km";
             ClearAnswers();
@@ -155,11 +192,14 @@ namespace Assets.Scripts.Games.Shipments
             SetPlayerToFirstPlace();
             EnableGameButtons(true);
             Player.transform.SetAsLastSibling();
+            MapGenerator.Ruler.transform.SetAsLastSibling();
+            _gold = 0;
+            GoldeText.text = "" + _gold;
         }
 
         private void SetPlayerToFirstPlace()
         {
-            MapPlace place = MapGenerator.Places.Find(e => e.Id == 0);
+            MapPlace place = MapGenerator.Places.Find(e => e.Type == ShipmentNodeType.Start);
             Player.transform.position = place.transform.position;
             Player.GetComponent<Image>().sprite = GetNeutralBoatSprite();
         }
@@ -300,11 +340,12 @@ namespace Assets.Scripts.Games.Shipments
 
         public void OnClickOk()
         {
+            _edgesAnswers.Clear();
+
             OkButton.enabled = false;
 
             PlaySoundClick();
             EnableGameButtons(false);
-            List<ShipmentEdge> edgeAnswers = new List<ShipmentEdge>();
 
             
             for (int i = 0; i < AnswerRowGameObjects.Length; i++)
@@ -318,10 +359,10 @@ namespace Assets.Scripts.Games.Shipments
                     IdNodeB = answerCells[1].Value,
                     Length = answerCells[2].Value
                 };
-                edgeAnswers.Add(shipmentEdge);
+                _edgesAnswers.Add(shipmentEdge);
             }
 
-            ContinueCorrection(edgeAnswers, 0);
+            ContinueCorrection(_edgesAnswers, 0);
 
         
         }
@@ -342,7 +383,8 @@ namespace Assets.Scripts.Games.Shipments
 
         private void CheckEdgeAnswer(ShipmentEdge realEdge, List<ShipmentEdge> edgeAnswers, int index)
         {
-            SoundController.GetController().PlayClip(BoatSound);
+            if(index > 0) Invoke("PlayBoatSond", 0.4f);
+            else { PlayBoatSond();}
             // no hay arista
             if (realEdge == null)
             {
@@ -361,13 +403,36 @@ namespace Assets.Scripts.Games.Shipments
             if (answerValue == realEdge.Length && rest == 0)
             {
                 Player.transform.DOMove(destine.transform.position, GetDuration(realEdge.Length))
-                    .OnComplete(() => ContinueCorrection(edgeAnswers, ++index));
+                    .OnComplete(() =>
+                    {
+                        AddGold();
+                        index++;
+                        indexToCorrect = index;
+                        Invoke("CorrectAnswerContinueCorrection", 1);
+                    });
             }
             // se pasó
             else if (answerValue >= realEdge.Length) AnswerEdgeTooLong(destine.transform.position, realEdge.Length, edgeAnswers);
 
             // se quedó corto
             else AnswerEdgeTooShort(destine.transform.position, realEdge.Length, edgeAnswers);
+        }
+
+        private void CorrectAnswerContinueCorrection()
+        {
+            ContinueCorrection(_edgesAnswers, indexToCorrect);
+
+        }
+        private void PlayBoatSond()
+        {
+            SoundController.GetController().PlayClip(BoatSound);
+        }
+
+        private void AddGold()
+        {
+            _gold += 10;
+            GoldeText.text = "" + _gold;
+            SoundController.GetController().PlayClip(GoldSound);
         }
 
         private void AnswerEdgeNotExists(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
@@ -402,8 +467,13 @@ namespace Assets.Scripts.Games.Shipments
 
         private void FinalCheckAnswer(List<ShipmentEdge> edgeAnswers)
         {
-            if (Model.IsCorrectAnswer(edgeAnswers)) ShowRightAnswerAnimation();
+            if (Model.IsCorrectAnswer(edgeAnswers))
+            {
+                ShowRightAnswerAnimation();
+
+            }
             else ShowWrongAnswerAnimation();
+
         }
 
         private void AnswerEdgeTooShort(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
@@ -419,6 +489,8 @@ namespace Assets.Scripts.Games.Shipments
         private void BadEdgeAnswerEnd()
         {
             Player.GetComponent<Image>().sprite = GetBrokenBoatSprite();
+            DropGold();
+
             Invoke("SetPlayerToFirstPlace", 1.5f);
         }
 
@@ -434,7 +506,13 @@ namespace Assets.Scripts.Games.Shipments
             );
         }
 
-        
+        private void DropGold()
+        {
+            _gold = 0;
+            GoldeText.text = "" + _gold;
+            SoundController.GetController().PlayClip(DropGoldSound);
+        }
+
 
         private Sprite GetBrokenBoatSprite()
         {
@@ -448,8 +526,17 @@ namespace Assets.Scripts.Games.Shipments
 
         public override void OnRightAnimationEnd()
         {
-            OkButton.gameObject.SetActive(false);
-            NextButton.gameObject.SetActive(true);
+
+            if (Model.GameEnd())
+            {
+                EndGame(60, 0, 1250);
+
+            }
+            else
+            {
+                OkButton.gameObject.SetActive(false);
+                NextButton.gameObject.SetActive(true);
+            }
         }
 
         public override void OnWrongAnimationEnd()
@@ -459,5 +546,58 @@ namespace Assets.Scripts.Games.Shipments
             OkButton.enabled = true;
             EnableGameButtons(true);
         }
+        void SetClock()
+        {
+            clock.text = Model.GetTimer().ToString();
+        }
+
+        public override void OnNextLevelAnimationEnd()
+        {
+            base.OnNextLevelAnimationEnd();
+            PlayTimeLevelMusic();
+            menuBtn.interactable = false;
+            NextTimeExercise();
+        }
+
+        void NextTimeExercise()
+        {
+            clock.gameObject.SetActive(true);
+            clockImage.gameObject.SetActive(true);
+            SetClock();
+            StartTimer(true);
+/*
+            SetRule();
+*/
+        }
+
+        void StartTimer(bool first = false)
+        {
+            StartCoroutine(TimerFunction(first));
+            timerActive = true;
+        }
+
+        public IEnumerator TimerFunction(bool first = false)
+        {
+            yield return new WaitForSeconds(1);
+            Debug.Log("segundo");
+
+            UpdateView();
+
+            if (timerActive) StartTimer();
+        }
+
+        void UpdateView()
+        {
+            Model.DecreaseTimer();
+
+            SetClock();
+
+            if (Model.IsTimerDone())
+            {
+                timerActive = false;
+                EndGame(60, 0, 1250);
+            }
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Scripts.Common;
 using Assets.Scripts.Games.Shipments;
+using Assets.Scripts.Metrics.Model;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -9,13 +10,19 @@ namespace Assets.Scripts.Games.Shipments
 {
     public class ShipmentsModel : LevelModel
     {
+        public const int START_TIME = 60, CORRECT_SCENE_TIME = 20;
+        private bool withTime;
 
-        private const int NODES = 16;
+        private const int NODES = 13;
         private int _currentLevel;
+        public int _remainExercises = 6;
         private List<ShipmentNode> _nodes; 
         private List<ShipmentEdge> _edges;
         private List<ShipmentsPath> _solutionPaths;
+        private List<int> _edgesBySolutionPath;
+
         private bool lastCorrect;
+        private int timer;
 
 
         public ShipmentsModel()
@@ -23,8 +30,10 @@ namespace Assets.Scripts.Games.Shipments
             _nodes = new List<ShipmentNode>();
             _edges = new List<ShipmentEdge>();
             _solutionPaths = new List<ShipmentsPath>();
-            _currentLevel = 3;
+            _currentLevel = 0;
             lastCorrect = true;
+            MetricsController.GetController().GameStart();
+
         }
 
         public List<ShipmentNode> Nodes
@@ -39,95 +48,75 @@ namespace Assets.Scripts.Games.Shipments
 
         public int Scale { get; set; }
 
+        public int RemainExercises
+        {
+            get { return _remainExercises; }
+            set { _remainExercises = value; }
+        }
+
 
         public void NextExercise()
         {
             int nodes;
             int solutionPaths;
-            List<int> edgesBySolutionPath;
             float extraEdgeProbability;
+            int nodesRequiered;
             Scale = Randomizer.RandomBoolean() ? 5 : 10;
             _solutionPaths.Clear();
             Nodes.Clear();
             Edges.Clear();
-            Debug.Log("current lvl: " + (_currentLevel+1));
 
             switch (_currentLevel)
             {
                 case 0:
                     nodes = 2;
                     solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths) {1};
+                    _edgesBySolutionPath = new List<int>(solutionPaths) {1};
                     extraEdgeProbability = 0;
                     break;
                 case 1:
                     nodes = Random.Range(3, 6);
                     solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths) { 2 };
+                    _edgesBySolutionPath = new List<int>(solutionPaths) { 2 };
                     extraEdgeProbability = 0;
 
                     break;
                 case 2:
                     nodes = Random.Range(5, 8);
                     solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths)
-                    { 2 };
-                    extraEdgeProbability = 0.5f;
+                    _edgesBySolutionPath = new List<int>(solutionPaths)
+                    { GetEdgesToSolutionPath(nodes) };
+                    extraEdgeProbability = 0.25f;
               
                     break;
                 case 3:
-                    nodes = Random.Range(6, 9);
-                    solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths)
-                    { Mathf.CeilToInt((nodes - 1 ) * Random.Range(0.5f, 0.8f)),
-                        Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 0.8f)) };
+                    nodes = Random.Range(5, 8);
+                    solutionPaths = 2;
+                    _edgesBySolutionPath = new List<int>(solutionPaths)
+                   { GetEdgesToSolutionPath(nodes)
+                    , GetEdgesToSolutionPath(nodes) };
+                    nodesRequiered = GetQuantityNodesRequiered(_edgesBySolutionPath[0] + _edgesBySolutionPath[1]);
+                    if (nodes < nodesRequiered) nodes = nodesRequiered;
                     extraEdgeProbability = 0;
 
                     break;
                 default:
-                    nodes = 9;
-                    solutionPaths = 1;
-                    edgesBySolutionPath = new List<int>(solutionPaths)
-                    { Mathf.CeilToInt((nodes - 1) * 0.8f),
-                        Mathf.CeilToInt((nodes  - 1)  * 0.8f) };
-                    extraEdgeProbability = 1;
-                    break;
-                    /*     case 3:
-                             nodes = Random.Range(6, 9);
-                             solutionPaths = Random.Range(2, 4);
-                             edgesBySolutionPath = new List<int>(solutionPaths);
-                             for (int i = edgesBySolutionPath.Capacity - 1; i >= 0; i--)
-                             {
-                                 edgesBySolutionPath.Add(Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)));
-                             }
-                             extraEdgeProbability = 0.5f;
-                             maxLongEdge = 4;
-
-                             break;
-                         case 4:
-                             nodes = Random.Range(6, 9);
-                             solutionPaths = Random.Range(2, 4);
-                             edgesBySolutionPath = new List<int>(solutionPaths);
-                             for (int i = edgesBySolutionPath.Capacity - 1; i >= 0; i--)
-                             {
-                                 edgesBySolutionPath.Add(Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)));
-                             }
-                             extraEdgeProbability = 0.5f;
-                             maxLongEdge = 4;
-
-                             break;
-                         default:
-                             nodes = Random.Range(6, 9);
-                             solutionPaths = Random.Range(2, 4);
-                             edgesBySolutionPath = new List<int>(solutionPaths);
-                             for (int i = edgesBySolutionPath.Capacity - 1; i >= 0; i--)
-                             {
-                                 edgesBySolutionPath.Add(Mathf.CeilToInt((nodes - 1) * Random.Range(0.5f, 1)));
-                             }
-                             extraEdgeProbability = 0.5f;
-                             maxLongEdge = 4;
-
-                             break;*/
+                    nodes = Random.Range(6, 9);
+                    solutionPaths = 2;
+                    _edgesBySolutionPath = new List<int>(solutionPaths)
+                    { GetEdgesToSolutionPath(nodes)
+                    , GetEdgesToSolutionPath(nodes) };
+                    nodesRequiered = GetQuantityNodesRequiered(_edgesBySolutionPath[0] + _edgesBySolutionPath[1]);
+                    if(nodes < nodesRequiered) nodes = nodesRequiered;
+                    
+                    extraEdgeProbability = 1f;
+                    break;           
+            }
+            // Necesito que haya una cantidad mínima de nodos, para poder cumplir las restricciones
+            if (!CheckMinNodes(nodes))
+            {
+                NextExercise();
+                return;
             }
            
             GenerateNodes(nodes);
@@ -147,28 +136,67 @@ namespace Assets.Scripts.Games.Shipments
             _solutionPaths.Add(shipmentsPath);
             _solutionPaths.Add(shipmentsPath2);*/
 
-            GenerateSolutionPaths(solutionPaths, edgesBySolutionPath);
+            GenerateSolutionPaths(solutionPaths, _edgesBySolutionPath);
+
+
             while (SolutionsPathsAreEquals())
             {
                 _solutionPaths.Clear();
                 _edges.Clear();
-                GenerateSolutionPaths(solutionPaths, edgesBySolutionPath);
+                GenerateSolutionPaths(solutionPaths, _edgesBySolutionPath);
             }
-/*
-            GenerateEdgesToSolutionPaths();
-*/
 
+            if (!IsValidGraph())
+            {
+                NextExercise();
+                return;
+            }
+            RemainExercises--;
 
-/*
-            GenerateExtraEdges(extraEdgeProbability);
-*/
+            /*
+                        GenerateExtraEdges(extraEdgeProbability);
+            */
+        }
 
+        private static int GetEdgesToSolutionPath(int nodes)
+        {
+            int edgesToSolutionPath = Mathf.RoundToInt((nodes - 1) * Random.Range(0.5f, 1));
+            return edgesToSolutionPath > 5 ? 5 : edgesToSolutionPath;
+        }
 
+        private bool CheckMinNodes(int nodes)
+        {
+            int pathsSize = 0;
+            foreach (var edges in _edgesBySolutionPath)
+            {
+                pathsSize += edges + 1;
+            }
 
-          _currentLevel++;
-/*
-            if (_currentLevel == 5) _currentLevel = 0;
-*/
+            return nodes >= GetQuantityNodesRequiered(pathsSize);
+        }
+
+        private int GetQuantityNodesRequiered(int pathsSize)
+        {
+            return pathsSize - 2*_edgesBySolutionPath.Count;
+        }
+
+        private bool IsValidGraph()
+        {
+            return CheckEdgesQuantity() && CheckMaxEdges();
+        }
+
+        private bool CheckEdgesQuantity()
+        {
+            return Edges.Count < Nodes.Count * 2 - 2 ;
+        }
+
+        private bool CheckMaxEdges()
+        {
+            foreach (ShipmentNode node in Nodes)
+            {
+                if (GetEdgesByIdNode(node.Id).Count > 3) return false;
+            }
+            return true;
         }
 
         private bool SolutionsPathsAreEquals()
@@ -195,7 +223,9 @@ namespace Assets.Scripts.Games.Shipments
                 {
                     if(node.Id == otherNode.Id) continue;
                     if(GetEdge(node.Id, otherNode.Id) != null) continue;
-                    if (Random.Range(0, 1) < extraEdgeProbability && GetEdgesByIdNode(node.Id).Count < 2 && GetEdgesByIdNode(otherNode.Id).Count < 2 && Edges.Count < Nodes.Count * 2 )
+                    bool b = GetEdgesByIdNode(node.Id).Count < 2;
+                    bool b1 = GetEdgesByIdNode(otherNode.Id).Count < 2;
+                    if (Random.Range(0, 1) < extraEdgeProbability && b && b1/* && Edges.Count < (Nodes.Count/2)  * 3 - 4 */ )
                     {
                         ShipmentEdge shipmentEdge = new ShipmentEdge
                         {
@@ -208,31 +238,6 @@ namespace Assets.Scripts.Games.Shipments
             }
         }
 
-     /*   private void GenerateEdgesToSolutionPaths()
-        {
-            foreach (ShipmentsPath shipmentsPath in _solutionPaths)
-            {
-                shipmentsPath.EdgesList = new List<ShipmentEdge>(shipmentsPath.NodesList.Count - 1);
-                for (var i = 0; i < shipmentsPath.NodesList.Count - 1; i++)
-                {
-
-                    ShipmentEdge shipmentEdge = GetEdge(shipmentsPath.NodesList[i].Id, shipmentsPath.NodesList[i + 1].Id);
-                    if (shipmentEdge == null)
-                    {
-                        shipmentEdge = new ShipmentEdge
-                        {
-                            IdNodeA = shipmentsPath.NodesList[i].Id,
-                            IdNodeB = shipmentsPath.NodesList[i + 1].Id,
-                        };
-                        Edges.Add(shipmentEdge);
-                    }
-
-
-                    shipmentsPath.EdgesList.Add(shipmentEdge);
-                }
-            }
-        }*/
-
         private ShipmentEdge GetEdge(int idA, int idB)
         {
             return Edges.Find(e => (e.IdNodeA == idA && e.IdNodeB == idB) || (e.IdNodeA == idB && e.IdNodeB == idA));
@@ -241,7 +246,7 @@ namespace Assets.Scripts.Games.Shipments
         private void GenerateSolutionPaths(int solutionPaths, List<int> edgesBySolutionPath)
         {
             // hago - 2 xq el ultimo se lo voy a agregar al final. El 0 lo agrego si o si. 
-            Randomizer nodeRandomizer = Randomizer.New(Nodes.Count - 1, 0, false);
+            Randomizer nodeRandomizer = Randomizer.New(Nodes.Count - 2, 1, false);
             for (int i = solutionPaths - 1; i >= 0; i--)
             {
                 nodeRandomizer.Restart();
@@ -253,31 +258,40 @@ namespace Assets.Scripts.Games.Shipments
                     NodesList = new List<ShipmentNode>(pathLength + 1) {Nodes[0]}
                 };
                 // es -3 xq el 0 y el ultimo ya estan fijos
-                for (int j = 1; j <= shipmentsPath.NodesList.Capacity - 1; j++)
+                for (int j = 1; j <= shipmentsPath.NodesList.Capacity - 2; j++)
                 {
                     ShipmentNode shipmentNode = Nodes[nodeRandomizer.Next()];
-                    while (shipmentsPath.NodesList.Exists(e => e.Id == shipmentNode.Id) || GetEdgesByIdNode(shipmentNode.Id).Count >= 2)
+
+                    while (shipmentsPath.NodesList.Exists(e => e.Id == shipmentNode.Id) || GetEdgesByIdNode(shipmentNode.Id).Count > 2)
                     {
                         shipmentNode = Nodes[nodeRandomizer.Next()];
                     }
-                    ShipmentEdge edge = new ShipmentEdge();
                     shipmentsPath.NodesList.Add(shipmentNode);
-                    edge.IdNodeA = shipmentsPath.NodesList[j - 1].Id;
-                    edge.IdNodeB = shipmentsPath.NodesList[j].Id;
-                    Edges.Add(edge);
+
+                    if (!ExistsEdge(shipmentsPath.NodesList[j - 1].Id, shipmentsPath.NodesList[j].Id))
+                    {
+                        ShipmentEdge edge = new ShipmentEdge();
+                        edge.IdNodeA = shipmentsPath.NodesList[j - 1].Id;
+                        edge.IdNodeB = shipmentsPath.NodesList[j].Id;
+                        Edges.Add(edge);
+                    }
+                    
                                       
                 }
                 // Agrego el ultimo
-            /*    shipmentsPath.NodesList.Add(Nodes[Nodes.Count - 1]);
-                ShipmentEdge lastEdge = new ShipmentEdge();*/
-              /*  lastEdge.IdNodeA = shipmentsPath.NodesList[shipmentsPath.NodesList.Count - 2].Id;
-                lastEdge.IdNodeB = shipmentsPath.NodesList[shipmentsPath.NodesList.Count - 1].Id;*/
-/*
+                shipmentsPath.NodesList.Add(Nodes[Nodes.Count - 1]);
+                ShipmentEdge lastEdge = new ShipmentEdge();
+                lastEdge.IdNodeA = shipmentsPath.NodesList[shipmentsPath.NodesList.Count - 2].Id;
+                lastEdge.IdNodeB = shipmentsPath.NodesList[shipmentsPath.NodesList.Count - 1].Id;
                 Edges.Add(lastEdge);
-*/
 
                 _solutionPaths.Add(shipmentsPath);          
             }
+        }
+
+        private bool ExistsEdge(int idA, int idB)
+        {
+            return _edges.Exists(e => (e.IdNodeA == idA && e.IdNodeB == idB) || (e.IdNodeB == idA && e.IdNodeA == idB));
         }
 
         private void GenerateNodes(int totalNodes)
@@ -322,9 +336,7 @@ namespace Assets.Scripts.Games.Shipments
 
         public bool IsCorrectAnswer(List<ShipmentEdge> edgeAnswers)
         {
-/*
-            List<int> measuresList = ShipmentsView.instance.measuresList;
-*/
+
             for (int i = 0; i < edgeAnswers.Count; i++)
             {
                 edgeAnswers[i].Length = edgeAnswers[i].Length/Scale;
@@ -334,23 +346,8 @@ namespace Assets.Scripts.Games.Shipments
             bool isCorrectAnswer = edgeAnswers[edgeAnswers.Count - 1].IdNodeB == Nodes.Find(e => e.Type == ShipmentNodeType.Finish).Id;
             if (lastCorrect) _currentLevel++;
             lastCorrect = isCorrectAnswer;
+            LogAnswer(isCorrectAnswer);
             return isCorrectAnswer;
-
-
-            /*    foreach (ShipmentsPath shipmentsPath in _solutionPaths)
-            {
-                if(shipmentsPath.EdgesList.Count != edgeAnswers.Count) continue;
-                int i = shipmentsPath.EdgesList.Count - 1;
-                for (; i >= 0; i--)
-                {
-                    if(shipmentsPath.EdgesList[i].IdNodeA != edgeAnswers[i].IdNodeA) break;
-                    if(shipmentsPath.EdgesList[i].IdNodeB != edgeAnswers[i].IdNodeB) break;
-                    if(shipmentsPath.EdgesList[i].Length != edgeAnswers[i].Length / Scale) break;
-                }
-                if (i == -1) return true;
-
-            }
-            return false;*/
 
         }
 
@@ -359,7 +356,31 @@ namespace Assets.Scripts.Games.Shipments
             return Edges.FindAll(e => e.IdNodeA == idNode || e.IdNodeB == idNode);
         }
 
-       
+
+        public bool GameEnd()
+        {
+            return 0 == RemainExercises;
+        }
+
+        public void DecreaseTimer()
+        {
+            if (timer > 0) timer--;
+        }
+
+        public bool IsTimerDone()
+        {
+            return timer == 0;
+        }
+
+        public void CorrectTimer()
+        {
+            timer += CORRECT_SCENE_TIME;
+        }
+
+        public int GetTimer()
+        {
+            return timer;
+        }
     }
 
     public class ShipmentNode

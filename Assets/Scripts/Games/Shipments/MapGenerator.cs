@@ -110,37 +110,39 @@ public class MapGenerator : MonoBehaviour {
     }
 */
 
+
     private void SetFirstPlace(ShipmentNode node, float xMax, float yMax)
     {
         Places[0].SetData(node.Id, PlacesSprites[node.Id], CrosSprites[node.Type == ShipmentNodeType.Other ? 1 : 0], node.Type);
         Places[0].transform.localPosition = new Vector2(-xMax, yMax);
     }
-
-    private bool CheckEdgeDistances(MapPlace mapPlace, List<MapPlace> locatedPlaces, List<int> edgeDistances)
-    {
-        for (var i = locatedPlaces.Count - 1; i >= 0; i--)
+    /*
+        private bool CheckEdgeDistances(MapPlace mapPlace, List<MapPlace> locatedPlaces, List<int> edgeDistances)
         {
-            MapPlace locatedPlace = locatedPlaces[i];
-/*
-            float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
-*/
-            float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
-            float f = referenceDistance / Ruler.GetUnityDistances();
-            if (Math.Abs(f - edgeDistances[i]) > 0.1)
+            for (var i = locatedPlaces.Count - 1; i >= 0; i--)
             {
-                return false;
+                MapPlace locatedPlace = locatedPlaces[i];
+    /*
+                float distance = Vector2.Distance(locatedPlace.transform.localPosition, mapPlace.transform.localPosition);
+    #1#
+                float referenceDistance = Vector2.Distance(locatedPlace.CrossReference.transform.position, mapPlace.CrossReference.transform.position);
+                float f = referenceDistance / Ruler.GetUnityDistances();
+                if (Math.Abs(f - edgeDistances[i]) > 0.1)
+                {
+                    return false;
+                }
+
             }
 
+            return true;
         }
-    
-        return true;
-    }
+    */
 
 
     private bool CheckMinDistances(MapPlace mapPlace, List<MapPlace> locatedPlaces, float distanceMin)
     {
 
-       Debug.Log("checking min distances");
+
         iterations++;
         if (iterations > 100)
         {
@@ -194,7 +196,6 @@ public class MapGenerator : MonoBehaviour {
 
             line.material = DottedLineMateriallMaterial[lastMaterial++];
             if (lastMaterial == DottedLineMateriallMaterial.Length) lastMaterial = 0;
-            line.material.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
             line.textureScale = 1f;
             line.textureScale = 1f;
             line.Draw();
@@ -202,27 +203,30 @@ public class MapGenerator : MonoBehaviour {
             line.rectTransform.transform.SetParent(Ruler.transform.parent);
 
         }
-        Ruler.transform.SetAsLastSibling();
     }
 
     public void SafeLocatePlaces(List<ShipmentNode> nodes, List<ShipmentEdge> edges)
     {
         iterations = 0;
-
         ResetIds();
         float edge = Places[0].GetComponent<RectTransform>().sizeDelta.x / 2;
-        float distanceMin = Mathf.Sqrt(2) * edge;
+        float distanceMin = GetMinDistance();
         Vector2 mapSize = Map.GetComponent<RectTransform>().sizeDelta / 2;
-        float xMax = mapSize.x  - edge;
-        float yMax = mapSize.y - edge;
+        float xMax = (mapSize.x  - edge) * 0.95f;
+        float yMax = (mapSize.y - edge) *0.95f;
         List<MapPlace> locatedPlaces = new List<MapPlace>(Places.Count);
-
-        int i = 0;
-        nodes.Sort((node1, node2) => ShipmentsView.instance.Model.GetEdgesByIdNode(node2.Id).Count - ShipmentsView.instance.Model.GetEdgesByIdNode(node1.Id).Count);
+        Utils.Shuffle(Places);
+        nodes.Sort((node1, node2) => node1.Type == ShipmentNodeType.Start ? -1 : node2.Type == ShipmentNodeType.Start ? 1 : ShipmentsView.instance.Model.GetEdgesByIdNode(node2.Id).Count - ShipmentsView.instance.Model.GetEdgesByIdNode(node1.Id).Count);
+        SetFirstPlace(nodes[0], xMax, yMax);
+        locatedPlaces.Add(Places[0]);
+        Places[0].gameObject.SetActive(true);
+        int i = 1;
         for (; i < nodes.Count; i++)
         {
-            Places[i].gameObject.SetActive(true);
-            Places[i].SetData(nodes[i].Id, PlacesSprites[nodes[i].Id], CrosSprites[nodes[i].Type == ShipmentNodeType.Other ? 1 : 0], nodes[i].Type);
+            MapPlace mapPlace = Places[i];
+            mapPlace.gameObject.SetActive(true);
+            ShipmentNode node = nodes[i];
+            mapPlace.SetData(node.Id, PlacesSprites[node.Id], CrosSprites[node.Type == ShipmentNodeType.Other ? 1 : 0], node.Type);
             if (iterations >= 100)
             {
                 iterations = 0;
@@ -235,7 +239,7 @@ public class MapGenerator : MonoBehaviour {
                 SafeLocatePlaces(nodes, edges);
                 return;
             }
-            SafeLocatePlace(Places[i], locatedPlaces, ShipmentsView.instance.Model.GetEdgesByIdNode(nodes[i].Id), xMax, yMax, distanceMin);
+            SafeLocatePlace(mapPlace, locatedPlaces, ShipmentsView.instance.Model.GetEdgesByIdNode(node.Id), xMax, yMax, distanceMin);
         }
 
         // Oculto los places no usados
@@ -245,7 +249,11 @@ public class MapGenerator : MonoBehaviour {
         }
     }
 
-    
+    private float GetMinDistance()
+    {
+        return Mathf.Sqrt(2) * (Places[0].GetComponent<RectTransform>().sizeDelta.x / 2);
+    }
+
 
     private void ResetIds()
     {
@@ -259,7 +267,9 @@ public class MapGenerator : MonoBehaviour {
     private void SafeLocatePlace(MapPlace toLocate, List<MapPlace> locatedPlaces, List<ShipmentEdge> toLocateEdges, float xMax, float yMax, float distanceMin)
     {
         List<MapPlace> prevPlaces = ObtainLocatedNodesPrev(locatedPlaces, toLocateEdges);
+/*
         if(prevPlaces.Count > 2) throw new Exception("Mmmhhh tiene muchas restricciones previas. Revisar la generación del grafo.");
+*/
         switch (prevPlaces.Count)
         {
             case 2:
@@ -321,7 +331,9 @@ public class MapGenerator : MonoBehaviour {
                 {
                     if (edge.Length != 0)
                     {
+/*
                         throw new Exception("Edge have to b resized but the node is located");
+*/
                     }
                     if (distance < 10)
                     {
@@ -351,7 +363,9 @@ public class MapGenerator : MonoBehaviour {
                 {
                     if (edge.Length != 0)
                     {
+/*
                         throw new Exception("Edge have to b resized but the node is located");
+*/
                     }
 
                     if (distance < 10)
@@ -386,9 +400,7 @@ public class MapGenerator : MonoBehaviour {
     private bool EdgeIsIncorrect(MapPlace toLocate, List<MapPlace> locatedPlaces, float xMax, float yMax, float distanceMin, float f)
     {
        
-    
         iterations++;
-        Debug.Log("iterations: " + iterations);
         if (iterations > 100)
         {
             return false;
@@ -442,7 +454,7 @@ public class MapGenerator : MonoBehaviour {
             y = Mathf.Sqrt(f1 - f2) + d;
             if(!float.IsNaN(x) && !float.IsNaN(y)) toLocate.transform.position = new Vector2(x, y);
  
-        } while (float.IsNaN(x) || float.IsNaN(y) || EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, 5));
+        } while (float.IsNaN(x) || float.IsNaN(y) || EdgeIsIncorrect(toLocate, locatedPlaces, xMax, yMax, distanceMin, edgeLength1 > edgeLength2 ? edgeLength1 : edgeLength2 ));
         List<ShipmentEdge> edges = ShipmentsView.instance.Model.GetEdgesByIdNode(toLocate.Id);
         edges.Find(e => e.IdNodeA == placed1.Id || e.IdNodeB == placed1.Id).Length = edgeLength1;
         edges.Find(e => e.IdNodeA == placed2.Id || e.IdNodeB == placed2.Id).Length = edgeLength2;
@@ -461,7 +473,9 @@ public class MapGenerator : MonoBehaviour {
 
         List<MapPlace> vertices = locatedPlaces.FindAll(e => edgesByIdNode.Exists(f => f.IdNodeA == e.Id || f.IdNodeB == e.Id));
         if (vertices.Count < 2) return null;
+/*
         if (vertices.Count > 2) throw new Exception("mmmh many vertexes");
+*/
 
         ShipmentEdge edge = allEdges.Find(
             e =>
@@ -476,6 +490,44 @@ public class MapGenerator : MonoBehaviour {
             edgesByIdNode.Find(e => e.IdNodeA == vertices[1].Id || e.IdNodeB == vertices[1].Id)
         });
         return mapTriangle;
+    }
+
+    public bool CheckAllDistances(List<ShipmentEdge> allEdges)
+    {
+        List<MapPlace> locatedPlaces = Places.FindAll(e => e.Id != -1);
+        foreach (MapPlace place in locatedPlaces)
+        {
+            if (!CheckMinDistances(place, locatedPlaces, GetMinDistance()))
+            {
+                return false;
+            }
+        }
+
+        foreach (ShipmentEdge edge in allEdges)
+        {
+            MapPlace a = locatedPlaces.Find(e => e.Id == edge.IdNodeA);
+            MapPlace b = locatedPlaces.Find(e => e.Id == edge.IdNodeB);
+
+            float f = Vector2.Distance(a.transform.position, b.transform.position) / Ruler.GetUnityDistances();
+            if (Math.Abs(f%1) > 0.1) return false;
+        }
+
+        foreach (var mapPlace in locatedPlaces)
+        {
+            if(!IsInMapLimits(mapPlace)) return false;
+        }
+        return true;
+
+    }
+
+    private bool IsInMapLimits(MapPlace mapPlace)
+    {
+        float edge = Places[0].GetComponent<RectTransform>().sizeDelta.x / 2;
+        Vector2 mapSize = Map.GetComponent<RectTransform>().sizeDelta / 2;
+        float xMax = (mapSize.x - edge) * 0.95f;
+        float yMax = (mapSize.y - edge) * 0.95f;
+        Vector3 localPosition = mapPlace.transform.localPosition;
+        return Mathf.Abs(localPosition.x) <= xMax && Mathf.Abs(localPosition.y) <= yMax;
     }
 }
 

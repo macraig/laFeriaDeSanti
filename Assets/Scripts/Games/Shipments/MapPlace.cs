@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class MapPlace : MonoBehaviour
 {
     public Image CrossReference;
-    public string Name;
     private int _id;
 
     public int Id
