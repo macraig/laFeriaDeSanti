@@ -67,7 +67,7 @@ public class PlagasActivityModel : LevelModel {
 		tiles[freeSlot].SetTimeToAppear(randomSpawn);
 	}
 
-	void ResetTiles() {
+	public void ResetTiles() {
 		tiles = new List<PlagaTile>();
 		for(int i = 0; i < TILES; i++) {
 			tiles.Add(new PlagaTile());
@@ -101,7 +101,9 @@ public class PlagasActivityModel : LevelModel {
 
 	public void Correct() {
 		LogAnswer(true);
+	}
 
+	public void SmackMole(){
 		smackedMoles++;
 	}
 

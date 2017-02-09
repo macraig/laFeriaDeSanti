@@ -24,7 +24,6 @@ public class PlagasActivityView : LevelView {
 	private AudioClip whackSound, whackMoleSound;
 	private PlagasActivityModel model;
 
-
 	bool timerActive = false;
 
 	override public void Next(bool first = false){
@@ -33,6 +32,7 @@ public class PlagasActivityView : LevelView {
 		} else {
 			ClocksActive(false);
 			ResetTiles();
+			model.ResetTiles();
 			ResetLetterNumber();
 			SetCurrentLevel();
 			keyboardActive = true;
@@ -101,6 +101,7 @@ public class PlagasActivityView : LevelView {
 		if(IsCorrectNoTime(slot)) {
 			//correct
 			model.Correct();
+			model.SmackMole();
 			SmackMole(slot);
 
 			CheckEndLevel();
@@ -126,6 +127,7 @@ public class PlagasActivityView : LevelView {
 		CheckSmackGrass(slot);
 		if (model.IsCorrectTime(row, column)){
 			SmackMole(slot);
+			model.SmackMole();
 
 			CheckEndLevel();
 		} else {
