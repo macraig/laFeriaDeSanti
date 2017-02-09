@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: bfe321408a938824fa6e0813f509f374
-timeCreated: 1485541404
+timeCreated: 1486600363
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -12,6 +12,12 @@ TextureImporter:
     21300010: EnviosActivity-01_5
     21300012: EnviosActivity-01_6
     21300014: EnviosActivity-01_7
+    21300016: EnviosActivity-01_8
+    21300018: EnviosActivity-01_9
+    21300020: EnviosActivity-01_10
+    21300022: EnviosActivity-01_11
+    21300024: EnviosActivity-01_12
+    21300026: EnviosActivity-01_13
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -91,10 +97,10 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 246.625
-        height: 245
+        width: 513.6429
+        height: 510
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -102,10 +108,10 @@ TextureImporter:
       name: EnviosActivity-01_1
       rect:
         serializedVersion: 2
-        x: 246
+        x: 513
         y: 0
-        width: 246.625
-        height: 245
+        width: 513.6428
+        height: 510
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,10 +121,10 @@ TextureImporter:
       name: EnviosActivity-01_2
       rect:
         serializedVersion: 2
-        x: 492
+        x: 1026
         y: 0
-        width: 246.625
-        height: 245
+        width: 513.6428
+        height: 510
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,10 +134,10 @@ TextureImporter:
       name: EnviosActivity-01_3
       rect:
         serializedVersion: 2
-        x: 738
+        x: 1539
         y: 0
-        width: 246.625
-        height: 245
+        width: 513.6428
+        height: 510
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,10 +147,10 @@ TextureImporter:
       name: EnviosActivity-01_4
       rect:
         serializedVersion: 2
-        x: 986
+        x: 2052
         y: 0
-        width: 247
-        height: 245
+        width: 514
+        height: 510
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,10 +160,10 @@ TextureImporter:
       name: EnviosActivity-01_5
       rect:
         serializedVersion: 2
-        x: 1232
+        x: 2567
         y: 0
-        width: 247
-        height: 245
+        width: 514
+        height: 510
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -167,12 +173,12 @@ TextureImporter:
       name: EnviosActivity-01_6
       rect:
         serializedVersion: 2
-        x: 1476
+        x: 3078
         y: 0
-        width: 246.625
-        height: 245
+        width: 513.6428
+        height: 510
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.49999976, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -180,10 +186,88 @@ TextureImporter:
       name: EnviosActivity-01_7
       rect:
         serializedVersion: 2
-        x: 1726
+        x: 3594
         y: 0
-        width: 247
-        height: 245
+        width: 514
+        height: 510
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: EnviosActivity-01_8
+      rect:
+        serializedVersion: 2
+        x: 4110
+        y: 0
+        width: 514
+        height: 510
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: EnviosActivity-01_9
+      rect:
+        serializedVersion: 2
+        x: 4624
+        y: 0
+        width: 514
+        height: 510
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: EnviosActivity-01_10
+      rect:
+        serializedVersion: 2
+        x: 5138
+        y: 0
+        width: 514
+        height: 510
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: EnviosActivity-01_11
+      rect:
+        serializedVersion: 2
+        x: 5651
+        y: 0
+        width: 514
+        height: 510
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: EnviosActivity-01_12
+      rect:
+        serializedVersion: 2
+        x: 6163
+        y: 0
+        width: 514
+        height: 510
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: EnviosActivity-01_13
+      rect:
+        serializedVersion: 2
+        x: 6677
+        y: 0
+        width: 514
+        height: 510
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
