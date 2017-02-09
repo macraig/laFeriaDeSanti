@@ -4,19 +4,21 @@ using Assets.Scripts.Metrics;
 public class PlagaTile {
 	private int timer;
 	private PlagaState state;
-	private int timeToAppear, timeToMole;
+	private int timeToAppear, timeToMole, smackTimeToHole;
 
 	public PlagaTile(){
 		state = PlagaState.FREE;
 		timer = 0;
 		timeToAppear = 0;
 		timeToMole = 0;
+		smackTimeToHole = 0;
 	}
 
 	public void DecreaseTimer(){
 		if(timer != 0) timer--;
 		if(timeToAppear != 0) timeToAppear--;
 		if(timeToMole != 0) timeToMole--;
+		if(smackTimeToHole != 0) smackTimeToHole--;
 	}
 
 	public bool HasToAppear() {
@@ -38,9 +40,18 @@ public class PlagaTile {
 	public bool IsCorrect() {
 		if(state == PlagaState.MOLE){
 			state = PlagaState.SMACKED_MOLE;
+			smackTimeToHole = PlagasActivityModel.SMACKED_MOLE_TO_HOLE;
 			return true;
 		}
 		return false;
+	}
+
+	public bool IsSmackTimeDone(){
+		return state == PlagaState.SMACKED_MOLE && smackTimeToHole == 0;
+	}
+
+	public void SmackToHole(){
+		if(state == PlagaState.SMACKED_MOLE) state = PlagaState.SMACKED_MOLE_HOLE;
 	}
 
 	public bool TimeDoneAndNotSmacked() {

@@ -14,12 +14,12 @@ public class PlagasActivityView : LevelView {
 	public Button okBtn;
 	public List<Image> tiles, clocks;
 	public List<GameObject> lives;
-	public Text letter, number;
+	public Text letter, number, topoCounter;
 
 	private Sprite[] tileSprites;
 	private bool keyboardActive;
 	private Randomizer veggieRandomizer = Randomizer.New(3, 1), moleRandomizer = Randomizer.New(6, 4);
-	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7;
+	private const int GRASS_SPRITE = 0, SMACKED_MOLE_SPRITE = 7, GRASS_HOLE_SPRITE = 8, MOLE_HOLE_SPRITE = 9;
 
 	private AudioClip whackSound, whackMoleSound;
 	private PlagasActivityModel model;
@@ -63,6 +63,8 @@ public class PlagasActivityView : LevelView {
 	}
 
 	public void OkClick() {
+		okBtn.interactable = false;
+		keyboardActive = false;
 		PlayWhackSound ();
 		Invoke ("CheckWhack",0.5f);
 
@@ -78,13 +80,11 @@ public class PlagasActivityView : LevelView {
 			SetLives(model.GetLives());
 		} else {
 			NoTimeOkClick(row, column);
-//			SetLives(0);
 		}
 	}
 
 	void SetLives(int livesModel) {
 		for(int i = 0; i < lives.Count; i++) {
-//			lives[i].SetActive(livesModel > i);
 			lives[i].GetComponent<Button>().interactable = (livesModel > i);
 		}
 	}
@@ -97,7 +97,8 @@ public class PlagasActivityView : LevelView {
 
 	void NoTimeOkClick(int row, int column) {
 		int slot = model.GetSlot(row, column);
-		if(tiles[slot].sprite != tileSprites[GRASS_SPRITE] && tiles[slot].sprite != tileSprites[SMACKED_MOLE_SPRITE]){
+		CheckSmackGrass(slot);
+		if(IsCorrectNoTime(slot)) {
 			//correct
 			model.Correct();
 			SmackMole(slot);
@@ -105,47 +106,63 @@ public class PlagasActivityView : LevelView {
 			CheckEndLevel();
 		} else {
 			PlayWrongSound();
+			keyboardActive = true;
 		}
 	}
 
+	void CheckSmackGrass(int slot) {
+		if(tiles[slot].sprite == tileSprites[GRASS_SPRITE]) {
+			//TODO mary woosh sound!
+			tiles[slot].sprite = tileSprites[GRASS_HOLE_SPRITE];
+		}
+	}
+
+	bool IsCorrectNoTime(int slot) {
+		return tiles[slot].sprite != tileSprites[GRASS_SPRITE] && tiles[slot].sprite != tileSprites[GRASS_HOLE_SPRITE] && tiles[slot].sprite != tileSprites[SMACKED_MOLE_SPRITE];
+	}
+
 	void TimeOkClick(int row, int column) {
+		int slot = model.GetSlot(row, column);
+		CheckSmackGrass(slot);
 		if (model.IsCorrectTime(row, column)){
-//			model.Correct();
-//			PlayRightSound();
-			SmackMole(model.GetSlot(row, column));
-			//ShowRightAnswerAnimation();
+			SmackMole(slot);
 
 			CheckEndLevel();
 		} else {
-			//ShowWrongAnswerAnimation();
 			PlayWrongSound();
-//			model.Wrong();
 			model.OneLessLife();
+
+			SetLives(model.GetLives());
 
 			if(model.NoMoreLives()){
 				timerActive = false;
 				EndGame(60, 0, 1250);
-			}
+			} else keyboardActive = true;
 		}
 	}
 
 	void SmackMole(int slot) {
-		
 		PlayWhackedMoleSound ();
 		tiles[slot].sprite = tileSprites[SMACKED_MOLE_SPRITE];
 		clocks[slot].gameObject.SetActive(false);
+
+		if(model.HasTime()){
+			topoCounter.text = (int.Parse(topoCounter.text) + 1).ToString();
+		}
 
 		ResetLetterNumber();
 		CheckOk();
 	}
 
 	void CheckEndLevel() {
-		if(model.IsLevelEnded()){
-			if(timerActive) timerActive = false;
+		if(model.IsLevelEnded()) {
+			if(timerActive)
+				timerActive = false;
 			keyboardActive = false;
 			ShowRightAnswerAnimation();
 			model.NextLvl();
-		}
+		} else
+			keyboardActive = true;
 	}
 
 	public void Start(){
@@ -153,6 +170,7 @@ public class PlagasActivityView : LevelView {
 		tileSprites = Resources.LoadAll<Sprite>("Sprites/PlagasActivity/tiles");
 		whackSound = Resources.Load<AudioClip> ("Audio/PlagasActivity/whack");
 		whackMoleSound = Resources.Load<AudioClip> ("Audio/PlagasActivity/whackedMole");
+		topoCounter.text = "0";
 		timerActive = false;
 		Begin();
 	}
@@ -173,10 +191,12 @@ public class PlagasActivityView : LevelView {
 	private void SetCurrentLevel() {
 		//deberia ser con herencia, pero odio c# :)
 		if(model.HasTime()){
+			topoCounter.gameObject.SetActive(true);
 			lives.ForEach ((GameObject g) => g.SetActive (true));
 			TimeLevel(model.CurrentLvl());
 			SetLives(model.GetLives());
 		} else {
+			topoCounter.gameObject.SetActive(false);
 			NormalLevel(model.CurrentLvl());
 		}
 	}
@@ -254,6 +274,22 @@ public class PlagasActivityView : LevelView {
 				tiles[i].sprite = tileSprites[GRASS_SPRITE];
 				clocks[i].gameObject.SetActive(false);
 				modelTiles[i].DissapearMole();
+
+				if(model.HasTime()) {
+					model.OneLessLife();
+					SetLives(model.GetLives());
+				}
+			}
+
+			//pasaron 5 segundos desde que esta mareado, se fue para abajo y dejo un pozo
+			if(tile.IsSmackTimeDone()){
+				tiles[i].sprite = tileSprites[MOLE_HOLE_SPRITE];
+				modelTiles[i].SmackToHole();
+			}
+
+			if(model.NoMoreLives()){
+				timerActive = false;
+				EndGame(60, 0, 1250);
 			}
 		}
 	}
