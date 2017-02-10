@@ -104,7 +104,7 @@ public class PlagasActivityView : LevelView {
 			model.SmackMole();
 			SmackMole(slot);
 
-			CheckEndLevel();
+			Invoke ("CheckEndLevel", 1);
 		} else {
 			PlayWrongSound();
 			keyboardActive = true;
@@ -129,7 +129,7 @@ public class PlagasActivityView : LevelView {
 			SmackMole(slot);
 			model.SmackMole();
 
-			CheckEndLevel();
+			Invoke ("CheckEndLevel", 1);
 		} else {
 			PlayWrongSound();
 			model.OneLessLife();
