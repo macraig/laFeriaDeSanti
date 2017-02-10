@@ -10,7 +10,7 @@ namespace Assets.Scripts.Games.Shipments
 {
     public class ShipmentsModel : LevelModel
     {
-        public const int START_TIME = 60, CORRECT_SCENE_TIME = 20;
+        public const int START_TIME = 70, CORRECT_SCENE_TIME = 30;
         private bool withTime;
 
         private const int NODES = 13;
@@ -63,7 +63,7 @@ namespace Assets.Scripts.Games.Shipments
             int solutionPaths;
             float extraEdgeProbability;
             int nodesRequiered;
-            Scale = Randomizer.RandomBoolean() ? 5 : 10;
+            Scale = 10;
             _solutionPaths.Clear();
             Nodes.Clear();
             Edges.Clear();

@@ -64,7 +64,7 @@ namespace Assets.Scripts.Games.Shipments
             
             HighlightCurrentFocus();
             menuBtn.onClick.AddListener(OnClickMenuBtn);
-            OnNextLevelAnimationEnd();
+            Next();
             attempsToGenerate = 0;
             _edgesAnswers = new List<ShipmentEdge>();
         }
@@ -383,7 +383,7 @@ namespace Assets.Scripts.Games.Shipments
 
         private void CheckEdgeAnswer(ShipmentEdge realEdge, List<ShipmentEdge> edgeAnswers, int index)
         {
-            if(index > 0) Invoke("PlayBoatSond", 0.4f);
+            if(index > 0) Invoke("PlayBoatSond", 0.2f);
             else { PlayBoatSond();}
             // no hay arista
             if (realEdge == null)
@@ -415,7 +415,7 @@ namespace Assets.Scripts.Games.Shipments
             else if (answerValue >= realEdge.Length) AnswerEdgeTooLong(destine.transform.position, realEdge.Length, edgeAnswers);
 
             // se quedó corto
-            else AnswerEdgeTooShort(destine.transform.position, realEdge.Length, edgeAnswers);
+            else AnswerEdgeTooShort(destine.transform.position, realEdge.Length);
         }
 
         private void CorrectAnswerContinueCorrection()
@@ -437,19 +437,15 @@ namespace Assets.Scripts.Games.Shipments
 
         private void AnswerEdgeNotExists(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
         {
-            Player.transform.DOMove(destine - (destine - Player.transform.position) * 0.8f, GetDuration(length)).OnComplete(
-               () =>
-               {
-                   BadEdgeAnswerEnd();
-                   FinalCheckAnswer(edgeAnswers);
-               });
+            Player.transform.DOMove(destine - (destine - Player.transform.position) * 0.5f, GetDuration(length)).OnComplete(
+               BadEdgeAnswerEnd);
         }
 
         private void ContinueCorrection(List<ShipmentEdge> edgeAnswers, int index)
         {
             if (index == edgeAnswers.Count)
             {
-                FinalCheckAnswer(edgeAnswers);
+                FinalCheckAnswer();
             }
             else
             {
@@ -465,9 +461,9 @@ namespace Assets.Scripts.Games.Shipments
             }
         }
 
-        private void FinalCheckAnswer(List<ShipmentEdge> edgeAnswers)
+        private void FinalCheckAnswer()
         {
-            if (Model.IsCorrectAnswer(edgeAnswers))
+            if (Model.IsCorrectAnswer(_edgesAnswers))
             {
                 if (timerActive)
                 {
@@ -479,36 +475,29 @@ namespace Assets.Scripts.Games.Shipments
 
             }
             else ShowWrongAnswerAnimation();
+          
 
         }
 
-        private void AnswerEdgeTooShort(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
+        private void AnswerEdgeTooShort(Vector3 destine, int length)
         {
-            Player.transform.DOMove(destine - (destine - Player.transform.position) * 0.2f, GetDuration(length)).OnComplete(
-                () =>
-                {
-                    BadEdgeAnswerEnd();
-                    FinalCheckAnswer(edgeAnswers);
-                });
+            Player.transform.DOMove(destine - (destine - Player.transform.position) * 0.5f, GetDuration(length)).OnComplete(
+                BadEdgeAnswerEnd);
         }
 
         private void BadEdgeAnswerEnd()
         {
             Player.GetComponent<Image>().sprite = GetBrokenBoatSprite();
             DropGold();
+            Invoke("FinalCheckAnswer", 1.5f);
 
-            Invoke("SetPlayerToFirstPlace", 1.5f);
         }
 
 
         private void AnswerEdgeTooLong(Vector3 destine, int length, List<ShipmentEdge> edgeAnswers)
         {
             Player.transform.DOMove(destine + (destine - Player.transform.position) * 0.2f, GetDuration(length)).OnComplete(
-                () =>
-                {
-                    BadEdgeAnswerEnd();
-                    FinalCheckAnswer(edgeAnswers);
-                }                  
+                BadEdgeAnswerEnd                  
             );
         }
 
@@ -535,8 +524,7 @@ namespace Assets.Scripts.Games.Shipments
 
             if (Model.GameEnd())
             {
-                EndGame(60, 0, 1250);
-
+                ShowNextLevelAnimation();
             }
             else
             {
@@ -548,9 +536,9 @@ namespace Assets.Scripts.Games.Shipments
         public override void OnWrongAnimationEnd()
         {
             base.OnWrongAnimationEnd();
-            BadEdgeAnswerEnd();
             OkButton.enabled = true;
             EnableGameButtons(true);
+
         }
         void SetClock()
         {
