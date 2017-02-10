@@ -99,7 +99,7 @@ public class RecorridosTile {
                 RecorridosController.instance.MovePuppet();
                 break;
             case (RecorridosController.RecorridosTileEnum.End):
-                RecorridosController.instance.EndGame(true);
+                RecorridosController.instance.GameOver(true);
                 break;
             case RecorridosController.RecorridosTileEnum.Nut:
                 RecorridosController.instance.PickNut(gridPositionX,gridPositionY);

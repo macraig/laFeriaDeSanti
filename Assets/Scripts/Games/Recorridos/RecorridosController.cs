@@ -7,18 +7,21 @@ namespace Assets.Scripts.Games.Recorridos
 {
     public class RecorridosController : MonoBehaviour
     {
-        public float timeBetweenActions;
+		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 1;
+		private int timer, currentStartTime;
+
+		public float timeBetweenActions;
 
         public static RecorridosController instance;
-
-        public enum RecorridosTileEnum { Path, Hole, Wall, Start, End, Nut, Bomb, Fire }
+		private RecorridosBoard board;
+		private List<List<int>> boardMatrix;
+	
+		public enum RecorridosTileEnum { Path, Wall, Bomb, Hole, Fire, Nut, Start, End }
 
         public GameObject boardPosition;
         public GameObject player;
 
         public Sprite pathSprite;
-
-
 
         public Sprite holeSprite;
         public Sprite wallSprite;
@@ -42,10 +45,13 @@ namespace Assets.Scripts.Games.Recorridos
         private Dictionary<RecorridosTileEnum, Sprite> tileDictionary;
         private List<RecorridosTileEnum> keys;
 
-        private Vector2 initialPupperGridPosition;
+        private Vector2 initialPuppetGridPosition;
         private List<RecorridosTile> pathTiles;
         private int nutCount;
 		private bool first = true;
+		private int currentLevel, gameCounter;
+		private List<RecorridosLevel> lvls;
+		private bool withTime;
        
 		private void Awake()
         {
@@ -62,14 +68,33 @@ namespace Assets.Scripts.Games.Recorridos
         // Use this for initialization
         void Start()
         {
-            keys = new List<RecorridosTileEnum>();
+			board = new RecorridosBoard ();
+			lvls = board.GetLevels ();
+			keys = new List<RecorridosTileEnum>();
 
+			/*
+         Tile frames
+         1:white
+         2:black
+         3:wall
+         4:bomb
+         5:hole
+         6:fire
+         7:nut
+         8:start
+         9:finish
+         * */
+			keys.Add(RecorridosTileEnum.Path);
+			keys.Add(RecorridosTileEnum.Path);
             keys.Add(RecorridosTileEnum.Path);
-            keys.Add(RecorridosTileEnum.Hole);
+			keys.Add(RecorridosTileEnum.Wall);
             keys.Add(RecorridosTileEnum.Bomb);
-            keys.Add(RecorridosTileEnum.Wall);
+			keys.Add(RecorridosTileEnum.Hole);
+			keys.Add(RecorridosTileEnum.Fire);
             keys.Add(RecorridosTileEnum.Nut);
-            keys.Add(RecorridosTileEnum.Fire);
+			keys.Add(RecorridosTileEnum.Start);
+			keys.Add(RecorridosTileEnum.End);
+
 
             tileDictionary = new Dictionary<RecorridosTileEnum, Sprite>();
 
@@ -79,6 +104,10 @@ namespace Assets.Scripts.Games.Recorridos
             tileDictionary.Add(RecorridosTileEnum.Wall, wallSprite);
             tileDictionary.Add(RecorridosTileEnum.Nut, nutSprite);
             tileDictionary.Add(RecorridosTileEnum.Fire, fireSprite);
+			tileDictionary.Add(RecorridosTileEnum.Start, startSprite);
+			tileDictionary.Add(RecorridosTileEnum.End, endSprite);
+
+
 
             gridSpace = new RecorridosTile[7][];
             view = GetComponent<RecorridosView>();
@@ -94,8 +123,13 @@ namespace Assets.Scripts.Games.Recorridos
 		public void HideExplanation(){
 			view.HideExplanation ();
 			if (first) {
-				ResetGame();
 				first = false;
+				withTime = false;
+				currentLevel = 0;
+				timer = START_TIME;
+				currentStartTime = START_TIME;
+				gameCounter = 0;
+				ResetGame();
 			}
 
 		}
@@ -110,8 +144,8 @@ namespace Assets.Scripts.Games.Recorridos
 
         public void BackToStart()
         {
-            puppetGridPosition.x = (int)initialPupperGridPosition.x;
-            puppetGridPosition.y = (int)initialPupperGridPosition.y;
+            puppetGridPosition.x = (int)initialPuppetGridPosition.x;
+            puppetGridPosition.y = (int)initialPuppetGridPosition.y;
             StartCoroutine(GoRolling(2, gridSpace[(int)puppetGridPosition.x][(int)puppetGridPosition.y]));
         }
 
@@ -130,213 +164,48 @@ namespace Assets.Scripts.Games.Recorridos
 
 		public void OnBombAnimationEnd(){
 			
-			 EndGame(false);
+			 GameOver(false);
 		}
 
-        private void ResetGame()
+
+		public void ResetGame()
         {
+
 			view.ShowPlayer ();
 			nutCount = 0;
-
             int rowCounter = 0;
-
             pathTiles = new List<RecorridosTile>();
+			gridSpace[rowCounter] = new RecorridosTile[7];
 
+			boardMatrix = board.GenerateBoard (lvls [currentLevel]);
 
-            gridSpace[rowCounter] = new RecorridosTile[7];
-
-            for (int i = 0; i < boardPosition.transform.childCount; i++)
-            {
+			for (int i = 0; i < boardPosition.transform.childCount; i++) {
                 if (i % 7 == 0 && i!=0)
                 {
                     rowCounter++;
                     gridSpace[rowCounter] = new RecorridosTile[7];
                 }
-                    int randomKey = Random.Range(0, keys.Count);
-
-                    RecorridosTileEnum randomTile = keys[randomKey];
+					int key = boardMatrix [rowCounter] [i % 7];
+                    RecorridosTileEnum tile = keys[key];
 
                     Sprite spriteToPut;
+					tileDictionary.TryGetValue(tile, out spriteToPut);
 
-                    tileDictionary.TryGetValue(randomTile, out spriteToPut);
-
-                    gridSpace[rowCounter][i % 7] = new RecorridosTile(randomTile,
-                        boardPosition.transform.GetChild(i).transform.position, spriteToPut, boardPosition.transform.GetChild(i).GetComponent<Image>(),rowCounter,i%7);
+				    gridSpace[rowCounter][i % 7] = new RecorridosTile(tile,
+                    boardPosition.transform.GetChild(i).transform.position, spriteToPut, boardPosition.transform.GetChild(i).GetComponent<Image>(),rowCounter,i%7);
                 
             }
 
-            SetStartAndEndPosition();
+			puppetGridPosition = board.GetStartPosition();
+			initialPuppetGridPosition = board.GetStartPosition();
             EnableButtonState(true);
             view.ResetGame();
-            player.transform.position = gridSpace[(int)initialPupperGridPosition.x][(int)initialPupperGridPosition.y].Position;
+            player.transform.position = gridSpace[(int)initialPuppetGridPosition.x][(int)initialPuppetGridPosition.y].Position;
             actionsToDo = new List<RecorridosAction>();
 
         }
 
 
-        //ESTE METODO DA ASCO, LO VOY A MEJORAR EL FINDE
-        private void SetStartAndEndPosition()
-        {
-
-            int randomStartQuarterGrid = Random.Range(0, 4);
-            int randomPositionInQuarterGrid = Random.Range(0, 9);
-
-            int row;
-
-            if (randomPositionInQuarterGrid < 3)
-            {
-                row = 0;
-            }
-            else if (randomPositionInQuarterGrid < 6)
-            {
-                row = 1;
-            }
-            else
-            {
-                row = 2;
-            }
-
-            int finalRowPosition;
-            int finalColumnPosition;
-
-            if (randomStartQuarterGrid == 0)
-            {
-                finalRowPosition = row;
-                finalColumnPosition = randomPositionInQuarterGrid % 3;
-            }
-            else if (randomStartQuarterGrid == 1)
-            {
-                finalRowPosition = row;
-                finalColumnPosition = 4 + randomPositionInQuarterGrid % 3;
-            }
-            else if (randomStartQuarterGrid == 2)
-            {
-                finalRowPosition = 4 + row;
-                finalColumnPosition = randomPositionInQuarterGrid % 3;
-            }
-            else
-            {
-                finalRowPosition = 4 + row;
-                finalColumnPosition = 4 + randomPositionInQuarterGrid % 3;
-            }
-
-            gridSpace[finalRowPosition][finalColumnPosition].Type = RecorridosTileEnum.Start;
-            gridSpace[finalRowPosition][finalColumnPosition].Sprite = startSprite;
-            puppetGridPosition = new Vector2(finalRowPosition, finalColumnPosition);
-            initialPupperGridPosition = new Vector2(finalRowPosition, finalColumnPosition);
-
-            
-            if(randomStartQuarterGrid == 0)
-            {
-                randomStartQuarterGrid = 3;
-            }else if(randomStartQuarterGrid == 1)
-            {
-                randomStartQuarterGrid = 2;
-            }else if(randomStartQuarterGrid == 2)
-            {
-                randomStartQuarterGrid = 1;
-            }
-            else
-            {
-                randomStartQuarterGrid = 0;
-            }
-            
-            randomPositionInQuarterGrid = Random.Range(0, 9);
-
-            if (randomPositionInQuarterGrid < 3)
-            {
-                row = 0;
-            }
-            else if (randomPositionInQuarterGrid < 6)
-            {
-                row = 1;
-            }
-            else
-            {
-                row = 2;
-            }
-
-            if (randomStartQuarterGrid == 0)
-            {
-                finalRowPosition = row;
-                finalColumnPosition = randomPositionInQuarterGrid % 3;
-            }
-            else if (randomStartQuarterGrid == 1)
-            {
-                finalRowPosition = row;
-                finalColumnPosition = 4 + randomPositionInQuarterGrid % 3;
-            }
-            else if (randomStartQuarterGrid == 2)
-            {
-                finalRowPosition = 4 + row;
-                finalColumnPosition = randomPositionInQuarterGrid % 3;
-            }
-            else
-            {
-                finalRowPosition = 4 + row;
-                finalColumnPosition = 4 + randomPositionInQuarterGrid % 3;
-            }
-
-
-            gridSpace[finalRowPosition][finalColumnPosition].Type = RecorridosTileEnum.End;
-            gridSpace[finalRowPosition][finalColumnPosition].Sprite = endSprite;
-
-            int xDifference = Mathf.Abs(finalRowPosition - (int)initialPupperGridPosition.x);
-            int yDifference = Mathf.Abs(finalColumnPosition - (int)initialPupperGridPosition.y);
-
-            for(int i = 0; i < (xDifference + yDifference)-1; i++)
-            {
-                int randomRowOrColumn;
-
-                if(Mathf.Abs(finalRowPosition - (int)initialPupperGridPosition.x) == 0)
-                {
-                    randomRowOrColumn = 1;
-                }else if(Mathf.Abs(finalColumnPosition - (int)initialPupperGridPosition.y) == 0)
-                {
-                    randomRowOrColumn = 0;
-                }else
-                {
-                    randomRowOrColumn = Random.Range(0, 2);
-                }
-
-               
-
-                if(randomRowOrColumn == 0)
-                {
-                    if (initialPupperGridPosition.x > finalRowPosition)
-                    {
-                        finalRowPosition += 1;
-                    }
-                    else if (initialPupperGridPosition.x < finalRowPosition)
-                    {
-                        finalRowPosition -= 1;
-                    }
-                }
-                else
-                {
-                    if (initialPupperGridPosition.y > finalColumnPosition)
-                    {
-                        finalColumnPosition += 1;
-                    }
-                    else if (initialPupperGridPosition.y < finalColumnPosition)
-                    {
-                        finalColumnPosition -= 1;
-                    }
-                }
-                pathTiles.Add(gridSpace[finalRowPosition][finalColumnPosition]);
-
-                gridSpace[finalRowPosition][finalColumnPosition].Type = RecorridosTileEnum.Path;
-                gridSpace[finalRowPosition][finalColumnPosition].Sprite = pathSprite;
-            }
-
-
-            
-
-
-
-        }
-
-     
         public void AddAction(RecorridosAction recorridosButton)
         {
             switch (recorridosButton.currentAction)
@@ -474,11 +343,14 @@ namespace Assets.Scripts.Games.Recorridos
             EnableButtonState(true);
         }
 
-        public void EndGame(bool result)
+        public void GameOver(bool result)
         {
             if (result)
             {
                 view.ShowVictory();
+				if (gameCounter < GAMES_BEFORE_TIME) {
+					currentLevel++;
+				}
 
             }
             else
@@ -487,7 +359,19 @@ namespace Assets.Scripts.Games.Recorridos
 
             }
             StartCoroutine(ResetList(0, false));
-            Invoke("ResetGame", 3);
+			gameCounter++;
+			if (gameCounter >= GAMES_BEFORE_TIME){
+				if (gameCounter == GAMES_BEFORE_TIME) {
+					withTime = true; 
+					Invoke ("ShowNextLevelAnimation", 0.2f);
+				} else {
+					Invoke ("PlayTimeLevel",1);
+				}
+
+			}else{
+				Invoke("ResetGame", 1);	
+			}
+            
         }
 
         public void EnableButtonState(bool state)
@@ -498,7 +382,25 @@ namespace Assets.Scripts.Games.Recorridos
             }
         }
             
+		private void ShowNextLevelAnimation(){
+			view.ShowNextLevelAnimation ();
+		}
 
+		public void DecreaseTimer() {
+			if(timer > 0) timer--;
+		}
+
+		public bool IsTimerDone(){
+			return timer == 0;
+		}
+
+		public int GetTimer() {
+			return timer;
+		}
+
+		public void PlayTimeLevel(){
+			view.PlayTimeLevel ();
+		}
 
 
     }

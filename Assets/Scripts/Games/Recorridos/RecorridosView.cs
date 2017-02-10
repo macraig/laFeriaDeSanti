@@ -17,7 +17,7 @@ public class RecorridosView : LevelView {
 
 		#endregion
 
-		public GameObject instructionsStack;
+	public GameObject instructionsStack;
 
     private List<GameObject> stackImages;
     private int currentAvailableInstructionSpot;
@@ -33,10 +33,11 @@ public class RecorridosView : LevelView {
     public Sprite movingUp;
     public Sprite movingDown;
 
-    public Text nutTextCounter;
+    public Text nutTextCounter,clock;
 
     private Image playerImage;
-	public GameObject bombAnimation;
+	public GameObject bombAnimation,clockPlaca;
+	private bool timerActive;
 
     private void Start()
     {
@@ -48,6 +49,7 @@ public class RecorridosView : LevelView {
             stackImages[i].GetComponent<RecorridosAction>().indexInList = i;
         }
         currentAvailableInstructionSpot = 0;
+			clockPlaca.SetActive (false);
     }
 
 	override public void HideExplanation(){
@@ -190,6 +192,47 @@ public class RecorridosView : LevelView {
 
     }
 
+		override public void OnNextLevelAnimationEnd(){
+			base.OnNextLevelAnimationEnd ();
+			PlayTimeLevelMusic ();
+			menuBtn.interactable = false;
+			PlayTimeLevel ();
+		}
+
+		public void PlayTimeLevel(){
+			clockPlaca.SetActive(true);
+			SetClock();
+			StartTimer(true);
+			RecorridosController.instance.ResetGame ();
+		}
+
+		void SetClock() {
+			clock.text = RecorridosController.instance.GetTimer().ToString();
+		}
+
+		void StartTimer(bool first = false) {
+			StartCoroutine(TimerFunction(first));
+			timerActive = true;
+		}
+
+		public IEnumerator TimerFunction(bool first = false) {
+			yield return new WaitForSeconds(1);
+		
+			UpdateView();
+			if(timerActive) StartTimer();
+		}
+
+		void UpdateView() {
+			RecorridosController.instance.DecreaseTimer();
+
+			SetClock();
+
+			if(RecorridosController.instance.IsTimerDone()){
+				timerActive = false;
+				EndGame(60, 0, 1250);
+			}
+		}
+	
 
 	}
 }
