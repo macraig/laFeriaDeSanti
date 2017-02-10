@@ -27,6 +27,8 @@ namespace Assets.Scripts.Games.Shipments
 
         public ShipmentsModel()
         {
+            timer = START_TIME;
+
             _nodes = new List<ShipmentNode>();
             _edges = new List<ShipmentEdge>();
             _solutionPaths = new List<ShipmentsPath>();

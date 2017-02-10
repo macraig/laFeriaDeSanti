@@ -64,7 +64,7 @@ namespace Assets.Scripts.Games.Shipments
             
             HighlightCurrentFocus();
             menuBtn.onClick.AddListener(OnClickMenuBtn);
-            Next(true);
+            OnNextLevelAnimationEnd();
             attempsToGenerate = 0;
             _edgesAnswers = new List<ShipmentEdge>();
         }
@@ -469,6 +469,12 @@ namespace Assets.Scripts.Games.Shipments
         {
             if (Model.IsCorrectAnswer(edgeAnswers))
             {
+                if (timerActive)
+                {
+                    Model.CorrectTimer();
+                    SetClock();
+                }
+                
                 ShowRightAnswerAnimation();
 
             }
@@ -565,6 +571,7 @@ namespace Assets.Scripts.Games.Shipments
             clockImage.gameObject.SetActive(true);
             SetClock();
             StartTimer(true);
+            Next();
 /*
             SetRule();
 */
