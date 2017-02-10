@@ -65,7 +65,7 @@ namespace Assets.Scripts.Games.Shipments
             AddCellLiseners();
             GetAnswerCells()[0].Value = 0;
             Model = new ShipmentsModel();
-            
+            _currentFocus = 1;
             HighlightCurrentFocus();
             menuBtn.onClick.AddListener(OnClickMenuBtn);
             Next();
@@ -206,6 +206,7 @@ namespace Assets.Scripts.Games.Shipments
             MapGenerator.Ruler.transform.SetAsLastSibling();
             _currentGold = 0;
             TotalGoldText.text = "" + _totalGold;
+            UpdateTryButton();
         }
 
         private void SetPlayerToFirstPlace()
@@ -222,11 +223,13 @@ namespace Assets.Scripts.Games.Shipments
 
         private void ClearAnswers()
         {
-            foreach (ShipmentsAnswerCell shipmentsAnswerCell in GetAnswerCells())
+            List<ShipmentsAnswerCell> cells = GetAnswerCells();
+            for (int i = cells.Count - 1; i > 0; i--)
             {
-                if(shipmentsAnswerCell.Value == 0) continue;
-                shipmentsAnswerCell.Clear();
+                cells[i].Clear();
+
             }
+            
         }
 
 
@@ -351,6 +354,7 @@ namespace Assets.Scripts.Games.Shipments
 
         public void OnClickOk()
         {
+            EnableComponents(false);
             _edgesAnswers.Clear();
 
             OkButton.enabled = false;
@@ -442,7 +446,7 @@ namespace Assets.Scripts.Games.Shipments
         private void AddGold()
         {
             _currentGold += 10;
-            _totalGold += _currentGold;
+            _totalGold += 10;
             TotalGoldText.text = "" + _totalGold;
             SoundController.GetController().PlayClip(GoldSound);
         }
@@ -482,11 +486,14 @@ namespace Assets.Scripts.Games.Shipments
                     Model.CorrectTimer();
                     SetClock();
                 }
-                
+
                 ShowRightAnswerAnimation();
 
             }
-            else ShowWrongAnswerAnimation();
+            else
+            {
+                ShowWrongAnswerAnimation();
+            }
           
 
         }
@@ -548,10 +555,18 @@ namespace Assets.Scripts.Games.Shipments
 
         public override void OnWrongAnimationEnd()
         {
-            base.OnWrongAnimationEnd();
-            SetPlayerToFirstPlace();
-            OkButton.enabled = true;
-            EnableGameButtons(true);
+            
+            if (timerActive)
+            {
+                EndGame(60, 0, 1250);
+            }
+            else
+            {
+                base.OnWrongAnimationEnd();
+                SetPlayerToFirstPlace();
+                OkButton.enabled = true;
+                EnableGameButtons(true);
+            }
 
         }
         void SetClock()

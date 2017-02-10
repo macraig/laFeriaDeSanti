@@ -10,7 +10,7 @@ namespace Assets.Scripts.Games.Shipments
 {
     public class ShipmentsModel : LevelModel
     {
-        public const int START_TIME = 70, CORRECT_SCENE_TIME = 30;
+        public const int START_TIME = 120, CORRECT_SCENE_TIME = 50;
         private bool withTime;
 
         private const int NODES = 13;

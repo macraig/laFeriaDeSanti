@@ -33,8 +33,8 @@
 	}, {
 		"id": "6",
 		"icon": "5",
-		"name": "Envíos",
-		"description": "Medimos distancias y usamos la escala para enviar el barco a destino.\n\nMedir distancias usando puntos de referencia y escalas.",
+		"name": "Envíos", 
+		"description": "Medimos distancias usando la regla y las transformamos a kilómetros usando la escala.\n\nMedir distancias usando puntos de referencia y escalas.",
 		"prefabName":"EnviosActivity"
 	}
 ]
