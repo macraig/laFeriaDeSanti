@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.Scripts.Sound;
 namespace Assets.Scripts.Games.Recorridos
 {
 public class RecorridosAction : MonoBehaviour {
@@ -13,10 +14,10 @@ public class RecorridosAction : MonoBehaviour {
 
     public int indexInList;
  
-
     public void DoAction()
-    {
-        RecorridosController.instance.AddAction(this);
+		{
+			SoundController.GetController ().PlayClickSound ();
+			RecorridosController.instance.AddAction(this);
     }
 
 

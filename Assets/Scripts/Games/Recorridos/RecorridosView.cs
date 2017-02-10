@@ -139,16 +139,19 @@ public class RecorridosView : LevelView {
         }
         currentAvailableInstructionSpot = 0;
         MovingDown();
+		EnableComponents (true);
     }
 
     internal void ShowVictory()
     {
         centralPuppetImage.sprite = puppetVictory;
+		ShowRightAnswerAnimation ();
     }
 
     internal void ShowDefeat()
     {
         centralPuppetImage.sprite = puppetDefeat;
+			ShowWrongAnswerAnimation ();
     }
 
     public void ResetGame()
@@ -197,12 +200,12 @@ public class RecorridosView : LevelView {
 			PlayTimeLevelMusic ();
 			menuBtn.interactable = false;
 			PlayTimeLevel ();
+			StartTimer (true);
 		}
 
 		public void PlayTimeLevel(){
 			clockPlaca.SetActive(true);
 			SetClock();
-			StartTimer(true);
 			RecorridosController.instance.ResetGame ();
 		}
 
@@ -231,6 +234,11 @@ public class RecorridosView : LevelView {
 				timerActive = false;
 				EndGame(60, 0, 1250);
 			}
+		}
+
+		override public void OnRightAnimationEnd(){
+			EnableComponents (true);
+
 		}
 	
 

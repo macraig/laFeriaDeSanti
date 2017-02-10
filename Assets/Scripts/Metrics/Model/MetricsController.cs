@@ -71,6 +71,10 @@ namespace Assets.Scripts.Metrics.Model
             Timer.GetTimer().InitTimer();
         }
 
+		public void DiscardCurrentMetrics(){
+			metricsModel.DiscardCurrentMetrics ();
+		}
+
         private void RestartActualBuffer()
         {
             actualBuffer.Clear();

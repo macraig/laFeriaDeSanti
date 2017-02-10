@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.Sound;
 
 namespace Assets.Scripts.Games.Recorridos
 {
     public class RecorridosController : MonoBehaviour
     {
-		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 1;
+		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 5;
 		private int timer, currentStartTime;
 
 		public float timeBetweenActions;
@@ -277,8 +278,9 @@ namespace Assets.Scripts.Games.Recorridos
                 view.LightValue(currentValueAnalyzed, true, Color.yellow);
                 puppetGridPosition.x = (int)positionToAnalyze.x;
                 puppetGridPosition.y = (int)positionToAnalyze.y;
-                StartCoroutine(DoMove(timeBetweenActions, gridSpace[(int)positionToAnalyze.x][(int)positionToAnalyze.y]));
-
+				view.EnableComponents (false);
+				StartCoroutine(DoMove(timeBetweenActions, gridSpace[(int)positionToAnalyze.x][(int)positionToAnalyze.y]));
+				SoundController.GetController ().PlayDropSound ();
                 if(xChange == 1)
                 {
                     view.MovingDown();
@@ -345,11 +347,14 @@ namespace Assets.Scripts.Games.Recorridos
 
         public void GameOver(bool result)
         {
+			
             if (result)
             {
                 view.ShowVictory();
 				if (gameCounter < GAMES_BEFORE_TIME) {
 					currentLevel++;
+				} else {
+					if(timer+CORRECT_SCENE_TIME<100) timer += CORRECT_SCENE_TIME;
 				}
 
             }
@@ -365,6 +370,7 @@ namespace Assets.Scripts.Games.Recorridos
 					withTime = true; 
 					Invoke ("ShowNextLevelAnimation", 0.2f);
 				} else {
+					
 					Invoke ("PlayTimeLevel",1);
 				}
 

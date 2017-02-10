@@ -101,6 +101,7 @@ namespace Assets.Scripts.Games
 
 
 		internal void ExitGame(){
+			//TODO: TEST LATER
 //			MetricsController.GetController().DiscardCurrentMetrics();
 			ViewController.GetController().LoadMainMenu();
 			SoundController.GetController ().PlayMusic ();
@@ -108,6 +109,8 @@ namespace Assets.Scripts.Games
 
         // This method have to restart the view of the game to the initial state
 		virtual public  void RestartGame(){
+			//TODO: TEST LATER
+//			MetricsController.GetController ().DiscardCurrentMetrics ();
 			HideInGameMenu ();
 			first = true;
 

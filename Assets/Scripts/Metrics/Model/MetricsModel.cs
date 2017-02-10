@@ -18,13 +18,13 @@ namespace Assets.Scripts.Metrics.Model{
 			TOTAL_GAMES = games.Count;
 			metrics = new  List<List<GameMetrics>> ();
 			/*TESTING ONLY*/
-			foreach (Game game in games) {
-				GameMetrics gameMetrics = new GameMetrics (game.GetId ());
-				gameMetrics.SetStars (3);
-				List<GameMetrics> metricsList = new List<GameMetrics> ();
-				metricsList.Add (gameMetrics);
-				metrics.Add (metricsList);
-			}
+//			foreach (Game game in games) {
+//				GameMetrics gameMetrics = new GameMetrics (game.GetId ());
+//				gameMetrics.SetStars (3);
+//				List<GameMetrics> metricsList = new List<GameMetrics> ();
+//				metricsList.Add (gameMetrics);
+//				metrics.Add (metricsList);
+//			}
 		}
 			
 
