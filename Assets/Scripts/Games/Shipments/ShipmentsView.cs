@@ -35,10 +35,12 @@ namespace Assets.Scripts.Games.Shipments
 
         public AudioClip BoatSound;
 
-        private int _gold;
         public AudioClip GoldSound;
         public AudioClip DropGoldSound;
-        public Text GoldeText;
+        private int _totalGold;
+        private int _currentGold;
+
+        public Text TotalGoldText;
 
         public ShipmentsModel Model { get; set; }
 
@@ -58,6 +60,8 @@ namespace Assets.Scripts.Games.Shipments
         // Use this for initialization
         void Start ()
         {
+            _totalGold = 0;
+
             AddCellLiseners();
             GetAnswerCells()[0].Value = 0;
             Model = new ShipmentsModel();
@@ -67,6 +71,13 @@ namespace Assets.Scripts.Games.Shipments
             Next();
             attempsToGenerate = 0;
             _edgesAnswers = new List<ShipmentEdge>();
+            ShowExplanation();
+        }
+
+        public override void RestartGame()
+        {
+            base.RestartGame();
+            Start();
         }
 
 
@@ -193,8 +204,8 @@ namespace Assets.Scripts.Games.Shipments
             EnableGameButtons(true);
             Player.transform.SetAsLastSibling();
             MapGenerator.Ruler.transform.SetAsLastSibling();
-            _gold = 0;
-            GoldeText.text = "" + _gold;
+            _currentGold = 0;
+            TotalGoldText.text = "" + _totalGold;
         }
 
         private void SetPlayerToFirstPlace()
@@ -430,8 +441,9 @@ namespace Assets.Scripts.Games.Shipments
 
         private void AddGold()
         {
-            _gold += 10;
-            GoldeText.text = "" + _gold;
+            _currentGold += 10;
+            _totalGold += _currentGold;
+            TotalGoldText.text = "" + _totalGold;
             SoundController.GetController().PlayClip(GoldSound);
         }
 
@@ -503,8 +515,9 @@ namespace Assets.Scripts.Games.Shipments
 
         private void DropGold()
         {
-            _gold = 0;
-            GoldeText.text = "" + _gold;
+            _totalGold -= _currentGold;
+            _currentGold = 0;
+            TotalGoldText.text = "" + _totalGold;
             SoundController.GetController().PlayClip(DropGoldSound);
         }
 

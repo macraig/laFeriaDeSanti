@@ -383,6 +383,11 @@ namespace Assets.Scripts.Games.Shipments
         {
             return timer;
         }
+
+        public void Resart()
+        {
+            timer = CORRECT_SCENE_TIME;
+        }
     }
 
     public class ShipmentNode
