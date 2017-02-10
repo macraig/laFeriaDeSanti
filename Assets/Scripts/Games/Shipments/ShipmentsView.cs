@@ -536,6 +536,7 @@ namespace Assets.Scripts.Games.Shipments
         public override void OnWrongAnimationEnd()
         {
             base.OnWrongAnimationEnd();
+            SetPlayerToFirstPlace();
             OkButton.enabled = true;
             EnableGameButtons(true);
 

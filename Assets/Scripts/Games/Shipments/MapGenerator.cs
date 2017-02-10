@@ -509,7 +509,7 @@ public class MapGenerator : MonoBehaviour {
             MapPlace b = locatedPlaces.Find(e => e.Id == edge.IdNodeB);
 
             float f = Vector2.Distance(a.transform.position, b.transform.position) / Ruler.GetUnityDistances();
-            if (Math.Abs(f%1) > 0.1) return false;
+            if (Math.Abs(f % edge.Length) > 0.1) return false;
         }
 
         foreach (var mapPlace in locatedPlaces)
