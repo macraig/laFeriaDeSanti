@@ -137,11 +137,19 @@ namespace Assets.Scripts.Games.Recorridos
 
         public void FallInHole()
         {
-            int randonNewPath = Random.Range(0, pathTiles.Count);
-            puppetGridPosition.x = pathTiles[randonNewPath].GridPositionX;
-            puppetGridPosition.y = pathTiles[randonNewPath].GridPositionY;
-            StartCoroutine(GoRolling(2, gridSpace[(int)puppetGridPosition.x][(int)puppetGridPosition.y]));
+			//Go to random tile
+//            int randonNewPath = Random.Range(0, pathTiles.Count);
+//            puppetGridPosition.x = pathTiles[randonNewPath].GridPositionX;
+//            puppetGridPosition.y = pathTiles[randonNewPath].GridPositionY;
+//            StartCoroutine(GoRolling(2, gridSpace[(int)puppetGridPosition.x][(int)puppetGridPosition.y]));
+			BackToStart();
+			view.PlayFallSound ();
         }
+
+		public void GetBurnt(){
+			BackToStart();
+			view.PlayFireSound ();
+		}
 
         public void BackToStart()
         {
@@ -155,17 +163,26 @@ namespace Assets.Scripts.Games.Recorridos
             gridSpace[gridPositionX][gridPositionY].Type = RecorridosTileEnum.Path;
             gridSpace[gridPositionX][gridPositionY].Sprite = pathSprite;
             nutCount++;
+			view.PlayNutSound ();
             view.SetNutTextCounter(nutCount);
         }
 
 		public void Explode()
 		{
+
 			view.ShowBombAnimation ();
 		}
 
 		public void OnBombAnimationEnd(){
 			
 			 GameOver(false);
+		}
+
+		public void RestartGame(){
+			view.HideInGameMenu ();
+			first = true;
+			view.ResetGame ();
+			Start ();
 		}
 
 

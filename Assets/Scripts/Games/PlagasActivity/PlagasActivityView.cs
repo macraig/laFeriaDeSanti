@@ -23,8 +23,9 @@ public class PlagasActivityView : LevelView {
 
 	private AudioClip whackSound, whackMoleSound;
 	private PlagasActivityModel model;
-
+	private bool switchTime = true;
 	bool timerActive = false;
+	public GameObject placaTopos;
 
 	override public void Next(bool first = false){
 		if(model.GameEnded()) {
@@ -78,6 +79,8 @@ public class PlagasActivityView : LevelView {
 			
 			TimeOkClick(row, column);
 			SetLives(model.GetLives());
+	
+
 		} else {
 			NoTimeOkClick(row, column);
 		}
@@ -174,6 +177,8 @@ public class PlagasActivityView : LevelView {
 		whackMoleSound = Resources.Load<AudioClip> ("Audio/PlagasActivity/whackedMole");
 		topoCounter.text = "0";
 		timerActive = false;
+		switchTime = true;
+		placaTopos.SetActive (false);
 		Begin();
 	}
 
@@ -191,12 +196,18 @@ public class PlagasActivityView : LevelView {
 	}
 
 	private void SetCurrentLevel() {
-		//deberia ser con herencia, pero odio c# :)
+		
 		if(model.HasTime()){
-			topoCounter.gameObject.SetActive(true);
-			lives.ForEach ((GameObject g) => g.SetActive (true));
-			TimeLevel(model.CurrentLvl());
-			SetLives(model.GetLives());
+			if (switchTime) {
+				switchTime = false;
+				Invoke("ShowNextLevelAnimation",1);
+			} else {
+				topoCounter.gameObject.SetActive(true);
+				lives.ForEach ((GameObject g) => g.SetActive (true));
+				TimeLevel(model.CurrentLvl());
+				SetLives(model.GetLives());
+			}
+
 		} else {
 			topoCounter.gameObject.SetActive(false);
 			NormalLevel(model.CurrentLvl());
@@ -279,6 +290,7 @@ public class PlagasActivityView : LevelView {
 
 				if(model.HasTime()) {
 					model.OneLessLife();
+					SoundController.GetController ().PlayFailureSound ();
 					SetLives(model.GetLives());
 				}
 			}
@@ -350,4 +362,15 @@ public class PlagasActivityView : LevelView {
 			}
 		}
 	}
+
+	override public void OnNextLevelAnimationEnd(){
+		EnableComponents (true);
+		topoCounter.gameObject.SetActive(true);
+		lives.ForEach ((GameObject g) => g.SetActive (true));
+		TimeLevel(model.CurrentLvl());
+		SetLives(model.GetLives());
+		placaTopos.SetActive (true);
+		PlayTimeLevelMusic ();
+	}
+
 }

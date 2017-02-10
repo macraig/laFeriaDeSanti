@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Common;
+using Assets.Scripts.Sound;
 
 namespace Assets.Scripts.Games.Recorridos
 {
@@ -39,6 +40,8 @@ public class RecorridosView : LevelView {
 	public GameObject bombAnimation,clockPlaca;
 	private bool timerActive;
 
+	private AudioClip bombSound, nutSound, fallSound, fireSound;
+
     private void Start()
     {
         stackImages = new List<GameObject>();
@@ -50,7 +53,25 @@ public class RecorridosView : LevelView {
         }
         currentAvailableInstructionSpot = 0;
 			clockPlaca.SetActive (false);
+
+			bombSound = Resources.Load<AudioClip> ("Audio/RecorridosActivity/bomba");
+			nutSound = Resources.Load<AudioClip> ("Audio/RecorridosActivity/coin");
+			fallSound = Resources.Load<AudioClip> ("Audio/RecorridosActivity/fall");
+			fireSound = Resources.Load<AudioClip> ("Audio/RecorridosActivity/fire");
+
     }
+
+		public void PlayFallSound(){
+			SoundController.GetController ().PlayClip (fallSound);
+		}
+
+		public void PlayFireSound(){
+			SoundController.GetController ().PlayClip (fireSound);
+		}
+
+		public void PlayNutSound(){
+			SoundController.GetController ().PlayClip (nutSound);
+		}
 
 	override public void HideExplanation(){
 		PlaySoundClick ();
@@ -168,10 +189,13 @@ public class RecorridosView : LevelView {
 
 		public void ShowBombAnimation ()
 		{
+
+
 			playerImage.gameObject.SetActive (false);
 			bombAnimation.transform.SetAsLastSibling ();
 			bombAnimation.GetComponent<BombAnimationScript>().ShowAnimation();
-//			SoundController.GetController ().PlaySwitchSound();
+
+			SoundController.GetController ().PlayClip (bombSound);
 		}
 
     internal void MovingLeft()

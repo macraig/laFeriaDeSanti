@@ -106,14 +106,14 @@ public class RecorridosTile {
                 RecorridosController.instance.MovePuppet();
                 break;
             case RecorridosController.RecorridosTileEnum.Fire:
-                RecorridosController.instance.BackToStart();
+				RecorridosController.instance.GetBurnt();
                 break;
 			case RecorridosController.RecorridosTileEnum.Bomb:
 				RecorridosController.instance.Explode ();
 
                 break;
             case RecorridosController.RecorridosTileEnum.Hole:
-                RecorridosController.instance.BackToStart();
+				RecorridosController.instance.FallInHole();
                 break;
             default:
                 RecorridosController.instance.MovePuppet();
