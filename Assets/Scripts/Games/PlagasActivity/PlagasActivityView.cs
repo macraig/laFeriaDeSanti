@@ -179,6 +179,7 @@ public class PlagasActivityView : LevelView {
 		timerActive = false;
 		switchTime = true;
 		placaTopos.SetActive (false);
+		lives.ForEach ((GameObject g) => g.SetActive (true));
 		Begin();
 	}
 

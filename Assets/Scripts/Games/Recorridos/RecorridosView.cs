@@ -177,10 +177,20 @@ public class RecorridosView : LevelView {
 
     public void ResetGame()
     {
+		timerActive = false;
         centralPuppetImage.sprite = puppetNeutral;
         nutTextCounter.text = "0";
+		
         MovingDown();
     }
+
+	override public void RestartGame(){
+			base.RestartGame ();
+			clockPlaca.SetActive(false);
+			ResetGame ();
+
+					
+	}
 
     public void SetNutTextCounter(int newValue)
     {
@@ -222,7 +232,7 @@ public class RecorridosView : LevelView {
 		override public void OnNextLevelAnimationEnd(){
 			base.OnNextLevelAnimationEnd ();
 			PlayTimeLevelMusic ();
-			menuBtn.interactable = false;
+//			menuBtn.interactable = false;
 			PlayTimeLevel ();
 			StartTimer (true);
 		}

@@ -124,7 +124,7 @@ namespace Assets.Scripts.Games
 
         public void SetLevel3()
         {
-			menuBtn.interactable = false;
+//			menuBtn.interactable = false;
 
 			placaClock.SetActive (true);
             taskImages = new List<GameObject>();

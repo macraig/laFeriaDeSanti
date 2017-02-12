@@ -181,7 +181,9 @@ namespace Assets.Scripts.Games.Recorridos
 		public void RestartGame(){
 			view.HideInGameMenu ();
 			first = true;
-			view.ResetGame ();
+			view.RestartGame ();
+
+
 			Start ();
 		}
 
@@ -385,7 +387,7 @@ namespace Assets.Scripts.Games.Recorridos
 			if (gameCounter >= GAMES_BEFORE_TIME){
 				if (gameCounter == GAMES_BEFORE_TIME) {
 					withTime = true; 
-					Invoke ("ShowNextLevelAnimation", 0.2f);
+					Invoke ("ShowNextLevelAnimation", 1);
 				} else {
 					
 					Invoke ("PlayTimeLevel",1);

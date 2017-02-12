@@ -60,7 +60,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 				} else {
 					TimeLevel(model.CurrentLvl());
 				}
-				menuBtn.interactable = false;
+//				menuBtn.interactable = false;
 
 			} else {
 				NormalLevel(model.CurrentLvl());

@@ -25,6 +25,7 @@ namespace Assets.Scripts.Games
 		public GameObject nextLevelAnimation;
 		//First turn
 		protected bool first = true;
+		protected bool withTime = false;
 
 		private AudioClip tictocClip;
 		public AudioSource timeLevelSource;
@@ -48,6 +49,7 @@ namespace Assets.Scripts.Games
 		public void HideInGameMenu(){
 			PlaySoundClick ();
 			menuPanel.SetActive (false);
+
 		}
 
 		public void OnClickInstructionsButton(){
@@ -93,6 +95,7 @@ namespace Assets.Scripts.Games
 		virtual public void HideExplanation(){
 			PlaySoundClick ();
 			explanationPanel.SetActive (false);
+
 			if (first) {
 				Next (true);
 				first = false;
@@ -112,6 +115,7 @@ namespace Assets.Scripts.Games
 			//TODO: TEST LATER
 //			MetricsController.GetController ().DiscardCurrentMetrics ();
 			HideInGameMenu ();
+			StopTimeLevelMusic ();
 			first = true;
 
 		}

@@ -76,7 +76,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 					TimeLevel(model.CurrentLvl());
 				}
 
-				menuBtn.interactable = false;
+//				menuBtn.interactable = false;
 
 
 			} else {
@@ -86,7 +86,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		override public void OnNextLevelAnimationEnd(){
 			PlayTimeLevelMusic ();
-			menuBtn.interactable = false;
+//			menuBtn.interactable = false;
 			TimeLevel(model.CurrentLvl());
 		}
 
