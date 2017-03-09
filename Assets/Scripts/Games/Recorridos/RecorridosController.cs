@@ -8,7 +8,7 @@ namespace Assets.Scripts.Games.Recorridos
 {
     public class RecorridosController : MonoBehaviour
     {
-		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 5;
+		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 1;
 		private int timer, currentStartTime;
 
 		public float timeBetweenActions;
@@ -72,6 +72,7 @@ namespace Assets.Scripts.Games.Recorridos
 			board = new RecorridosBoard ();
 			lvls = board.GetLevels ();
 			keys = new List<RecorridosTileEnum>();
+			nutCount = 0;
 
 			/*
          Tile frames
@@ -192,7 +193,7 @@ namespace Assets.Scripts.Games.Recorridos
         {
 
 			view.ShowPlayer ();
-			nutCount = 0;
+//			nutCount = 0;
             int rowCounter = 0;
             pathTiles = new List<RecorridosTile>();
 			gridSpace[rowCounter] = new RecorridosTile[7];

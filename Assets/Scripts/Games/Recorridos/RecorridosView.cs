@@ -44,7 +44,8 @@ public class RecorridosView : LevelView {
 
     private void Start()
     {
-        stackImages = new List<GameObject>();
+			nutTextCounter.text = "0";
+			stackImages = new List<GameObject>();
         for(int i = 0; i < instructionsStack.transform.childCount; i++)
         {
             stackImages.Add(instructionsStack.transform.GetChild(i).gameObject);
@@ -177,15 +178,17 @@ public class RecorridosView : LevelView {
 
     public void ResetGame()
     {
-		timerActive = false;
+//		timerActive = false;
         centralPuppetImage.sprite = puppetNeutral;
-        nutTextCounter.text = "0";
+//        nutTextCounter.text = "0";
 		
         MovingDown();
     }
 
 	override public void RestartGame(){
 			base.RestartGame ();
+			timerActive = false;
+			nutTextCounter.text = "0";
 			clockPlaca.SetActive(false);
 			ResetGame ();
 
@@ -266,7 +269,7 @@ public class RecorridosView : LevelView {
 
 			if(RecorridosController.instance.IsTimerDone()){
 				timerActive = false;
-				EndGame(60, 0, 1250);
+				EndGame(0, 0, 800);
 			}
 		}
 
