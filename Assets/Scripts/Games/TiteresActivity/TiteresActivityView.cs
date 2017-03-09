@@ -205,7 +205,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 				soundBtn.interactable = true;
 				puppetsCharacter.sprite = characterSprites [1];
 
-				EndGame(60, 0, 1250);
+				EndGame(0, 0, 800);
 			}
 		}
 
