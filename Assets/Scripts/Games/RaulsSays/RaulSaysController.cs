@@ -219,7 +219,7 @@ namespace Assets.Scripts.Games
         }
 
 		private void EndGame(){
-			view.EndGame (0, 0, 1250);
+			view.EndGame (0, 0, 800);
 		}
 
         private IEnumerator GetNextOption(RaulStage newStage, float timeToWait)

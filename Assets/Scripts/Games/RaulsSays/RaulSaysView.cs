@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Sound;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.Common;
 
 namespace Assets.Scripts.Games
 {
@@ -177,12 +178,16 @@ namespace Assets.Scripts.Games
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f, 0));
 
 
-            words[0].text = wordToShow[0];
-            words[1].text = "";
-            if (wordToShow.Length > 1)
-            {
-                words[1].text = wordToShow[1];
-            }
+			if (wordToShow.Length > 1) {
+				bool randomBool = Randomizer.RandomBoolean ();
+				words[0].text = wordToShow[randomBool ? 0 : 1];
+				words [1].text = wordToShow [randomBool ? 1 : 0];
+
+			} else {
+
+				words[0].text = wordToShow[0];
+				words[1].text = "";
+			}
             SetOptions(answer, restAnimalEnunciado, restAnimalResultado);
 
         }
@@ -204,20 +209,23 @@ namespace Assets.Scripts.Games
         public void ShowArrowOption(int answer, Sprite[] spriteToShow, Sprite[] restAnimalEnunciado, Sprite[] restAnimalResultado)
         {
 			PlaySignSound ();
-			firstArrowIndicator.color = Color.white;
-            firstArrowIndicator.sprite = spriteToShow[0];
 
             SetNeutralArms();
+
+			firstArrowIndicator.color = Color.white;
+			firstArrowIndicator.sprite = spriteToShow[0];
             leftArmGroup.transform.eulerAngles = new Vector3(0, 0, 60);
             StartCoroutine(Rotate(leftArmGroup, new Vector3(0, 0, -60), 0.3f,0));
 
-            if (spriteToShow.Length > 1)
-            {
-                secondArrowIndicator.color = Color.white;
-                secondArrowIndicator.sprite = spriteToShow[1];
-                rightArmGroup.transform.eulerAngles = new Vector3(0, 0, -60);
-                StartCoroutine(Rotate(rightArmGroup, new Vector3(0, 0, 60), 0.3f, 0));
-            }
+			if (spriteToShow.Length > 1) {
+				bool randomBool = Randomizer.RandomBoolean ();
+				firstArrowIndicator.sprite = spriteToShow[randomBool ? 0 : 1];
+
+				secondArrowIndicator.sprite = spriteToShow [randomBool ? 1 : 0];
+				secondArrowIndicator.color = Color.white;
+				rightArmGroup.transform.eulerAngles = new Vector3 (0, 0, -60);
+				StartCoroutine (Rotate (rightArmGroup, new Vector3 (0, 0, 60), 0.3f, 0));
+			} 
 
 
             SetOptions(answer, restAnimalEnunciado, restAnimalResultado);

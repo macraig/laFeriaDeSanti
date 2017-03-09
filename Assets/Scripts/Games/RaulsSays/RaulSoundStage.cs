@@ -3,6 +3,7 @@ using Assets.Scripts.Sound;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Common;
 using UnityEngine;
 
 public class RaulSoundStage : RaulStage
@@ -34,8 +35,9 @@ public class RaulSoundStage : RaulStage
         {
             List<AudioClip> audiosToPlay = new List<AudioClip>();
 
-            audiosToPlay.Add(soundsToPlay[random][0]);
-            audiosToPlay.Add(soundsToPlay[random][1]);
+			bool randomBool = Randomizer.RandomBoolean ();
+			audiosToPlay.Add(soundsToPlay[random][randomBool ? 0 : 1]);
+			audiosToPlay.Add(soundsToPlay[random][randomBool ? 1 : 0]);
 
             SoundController.GetController().ConcatenateAudios(audiosToPlay,null);
         }
