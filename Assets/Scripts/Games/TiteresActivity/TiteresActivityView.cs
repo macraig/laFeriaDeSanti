@@ -22,6 +22,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 		private List<AudioClip> audios;
 		private int currentRule, currentObjectLandscape;
 		bool timerActive,switchTime;
+
 		private TiteresActivityModel model;
 
 
@@ -54,8 +55,9 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		override public void Next(bool first = false){
 			if(model.GameEnded()) {
-				EndGame(60, 0, 1250);
+				EndGame(0, 0, 800);
 			} else {
+				model.Counter++;
 				ResetPuppets();
 				SetCurrentLevel();
 				CheckOk();

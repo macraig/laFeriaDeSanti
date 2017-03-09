@@ -18,11 +18,14 @@ public class TiteresActivityModel : LevelModel {
 	private bool withTime;
 	private Dictionary<string,AudioClip> positionsAudios, puppetsAudios, puppetsEndAudios;
 	private List<AudioClip> objectAudios;
-	private int currentLvl;
+	private int currentLvl, counter;
+
 	List<TiteresLevel> lvls;
+
 
 	public TiteresActivityModel() {
 		currentLvl = 0;
+		counter = 0;
 		timer = START_TIME;
 		withTime = false;
 		InitAudios ();
@@ -32,6 +35,12 @@ public class TiteresActivityModel : LevelModel {
 
 	public bool GameEnded(){
 		return currentLvl == lvls.Count;
+	}
+
+	public int Counter
+	{
+		get{return counter;}
+		set{counter = value;}
 	}
 
 	void InitAudios() {

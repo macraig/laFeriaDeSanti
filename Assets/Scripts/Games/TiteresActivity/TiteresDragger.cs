@@ -13,8 +13,10 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 	private bool droppedInLandscape;
 	//Position where dragger starts in screen.
 	private Vector3 initialPosition;
-	private int starterSpriteIndex;
+	private int starterSpriteIndex,clickCounter;
 	public List<Sprite> puppets;
+
+	public List<AudioClip> moveSounds, extraSounds,copyMoveSounds,copyExtraSounds;
 
 	public TiteresActivityView view;
 
@@ -23,6 +25,7 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 		droppedInLandscape = false;
 		puppets = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/TiteresActivity/puppets"));
 		starterSpriteIndex = puppets.IndexOf (GetComponent<Image> ().sprite);
+		clickCounter = 0;
 	}
 
 	public void SetActive(bool isActive){
@@ -76,6 +79,24 @@ public class TiteresDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 	}
 
 	public void ClickDragger(){
+		//Sounds
+		if (clickCounter < moveSounds.Count) {
+			if (copyMoveSounds.Count < 1) {
+				copyMoveSounds = new List<AudioClip>(moveSounds);
+			}
+			SoundController.GetController ().PlayClip (copyMoveSounds[0]);
+			copyMoveSounds.RemoveAt (0);
+			clickCounter++;	
+		} else {
+			clickCounter = 0;
+			if (copyExtraSounds.Count < 1) {
+				copyExtraSounds = new List<AudioClip>(extraSounds);
+			}
+			SoundController.GetController ().PlayClip (copyExtraSounds[0]);
+			copyExtraSounds.RemoveAt (0);
+		}
+
+
 		Sprite currentSprite = GetComponent<Image>().sprite;
 
 		int index = puppets.IndexOf(currentSprite);
