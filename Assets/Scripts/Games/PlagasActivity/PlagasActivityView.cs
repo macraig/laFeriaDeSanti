@@ -179,7 +179,7 @@ public class PlagasActivityView : LevelView {
 		timerActive = false;
 		switchTime = true;
 		placaTopos.SetActive (false);
-		lives.ForEach ((GameObject g) => g.SetActive (true));
+//		lives.ForEach ((GameObject g) => g.SetActive (true));
 		Begin();
 	}
 
@@ -201,7 +201,9 @@ public class PlagasActivityView : LevelView {
 		if(model.HasTime()){
 			if (switchTime) {
 				switchTime = false;
+
 				Invoke("ShowNextLevelAnimation",1);
+
 			} else {
 				topoCounter.gameObject.SetActive(true);
 				lives.ForEach ((GameObject g) => g.SetActive (true));
@@ -304,7 +306,7 @@ public class PlagasActivityView : LevelView {
 
 			if(model.NoMoreLives()){
 				timerActive = false;
-				EndGame(60, 0, 1250);
+				EndGame(0, 0, 800);
 			}
 		}
 	}

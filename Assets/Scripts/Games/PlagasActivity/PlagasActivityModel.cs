@@ -9,7 +9,7 @@ using Assets.Scripts.Common;
 public class PlagasActivityModel : LevelModel {
 	private const int TILES = 36;
 	//time is in seconds
-	public const int MOLE_TIME = 9, VEGETABLE_TO_MOLE = 2, SMACKED_MOLE_TO_HOLE = 5, VEGETABLES_IN_START = 2, MOLES_TO_NEXT_LEVEL = 5;
+	public const int MOLE_TIME = 15, VEGETABLE_TO_MOLE = 2, SMACKED_MOLE_TO_HOLE = 5, VEGETABLES_IN_START = 2, MOLES_TO_NEXT_LEVEL = 5;
 	private List<PlagaTile> tiles;
 	private int smackedMoles, lives;
 
