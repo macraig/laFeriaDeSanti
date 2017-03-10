@@ -21,6 +21,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		public void OnBeginDrag(PointerEventData eventData) {
 			if (active) {
+				this.transform.SetAsLastSibling ();
 				SoundController.GetController().PlayDragSound();
 				itemBeingDragged = this;
 

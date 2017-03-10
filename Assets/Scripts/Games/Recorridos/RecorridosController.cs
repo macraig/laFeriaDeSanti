@@ -8,7 +8,7 @@ namespace Assets.Scripts.Games.Recorridos
 {
     public class RecorridosController : MonoBehaviour
     {
-		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 1;
+		public const int START_TIME = 99, CORRECT_SCENE_TIME = 20,GAMES_BEFORE_TIME = 5;
 		private int timer, currentStartTime;
 
 		public float timeBetweenActions;
