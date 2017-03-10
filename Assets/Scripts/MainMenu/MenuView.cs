@@ -14,11 +14,12 @@ namespace Assets.Scripts.MainMenu {
       
 
         private List<GameButton> currentGames;
-
+		public List<Button> gameButtons;
 
         void Start() {
             
             currentGames = new List<GameButton>();
+			EnableGames (AppController.GetController().GetAppModel().GetGamesStatus());
            
         }
 
@@ -51,6 +52,12 @@ namespace Assets.Scripts.MainMenu {
              b.onClick.AddListener(() => OnClickGame(captured));
      */
         }
+
+		public void EnableGames(List<bool> gamesStatus){
+			for (int i = 0; i < gameButtons.Count; i++) {
+					gameButtons [i].interactable = gamesStatus [i];
+			}	
+		}
 
 		public void OnClickBack(){
 			ClickSound();

@@ -14,6 +14,9 @@ namespace Assets.Scripts.MainMenu
 
         public MenuView menuView;
         public GamePreview gamePreview;
+		public BlockPanel blockPanel;
+
+		private List<bool> gamesStatusList;
 
         [SerializeField]
         // numbering, geometry, ability, data
@@ -24,10 +27,6 @@ namespace Assets.Scripts.MainMenu
             else if (mainMenuController != this) Destroy(gameObject);
         }
 
-        void Start()
-        {
-        
-        }
 
         public static MainMenuController GetController()
         {
@@ -62,11 +61,20 @@ namespace Assets.Scripts.MainMenu
 //            {
 //                Destroy(animator.gameObject);
 //            }
-           
-
-
-           
+          
         }
+
+		public void ShowBlockPanel()
+		{
+			blockPanel.gameObject.SetActive (true);
+			blockPanel.SetStartState ();
+		}
+
+		public void EnableGames (List<bool> gamesStatus)
+		{
+			menuView.EnableGames (gamesStatus);
+			gamesStatusList = gamesStatus;
+		}
 
         internal void ShowSettings()
         {
