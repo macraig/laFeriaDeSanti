@@ -18,16 +18,19 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		bool timerActive,switchTime;
 		private int timeAnswers;
-		private List<Sprite> parts,transparentParts,lamps,puppetSprites;
+		private List<Sprite> parts,lamps,puppetSprites;
 		private int lampIndex;
 		private RompecabezasActivityModel model;
+	
+		private Part takenDragger;
+		private List<PartModel> levelDraggers;
 
 		public const int EMPTY_TILE = 26;
+		public Sprite baseTileSprite;
 
 		public void Start(){
 			model = new RompecabezasActivityModel();
 			parts = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/tiles"));
-			transparentParts = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/tiles2"));
 			lamps = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/lamps"));
 			puppetSprites = new List<Sprite>(Resources.LoadAll<Sprite>("Sprites/RompecabezasActivity/puppet"));
 			timeAnswers = 0;
@@ -42,12 +45,15 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		override public void Next(bool first = false){
 			if(model.GameEnded()) {
-				EndGame(60, 0, 1250);
+				EndGame(0, 0, 800);
 			} else {
 				puppetImage.sprite = puppetSprites [0];
 				lampIndex = Randomizer.RandomInRange (3)*2;
 				lampImage.sprite = lamps [lampIndex];
 				ResetTiles();
+				if (!first) {
+					ResetDraggers ();
+				}
 				SetCurrentLevel();
 			}
 		}
@@ -82,10 +88,11 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		}
 
 		void SetDraggers(List<PartModel> draggerParts) {
+			levelDraggers = draggerParts;
 			for(int i = 0; i < draggers.Count; i++) {
-				draggers[i].gameObject.SetActive(i < draggerParts.Count);
+				draggers[i].gameObject.SetActive(i < levelDraggers.Count);
 				if(i < draggerParts.Count){
-					draggers[i].SetModel(draggerParts[i], parts);
+					draggers[i].SetModel(levelDraggers[i], parts);
 				}
 			}
 
@@ -153,6 +160,20 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 				t.GetComponent<RompecabezasSlot>().EndSlot(false);
 				t.GetComponent<RompecabezasSlot>().StartSlot(false);
 			});
+		}
+
+		void ResetDraggers ()
+		{
+			for (int i = 0; i < draggers.Count; i++) {
+				if (i < levelDraggers.Count) {
+					if (!draggers [i].first) {
+						draggers [i].first = true;
+						draggers [i].ReturnToOriginalPosition ();
+					}
+					draggers [i].active = true;
+
+				}
+			}
 		}
 
 		public void OkClick() {
@@ -287,14 +308,45 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 
 		override public void RestartGame(){
 			base.RestartGame ();
+			ResetDraggers ();
 			ResetTiles();
+			timerActive = false;
+			switchTime = true;
+			clockPlaca.SetActive (false);
+
 			Start();
+		}
+
+		//ESTO SOLO ES CUANDO CAES EN UN SLOT, NO AFUERA
+		public void Dropped(Part dragger, RompecabezasSlot slot, int row, int column) {
+
+			dragger.SetPosition (slot.transform.position);
+			if(dragger.GetCurrentSlot()!=null)
+				ClearSlot (dragger.GetCurrentSlot ());
+
+			dragger.SetSlot (slot);
+			dragger.GetComponent<Button> ().interactable = true;
+			takenDragger = dragger;
+		}
+
+		public void ClearSlot(RompecabezasSlot slot){
+			if(slot)
+				slot.GetComponent<Image> ().sprite = baseTileSprite;
+		}
+
+		public void OnSelectedSlotClick(Part dragger){
+			if (dragger.WasDragged ()) {
+				ClearSlot (dragger.GetCurrentSlot());
+				dragger.ReturnToOriginalPosition ();
+
+			}
+
 		}
 
 		override public void OnWrongAnimationEnd(){
 			puppetImage.sprite = puppetSprites [0];
 			base.OnWrongAnimationEnd ();
-			if(model.HasTime())EndGame(0, 0, 1250);
+			if(model.HasTime())EndGame(0, 0, 800);
 		}
 
 		override public void EnableComponents(bool enable){
