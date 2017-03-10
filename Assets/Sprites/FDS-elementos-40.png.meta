@@ -1,15 +1,11 @@
 fileFormatVersion: 2
-guid: 016c96771eb6cbe4eb9cb52470b9b72f
-timeCreated: 1489151275
+guid: 196cb4e6bc825504eb2ba3bcf33fa69f
+timeCreated: 1489152305
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: TiteresActivity-06_0
-    21300002: TiteresActivity-06_1
-    21300004: TiteresActivity-06_2
-    21300006: puppetwinlose_0
-    21300008: puppetwinlose_1
-    21300010: puppetwinlose_2
+    21300000: FDS-elementos-40_0
+    21300002: FDS-elementos-40_1
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -84,39 +80,26 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: puppetwinlose_0
+      name: FDS-elementos-40_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 234
-        height: 691
+        width: 410.5
+        height: 174
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: puppetwinlose_1
+      name: FDS-elementos-40_1
       rect:
         serializedVersion: 2
-        x: 234
+        x: 410
         y: 0
-        width: 234
-        height: 691
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: puppetwinlose_2
-      rect:
-        serializedVersion: 2
-        x: 468
-        y: 0
-        width: 234
-        height: 691
+        width: 410.5
+        height: 174
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
