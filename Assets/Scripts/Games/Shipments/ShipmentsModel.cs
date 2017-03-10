@@ -32,7 +32,7 @@ namespace Assets.Scripts.Games.Shipments
             _nodes = new List<ShipmentNode>();
             _edges = new List<ShipmentEdge>();
             _solutionPaths = new List<ShipmentsPath>();
-            _currentLevel = 55;
+            _currentLevel = 0;
             lastCorrect = true;
             MetricsController.GetController().GameStart();
 

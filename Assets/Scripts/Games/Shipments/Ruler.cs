@@ -86,8 +86,8 @@ public class Ruler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     public void UnFix()
     {
-
         _isFixed = !_isFixed;
+        FixImage.gameObject.SetActive(_isFixed);
         RectTransform rectTransform = GetComponent<RectTransform>();
 
         if (_isFixed)
