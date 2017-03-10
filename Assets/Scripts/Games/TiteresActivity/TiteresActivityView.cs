@@ -7,7 +7,7 @@ using Assets.Scripts.Sound;
 
 namespace Assets.Scripts.Games.TiteresActivity {
 	public class TiteresActivityView : LevelView {
-		public Text clock, rules;
+		public Text clock, rules, tickets;
 		public Image clockImage;
 		public Button next, previous, okBtn, soundBtn;
 
@@ -28,6 +28,7 @@ namespace Assets.Scripts.Games.TiteresActivity {
 
 		public void Start(){
 			model = new TiteresActivityModel();
+			tickets.text = model.Counter.ToString ();
 			objects = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/objects");
 			characterSprites = Resources.LoadAll<Sprite>("Sprites/TiteresActivity/puppetWinLose");
 			landscapes = Resources.LoadAll<Material>("Sprites/TiteresActivity/Materials");
@@ -57,7 +58,8 @@ namespace Assets.Scripts.Games.TiteresActivity {
 			if(model.GameEnded()) {
 				EndGame(0, 0, 800);
 			} else {
-				model.Counter++;
+				
+
 				ResetPuppets();
 				SetCurrentLevel();
 				CheckOk();
@@ -197,6 +199,8 @@ namespace Assets.Scripts.Games.TiteresActivity {
 				//correct
 				SoundController.GetController ().SetConcatenatingAudios (false);
 				soundBtn.interactable = true;
+				model.Counter++;
+				tickets.text = model.Counter.ToString();
 				ShowRightAnswerAnimation();
 				model.CorrectTimer();
 				SetClock();
@@ -215,7 +219,8 @@ namespace Assets.Scripts.Games.TiteresActivity {
 				SoundController.GetController ().SetConcatenatingAudios (false);
 				soundBtn.interactable = true;
 				model.Correct();
-
+				model.Counter++;
+				tickets.text = model.Counter.ToString();
 				ShowRightAnswerAnimation();
 
 			} else {
