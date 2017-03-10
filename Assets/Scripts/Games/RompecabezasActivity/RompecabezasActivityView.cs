@@ -282,7 +282,7 @@ namespace Assets.Scripts.Games.RompecabezasActivity {
 		}
 
 		public Sprite PartSprite(int index){
-			return transparentParts[index];
+			return parts[index];
 		}
 
 		override public void RestartGame(){
