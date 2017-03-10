@@ -29,7 +29,7 @@ public class PlagasActivityView : LevelView {
 
 	override public void Next(bool first = false){
 		if(model.GameEnded()) {
-			EndGame(60, 0, 1250);
+			EndGame(60, 0, 800);
 		} else {
 			ClocksActive(false);
 			ResetTiles();
