@@ -25,13 +25,17 @@ namespace Assets.Scripts.Games.Shipments
         public Color FocusedColor;
         public Color UnfocusedColor;
         public Text ScaleText;
+        public Text TotalKmValue;
+
         private int _currentFocus;
         public Image StartPlace;
         public Image FinishPlace;
 
         public GameObject Player;
-        public Sprite[] PlayeSprites;
+        public Sprite[] PlayerSprites;
         private float _durationPerUnity = 0.5f;
+        public Sprite StartSpriteCell;
+
 
         public AudioClip BoatSound;
 
@@ -72,6 +76,14 @@ namespace Assets.Scripts.Games.Shipments
             attempsToGenerate = 0;
             _edgesAnswers = new List<ShipmentEdge>();
             ShowExplanation();
+            UpdateTotalKm();
+
+        }
+
+        private void UpdateTotalKm()
+        {
+            int sum = SumAllCellValues();
+            TotalKmValue.text = sum + " km";
         }
 
         public override void RestartGame()
@@ -125,13 +137,36 @@ namespace Assets.Scripts.Games.Shipments
                     cell.Value = int.Parse(uiText.text);
                 }
             }
-            
+            UpdateTotalKm();
+
+
+        }
+
+        private int SumAllCellValues()
+        {
+            int sum = 0;
+            foreach (GameObject answerRowGameObject in AnswerRowGameObjects)
+            {
+                foreach (ShipmentsAnswerCell cell in answerRowGameObject.GetComponentsInChildren<ShipmentsAnswerCell>())
+                {
+                    if (cell.Type == AnswerCellType.Numeric)
+                    {
+                        string text = cell.gameObject.GetComponentInChildren<Text>().text;
+                        if (text == "-") continue;
+
+                        sum += int.Parse(text);
+                    }
+                }
+            }
+            return sum;
         }
 
         public void OnClickClear()
         {
             SoundController.GetController().PlayTypingSound();
             GetCurrentAnswerCell().Clear();
+            UpdateTotalKm();
+
         }
 
         private ShipmentsAnswerCell GetCurrentAnswerCell()
@@ -161,6 +196,7 @@ namespace Assets.Scripts.Games.Shipments
         public override void Next(bool first = false)
         {
 
+            Player.gameObject.SetActive(false);
             attempsToGenerate = 0;
             if (!first) PlaySoundClick();
             EnableComponents(true);
@@ -207,6 +243,8 @@ namespace Assets.Scripts.Games.Shipments
             _currentGold = 0;
             TotalGoldText.text = "" + _totalGold;
             UpdateTryButton();
+            UpdateTotalKm();
+
         }
 
         private void SetPlayerToFirstPlace()
@@ -214,11 +252,12 @@ namespace Assets.Scripts.Games.Shipments
             MapPlace place = MapGenerator.Places.Find(e => e.Type == ShipmentNodeType.Start);
             Player.transform.position = place.transform.position;
             Player.GetComponent<Image>().sprite = GetNeutralBoatSprite();
+            Player.gameObject.SetActive(false);
         }
 
         private Sprite GetNeutralBoatSprite()
         {
-            return PlayeSprites[0];
+            return PlayerSprites[0];
         }
 
         private void ClearAnswers()
@@ -283,26 +322,29 @@ namespace Assets.Scripts.Games.Shipments
             {
                 SoundController.GetController().PlayTypingSound();
                 cell.Value = id;
-                cell.GetComponent<Image>().sprite = AnswerCellSprites[id];
+                cell.GetComponent<Image>().sprite = GetCellSprite(id, type);
                 List<ShipmentsAnswerCell> cells = GetAnswerCells();
                 if (type == ShipmentNodeType.Other && _currentFocus + 2 < cells.Count && _currentFocus%3 == 1)
                 {
                     ShipmentsAnswerCell cell2 = cells[_currentFocus + 2];
                     cell2.Value = id;
-                    cell2.GetComponent<Image>().sprite = AnswerCellSprites[id];
+                    cell2.GetComponent<Image>().sprite = GetCellSprite(id, type);
                 }
                 else if (type == ShipmentNodeType.Other && _currentFocus -2 > 0 && _currentFocus % 3 == 0)
                 {
                     ShipmentsAnswerCell cell2 = cells[_currentFocus - 2];
                     cell2.Value = id;
-                    cell2.GetComponent<Image>().sprite = AnswerCellSprites[id];
+                    cell2.GetComponent<Image>().sprite = GetCellSprite(id, type);
                 }
                 FocusNextEmptyCell();
 
             }
-
-
             
+        }
+
+        private Sprite GetCellSprite(int id, ShipmentNodeType type)
+        {
+            return type != ShipmentNodeType.Start ? AnswerCellSprites[id] : StartSpriteCell;
         }
 
         private void FocusNextEmptyCell()
@@ -354,6 +396,9 @@ namespace Assets.Scripts.Games.Shipments
 
         public void OnClickOk()
         {
+            Player.gameObject.SetActive(true);
+            MapGenerator.Ruler.gameObject.SetActive(false);
+            MapGenerator.Ruler.UnFix();
             EnableComponents(false);
             _edgesAnswers.Clear();
 
@@ -531,7 +576,7 @@ namespace Assets.Scripts.Games.Shipments
 
         private Sprite GetBrokenBoatSprite()
         {
-            return PlayeSprites[1];
+            return PlayerSprites[1];
         }
 
         private float GetDuration(int length)
